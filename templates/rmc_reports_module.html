@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports Module - RMC Plant ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --text-light: #ecf0f1;
+            --text-muted: #95a5a6;
+            --border-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Main Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        /* Sidebar - Report Categories */
+        .sidebar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .report-category {
+            margin-bottom: 20px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .category-header:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateX(5px);
+        }
+
+        .category-header.active {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+        }
+
+        .category-icon {
+            font-size: 20px;
+        }
+
+        .category-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .category-items {
+            padding-left: 42px;
+            display: none;
+        }
+
+        .category-items.active {
+            display: block;
+        }
+
+        .report-item {
+            padding: 10px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .report-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--text-light);
+            transform: translateX(5px);
+        }
+
+        .report-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        /* Main Content Area */
+        .content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Report Generator Section */
+        .report-generator {
+            background: rgba(52, 152, 219, 0.05);
+            border: 2px dashed var(--secondary-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .generator-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-light);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-input,
+        .form-select {
+            padding: 12px 15px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #229954);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d68910);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: #34495e;
+        }
+
+        /* Report Format Selection */
+        .format-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .format-card {
+            background: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .format-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .format-card.selected {
+            border-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .format-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .format-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .format-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Dual Rate Section */
+        .dual-rate-card {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .dual-rate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dual-rate-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .rate-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--secondary-color);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--secondary-color);
+        }
+
+        .rate-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .rate-box {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .rate-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .rate-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .rate-difference {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 13px;
+            color: var(--success-color);
+        }
+
+        /* Invoice Generation */
+        .invoice-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .deliveries-table {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-btn {
+            padding: 6px 12px;
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .table-btn:hover {
+            opacity: 0.8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(44, 62, 80, 0.3);
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .checkbox-cell {
+            width: 40px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-unbilled {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-billed {
+            background: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        /* Rate Management Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Rate Management Table */
+        .rate-management-table {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .rate-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr 1fr 100px;
+            gap: 15px;
+            padding: 15px 20px;
+            align-items: center;
+            border-bottom: 1px solid rgba(44, 62, 80, 0.3);
+        }
+
+        .rate-row:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .rate-row.header {
+            background: rgba(52, 152, 219, 0.1);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .rate-input {
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .rate-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .rate-diff {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .rate-diff.positive {
+            color: var(--success-color);
+        }
+
+        /* Export Options */
+        .export-section {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid var(--success-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .export-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--success-color);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            background: var(--bg-dark);
+            border: 2px solid var(--success-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            background: var(--success-color);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .format-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                    <span>›</span>
+                    <span>Reports Module</span>
+                </div>
+                <h1>
+                    <div class="header-icon">📊</div>
+                    Reports & Analytics
+                </h1>
+            </div>
+            <button class="btn btn-primary" onclick="window.location.href='/rmc_erp_full_layout.html'">
+                ← Back to Dashboard
+            </button>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Sidebar - Report Categories -->
+            <div class="sidebar">
+                <div class="sidebar-title">📁 Report Categories</div>
+
+                <!-- Production Reports -->
+                <div class="report-category">
+                    <div class="category-header active" onclick="toggleCategory(this)">
+                        <span class="category-icon">📈</span>
+                        <span class="category-name">Production Reports</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items active">
+                        <div class="report-item active" onclick="loadReport('daily-production')">Daily Production</div>
+                        <div class="report-item" onclick="loadReport('grade-wise')">Grade-wise Production</div>
+                        <div class="report-item" onclick="loadReport('party-wise-production')">Party-wise Production</div>
+                        <div class="report-item" onclick="loadReport('time-wise')">Time-wise Production</div>
+                    </div>
+                </div>
+
+                <!-- Financial Reports -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">💰</span>
+                        <span class="category-name">Financial Reports</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="loadReport('revenue')">Revenue Report</div>
+                        <div class="report-item" onclick="loadReport('rate-analysis')">Rate Analysis</div>
+                        <div class="report-item" onclick="loadReport('outstanding')">Outstanding Report</div>
+                        <div class="report-item" onclick="loadReport('payment-collection')">Payment Collection</div>
+                    </div>
+                </div>
+
+                <!-- Party Reports -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">👥</span>
+                        <span class="category-name">Party Reports</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="loadReport('party-ledger')">Party Ledger</div>
+                        <div class="report-item" onclick="loadReport('party-statement')">Party Statement</div>
+                        <div class="report-item" onclick="loadReport('party-wise-rates')">Party-wise Rates</div>
+                    </div>
+                </div>
+
+                <!-- Invoice Generation -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">🧾</span>
+                        <span class="category-name">Invoice Generation</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="loadReport('generate-invoice')">Generate Invoice</div>
+                        <div class="report-item" onclick="loadReport('invoice-list')">View Invoices</div>
+                        <div class="report-item" onclick="loadReport('proforma')">Proforma Invoice</div>
+                    </div>
+                </div>
+
+                <!-- Quality Reports -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">✅</span>
+                        <span class="category-name">Quality Reports</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="loadReport('grade-variance')">Grade Variance</div>
+                        <div class="report-item" onclick="loadReport('quantity-variance')">Quantity Variance</div>
+                    </div>
+                </div>
+
+                <!-- Operational Reports -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">🚚</span>
+                        <span class="category-name">Operational Reports</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="loadReport('vehicle-utilization')">Vehicle Utilization</div>
+                        <div class="report-item" onclick="loadReport('site-wise')">Site-wise Delivery</div>
+                    </div>
+                </div>
+
+                <!-- Rate Management -->
+                <div class="report-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">💱</span>
+                        <span class="category-name">Rate Management</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="report-item" onclick="openRateManagement()">Party Rate Master</div>
+                        <div class="report-item" onclick="loadReport('rate-history')">Rate History</div>
+                        <div class="report-item" onclick="loadReport('rate-comparison')">Rate Comparison</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content">
+                <!-- Report Generator -->
+                <div class="report-generator">
+                    <h2 class="generator-title">📊 Daily Production Report</h2>
+
+                    <!-- Dual Rate System -->
+                    <div class="dual-rate-card">
+                        <div class="dual-rate-header">
+                            <div class="dual-rate-title">💱 Dual Rate System</div>
+                            <div class="rate-toggle">
+                                <button class="toggle-btn active">Internal View</button>
+                                <button class="toggle-btn">Party View</button>
+                                <button class="toggle-btn">Comparison</button>
+                            </div>
+                        </div>
+                        <div class="rate-comparison">
+                            <div class="rate-box">
+                                <div class="rate-label">Internal Revenue</div>
+                                <div class="rate-value">₹74,900</div>
+                                <div class="rate-difference">Company Books</div>
+                            </div>
+                            <div class="rate-box">
+                                <div class="rate-label">Party Revenue</div>
+                                <div class="rate-value">₹77,640</div>
+                                <div class="rate-difference">Customer Billing</div>
+                            </div>
+                            <div class="rate-box">
+                                <div class="rate-label">Extra Earnings</div>
+                                <div class="rate-value">₹2,740</div>
+                                <div class="rate-difference">
+                                    ↑ Rate Difference
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">📅 Date From</label>
+                            <input type="date" class="form-input" value="2026-01-01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">📅 Date To</label>
+                            <input type="date" class="form-input" value="2026-01-24">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">👥 Party</label>
+                            <select class="form-select">
+                                <option>All Parties</option>
+                                <option>ABC Constructions</option>
+                                <option>PQR Builders</option>
+                                <option>XYZ Infrastructure</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🏗️ Grade</label>
+                            <select class="form-select">
+                                <option>All Grades</option>
+                                <option>M20</option>
+                                <option>M25</option>
+                                <option>M30</option>
+                                <option>M40</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Report Format Selection -->
+                    <div class="section-title">📄 Select Report Format</div>
+                    <div class="format-selection">
+                        <div class="format-card selected">
+                            <div class="format-icon">📝</div>
+                            <div class="format-name">Challan-wise Detail</div>
+                            <div class="format-desc">Complete challan details</div>
+                        </div>
+                        <div class="format-card">
+                            <div class="format-icon">📅</div>
+                            <div class="format-name">Date-wise Grouped</div>
+                            <div class="format-desc">Grouped by date</div>
+                        </div>
+                        <div class="format-card">
+                            <div class="format-icon">🏗️</div>
+                            <div class="format-name">Grade-wise Grouped</div>
+                            <div class="format-desc">Grouped by grade</div>
+                        </div>
+                        <div class="format-card">
+                            <div class="format-icon">📍</div>
+                            <div class="format-name">Site-wise Grouped</div>
+                            <div class="format-desc">Grouped by site</div>
+                        </div>
+                        <div class="format-card">
+                            <div class="format-icon">📊</div>
+                            <div class="format-name">Consolidated Summary</div>
+                            <div class="format-desc">Summary only</div>
+                        </div>
+                        <div class="format-card">
+                            <div class="format-icon">🔀</div>
+                            <div class="format-name">Date + Grade Combined</div>
+                            <div class="format-desc">Multi-level grouping</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="generateReport()">
+                            <span>🔍</span> Generate Report
+                        </button>
+                        <button class="btn btn-success" onclick="previewReport()">
+                            <span>👁️</span> Preview
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span>⚙️</span> Save as Template
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invoice Generation Section -->
+                <div class="invoice-section">
+                    <h2 class="section-title">
+                        <span>🧾</span> Generate Invoice
+                    </h2>
+
+                    <!-- Party Selection -->
+                    <div class="form-grid" style="margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Select Party</label>
+                            <select class="form-select" onchange="loadUnbilledDeliveries()">
+                                <option>-- Select Party --</option>
+                                <option selected>ABC Constructions</option>
+                                <option>PQR Builders</option>
+                                <option>XYZ Infrastructure</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Invoice Date</label>
+                            <input type="date" class="form-input" value="2026-01-24">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Invoice Number</label>
+                            <input type="text" class="form-input" value="INV/2025-26/0042" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Unbilled Deliveries Table -->
+                    <div class="deliveries-table">
+                        <div class="table-header">
+                            <div class="table-title">📦 Unbilled Deliveries - ABC Constructions</div>
+                            <div class="table-actions">
+                                <button class="table-btn" onclick="selectAll()">Select All</button>
+                                <button class="table-btn" onclick="unselectAll()">Clear All</button>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">
+                                        <input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th>Date</th>
+                                    <th>Challan No</th>
+                                    <th>Grade</th>
+                                    <th>Qty (cum)</th>
+                                    <th>Internal Rate</th>
+                                    <th>Party Rate</th>
+                                    <th>Party Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="delivery-check" checked>
+                                    </td>
+                                    <td>18-01-2026</td>
+                                    <td>CHL002540</td>
+                                    <td>M30</td>
+                                    <td>5.00</td>
+                                    <td>₹5,000</td>
+                                    <td>₹5,200</td>
+                                    <td><strong>₹26,000</strong></td>
+                                    <td><span class="status-badge status-unbilled">Unbilled</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="delivery-check" checked>
+                                    </td>
+                                    <td>19-01-2026</td>
+                                    <td>CHL002541</td>
+                                    <td>M30</td>
+                                    <td>6.00</td>
+                                    <td>₹5,000</td>
+                                    <td>₹5,200</td>
+                                    <td><strong>₹31,200</strong></td>
+                                    <td><span class="status-badge status-unbilled">Unbilled</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="delivery-check" checked>
+                                    </td>
+                                    <td>20-01-2026</td>
+                                    <td>CHL002545</td>
+                                    <td>M25</td>
+                                    <td>4.50</td>
+                                    <td>₹4,800</td>
+                                    <td>₹5,000</td>
+                                    <td><strong>₹22,500</strong></td>
+                                    <td><span class="status-badge status-unbilled">Unbilled</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="delivery-check" checked>
+                                    </td>
+                                    <td>21-01-2026</td>
+                                    <td>CHL002550</td>
+                                    <td>M30</td>
+                                    <td>5.50</td>
+                                    <td>₹5,000</td>
+                                    <td>₹5,200</td>
+                                    <td><strong>₹28,600</strong></td>
+                                    <td><span class="status-badge status-unbilled">Unbilled</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="delivery-check">
+                                    </td>
+                                    <td>22-01-2026</td>
+                                    <td>CHL002555</td>
+                                    <td>M40</td>
+                                    <td>3.00</td>
+                                    <td>₹5,500</td>
+                                    <td>₹5,800</td>
+                                    <td><strong>₹17,400</strong></td>
+                                    <td><span class="status-badge status-unbilled">Unbilled</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Invoice Summary -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-label">Selected Items</div>
+                            <div class="summary-value">4</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Total Quantity</div>
+                            <div class="summary-value">21.00 cum</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Subtotal</div>
+                            <div class="summary-value">₹1,08,300</div>
+                        </div>
+                        <div class="summary-card" style="border-left-color: var(--warning-color);">
+                            <div class="summary-label">GST @18%</div>
+                            <div class="summary-value">₹19,494</div>
+                        </div>
+                        <div class="summary-card" style="border-left-color: var(--success-color);">
+                            <div class="summary-label">Grand Total</div>
+                            <div class="summary-value">₹1,27,794</div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Actions -->
+                    <div class="button-group" style="margin-top: 25px;">
+                        <button class="btn btn-primary" onclick="generateInvoice()">
+                            <span>🧾</span> Generate Invoice
+                        </button>
+                        <button class="btn btn-success" onclick="previewInvoice()">
+                            <span>👁️</span> Preview Invoice
+                        </button>
+                        <button class="btn btn-warning" onclick="saveAsDraft()">
+                            <span>💾</span> Save as Draft
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-section">
+                    <div class="export-title">📤 Export & Share Options</div>
+                    <div class="export-options">
+                        <button class="export-btn" onclick="exportPDF()">
+                            <span>📄</span> Export to PDF
+                        </button>
+                        <button class="export-btn" onclick="exportExcel()">
+                            <span>📊</span> Export to Excel
+                        </button>
+                        <button class="export-btn" onclick="sendEmail()">
+                            <span>📧</span> Send via Email
+                        </button>
+                        <button class="export-btn" onclick="sendWhatsApp()">
+                            <span>💬</span> Send via WhatsApp
+                        </button>
+                        <button class="export-btn" onclick="printReport()">
+                            <span>🖨️</span> Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rate Management Modal -->
+    <div class="modal" id="rateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💱 Party Rate Management - ABC Constructions</h2>
+                <button class="modal-close" onclick="closeRateManagement()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="rate-management-table">
+                    <div class="rate-row header">
+                        <div>Grade</div>
+                        <div>Internal Rate</div>
+                        <div>Party Rate</div>
+                        <div>Difference</div>
+                        <div>Action</div>
+                    </div>
+                    <div class="rate-row">
+                        <div><strong>M20</strong></div>
+                        <div>
+                            <input type="number" class="rate-input" value="4500" readonly>
+                        </div>
+                        <div>
+                            <input type="number" class="rate-input" value="4700">
+                        </div>
+                        <div class="rate-diff positive">+₹200</div>
+                        <div>
+                            <button class="table-btn">Save</button>
+                        </div>
+                    </div>
+                    <div class="rate-row">
+                        <div><strong>M25</strong></div>
+                        <div>
+                            <input type="number" class="rate-input" value="4800" readonly>
+                        </div>
+                        <div>
+                            <input type="number" class="rate-input" value="5000">
+                        </div>
+                        <div class="rate-diff positive">+₹200</div>
+                        <div>
+                            <button class="table-btn">Save</button>
+                        </div>
+                    </div>
+                    <div class="rate-row">
+                        <div><strong>M30</strong></div>
+                        <div>
+                            <input type="number" class="rate-input" value="5000" readonly>
+                        </div>
+                        <div>
+                            <input type="number" class="rate-input" value="5200">
+                        </div>
+                        <div class="rate-diff positive">+₹200</div>
+                        <div>
+                            <button class="table-btn">Save</button>
+                        </div>
+                    </div>
+                    <div class="rate-row">
+                        <div><strong>M40</strong></div>
+                        <div>
+                            <input type="number" class="rate-input" value="5500" readonly>
+                        </div>
+                        <div>
+                            <input type="number" class="rate-input" value="5800">
+                        </div>
+                        <div class="rate-diff positive">+₹300</div>
+                        <div>
+                            <button class="table-btn">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 25px;">
+                    <button class="btn btn-primary" onclick="saveAllRates()">
+                        <span>💾</span> Save All Changes
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeRateManagement()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Toggle Category
+        function toggleCategory(element) {
+            const items = element.nextElementSibling;
+            const isActive = items.classList.contains('active');
+            
+            // Close all categories
+            document.querySelectorAll('.category-items').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.category-header').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Open clicked category
+            if (!isActive) {
+                items.classList.add('active');
+                element.classList.add('active');
+            }
+        }
+
+        // Load Report
+        function loadReport(reportType) {
+            // Remove active class from all items
+            document.querySelectorAll('.report-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            event.target.classList.add('active');
+            
+            showToast(`Loading ${reportType} report...`);
+            
+            // Simulate loading
+            setTimeout(() => {
+                showToast(`${reportType} report loaded successfully!`);
+            }, 1000);
+        }
+
+        // Generate Report
+        function generateReport() {
+            showToast('Generating report... Please wait');
+            setTimeout(() => {
+                showToast('✅ Report generated successfully!');
+            }, 2000);
+        }
+
+        // Preview Report
+        function previewReport() {
+            showToast('Opening report preview...');
+            setTimeout(() => {
+                window.open('about:blank', '_blank');
+            }, 500);
+        }
+
+        // Generate Invoice
+        function generateInvoice() {
+            const checkedBoxes = document.querySelectorAll('.delivery-check:checked').length;
+            if (checkedBoxes === 0) {
+                showToast('❌ Please select at least one delivery!');
+                return;
+            }
+            
+            showToast('Generating invoice... Please wait');
+            setTimeout(() => {
+                showToast('✅ Invoice INV/2025-26/0042 generated successfully!');
+            }, 2000);
+        }
+
+        // Preview Invoice
+        function previewInvoice() {
+            const checkedBoxes = document.querySelectorAll('.delivery-check:checked').length;
+            if (checkedBoxes === 0) {
+                showToast('❌ Please select at least one delivery!');
+                return;
+            }
+            
+            showToast('Opening invoice preview...');
+            setTimeout(() => {
+                window.open('about:blank', '_blank');
+            }, 500);
+        }
+
+        // Save as Draft
+        function saveAsDraft() {
+            showToast('💾 Invoice saved as draft');
+        }
+
+        // Select All Deliveries
+        function selectAll() {
+            document.querySelectorAll('.delivery-check').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            document.getElementById('selectAllCheck').checked = true;
+            showToast('All deliveries selected');
+        }
+
+        // Unselect All
+        function unselectAll() {
+            document.querySelectorAll('.delivery-check').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('selectAllCheck').checked = false;
+            showToast('All deliveries unselected');
+        }
+
+        // Toggle Select All
+        function toggleSelectAll() {
+            const isChecked = document.getElementById('selectAllCheck').checked;
+            document.querySelectorAll('.delivery-check').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        }
+
+        // Load Unbilled Deliveries
+        function loadUnbilledDeliveries() {
+            showToast('Loading unbilled deliveries...');
+            setTimeout(() => {
+                showToast('✅ Deliveries loaded!');
+            }, 1000);
+        }
+
+        // Export Functions
+        function exportPDF() {
+            showToast('📄 Exporting to PDF...');
+            setTimeout(() => {
+                showToast('✅ PDF exported successfully!');
+            }, 1500);
+        }
+
+        function exportExcel() {
+            showToast('📊 Exporting to Excel...');
+            setTimeout(() => {
+                showToast('✅ Excel file exported successfully!');
+            }, 1500);
+        }
+
+        function sendEmail() {
+            showToast('📧 Opening email composer...');
+            setTimeout(() => {
+                showToast('✅ Email sent successfully!');
+            }, 2000);
+        }
+
+        function sendWhatsApp() {
+            showToast('💬 Opening WhatsApp...');
+            setTimeout(() => {
+                showToast('✅ Message sent via WhatsApp!');
+            }, 2000);
+        }
+
+        function printReport() {
+            showToast('🖨️ Opening print dialog...');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // Rate Management
+        function openRateManagement() {
+            document.getElementById('rateModal').classList.add('active');
+        }
+
+        function closeRateManagement() {
+            document.getElementById('rateModal').classList.remove('active');
+        }
+
+        function saveAllRates() {
+            showToast('💾 Saving all rates...');
+            setTimeout(() => {
+                showToast('✅ All rates saved successfully!');
+                closeRateManagement();
+            }, 1500);
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Format Card Selection
+        document.querySelectorAll('.format-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.format-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                showToast('Report format selected: ' + this.querySelector('.format-name').textContent);
+            });
+        });
+
+        // Rate Toggle Buttons
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.toggle-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                showToast('View changed to: ' + this.textContent);
+            });
+        });
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('rateModal');
+            if (event.target === modal) {
+                closeRateManagement();
+            }
+        }
+    </script>
+</body>
+</html>

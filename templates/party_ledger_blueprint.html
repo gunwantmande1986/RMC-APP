@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Ledger - Professional Edition</title>
+    <style>
+        /* ============================================
+           🎨 PROFESSIONAL PARTY LEDGER - BLUEPRINT STYLE
+           ============================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            /* Blueprint Colors - EXACT MATCH WITH DASHBOARD */
+            --blueprint-bg: #0a1628;
+            --blueprint-secondary: #0f1e32;
+            --blueprint-card: #1a2942;
+            --blueprint-border: #4a6b8a;
+            
+            /* Technical Colors */
+            --cyan-bright: #00d9ff;
+            --green-tech: #00ff88;
+            --orange-tech: #ff9500;
+            --yellow-tech: #ffe600;
+            --red-tech: #ff3366;
+            --blue-tech: #4A90E2;
+            
+            /* Text Colors */
+            --text-white: #c8d9f0;
+            --text-cyan: #b8e6ff;
+            --text-muted: #7ab8d9;
+            
+            /* Grid */
+            --grid-fine: rgba(0, 217, 255, 0.05);
+            --grid-major: rgba(0, 217, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--blueprint-bg);
+            background-image: 
+                linear-gradient(var(--grid-fine) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px),
+                linear-gradient(var(--grid-major) 2px, transparent 2px),
+                linear-gradient(90deg, var(--grid-major) 2px, transparent 2px);
+            background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-white);
+            padding: 8px;
+            min-height: 100vh;
+        }
+
+        .ledger-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .ledger-header {
+            background: linear-gradient(135deg, var(--blueprint-secondary) 0%, var(--blueprint-card) 100%);
+            border: 2px solid var(--cyan-bright);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .company-info h1 {
+            font-size: 14px;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .company-info p {
+            font-size: 9px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        .ledger-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-tech);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--blueprint-card) 0%, var(--blueprint-secondary) 100%);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .summary-card .label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .summary-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-white);
+            line-height: 1.2;
+        }
+
+        .summary-card.debit .value { color: var(--red-tech); }
+        .summary-card.credit .value { color: var(--green-tech); }
+        .summary-card.balance .value { color: var(--cyan-bright); }
+        .summary-card.opening .value { color: var(--yellow-tech); }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .filter-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--cyan-bright);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 10px;
+            color: var(--text-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            background: var(--blueprint-card);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 5px;
+            padding: 8px 10px;
+            color: var(--text-white);
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            line-height: 1.3;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        .filter-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--blueprint-card);
+            border: 2px solid var(--cyan-bright);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 16px rgba(0, 217, 255, 0.3);
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--blueprint-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: rgba(0, 217, 255, 0.15);
+        }
+
+        .autocomplete-item-left {
+            flex: 1;
+        }
+
+        .autocomplete-item-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--cyan-bright);
+            margin-bottom: 2px;
+        }
+
+        .autocomplete-item-details {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .autocomplete-item-badge {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .autocomplete-item-badge.customer {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-tech);
+            border: 1px solid var(--green-tech);
+        }
+
+        .autocomplete-item-badge.supplier {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--cyan-bright);
+            border: 1px solid var(--cyan-bright);
+        }
+
+        .autocomplete-no-results {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        /* Action Buttons - COMPACT */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: 2px solid;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            line-height: 1.2;
+        }
+
+        .btn-primary {
+            background: var(--cyan-bright);
+            border-color: var(--cyan-bright);
+            color: var(--blueprint-bg);
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--cyan-bright);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: var(--blueprint-border);
+            color: var(--text-white);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyan-bright);
+            color: var(--cyan-bright);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-success {
+            background: var(--green-tech);
+            border-color: var(--green-tech);
+            color: var(--blueprint-bg);
+        }
+
+        .btn-success:hover {
+            background: transparent;
+            color: var(--green-tech);
+        }
+
+        .btn-warning {
+            background: var(--orange-tech);
+            border-color: var(--orange-tech);
+            color: var(--blueprint-bg);
+        }
+
+        .btn-warning:hover {
+            background: transparent;
+            color: var(--orange-tech);
+        }
+
+        /* Party Info Section */
+        .party-info {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .party-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dashed var(--blueprint-border);
+        }
+
+        .info-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .info-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        /* Ledger Table */
+        .ledger-table-container {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--blueprint-card);
+            padding: 6px 10px;
+            border-bottom: 2px solid var(--cyan-bright);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 14px;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ledger-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .ledger-table thead th {
+            background: var(--blueprint-card);
+            color: var(--cyan-bright);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--blueprint-border);
+            line-height: 1.3;
+        }
+
+        .ledger-table thead th:first-child {
+            padding-left: 16px;
+        }
+
+        .ledger-table tbody tr {
+            border-bottom: 1px solid var(--blueprint-border);
+            transition: all 0.2s ease;
+            height: 36px;
+        }
+
+        .ledger-table tbody tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .ledger-table tbody td {
+            padding: 6px 12px;
+            font-size: 11.5px;
+            color: var(--text-white);
+            line-height: 1.4;
+        }
+
+        .ledger-table tbody td:first-child {
+            padding-left: 16px;
+        }
+
+        /* Transaction Type Badges - COMPACT */
+        .type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .type-opening { background: var(--yellow-tech); color: var(--blueprint-bg); }
+        .type-sale { background: var(--green-tech); color: var(--blueprint-bg); }
+        .type-receipt { background: var(--blue-tech); color: white; }
+        .type-payment { background: var(--orange-tech); color: var(--blueprint-bg); }
+
+        /* Amount Columns - COMPACT */
+        .amount-debit {
+            color: var(--red-tech);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .amount-credit {
+            color: var(--green-tech);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .amount-balance {
+            color: var(--cyan-bright);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* Row Action Buttons */
+        .row-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .action-icon:hover {
+            border-color: var(--cyan-bright);
+            color: var(--cyan-bright);
+            transform: scale(1.1);
+        }
+
+        /* Footer Summary */
+        .ledger-footer {
+            background: var(--blueprint-card);
+            padding: 8px 12px;
+            border-top: 2px solid var(--cyan-bright);
+        }
+
+        .footer-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .footer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .footer-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .table-wrapper {
+                overflow-x: scroll;
+            }
+
+            /* Mobile - Slightly larger for touch */
+            .ledger-table tbody tr {
+                height: 42px;
+            }
+
+            .ledger-table tbody td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .ledger-table thead th {
+                padding: 10px 10px;
+                font-size: 11px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--cyan-bright);
+            font-size: 16px;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ledger-container">
+        <!-- Header -->
+        <div class="ledger-header">
+            <div class="header-top">
+                <div class="company-info">
+                    <h1>🏭 SKCON RMC PLANT</h1>
+                    <p>Site No. 5, Bandra West, Mumbai - 400050 | GST: 27XXXXX1234X1Z5</p>
+                </div>
+            </div>
+            <div class="ledger-title">📊 PARTY LEDGER ACCOUNT</div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card opening">
+                <div class="label">Opening Balance</div>
+                <div class="value" id="openingBalance">₹ 2,50,000.00</div>
+            </div>
+            <div class="summary-card debit">
+                <div class="label">Total Debit</div>
+                <div class="value" id="totalDebit">₹ 3,75,000.00</div>
+            </div>
+            <div class="summary-card credit">
+                <div class="label">Total Credit</div>
+                <div class="value" id="totalCredit">₹ 1,00,000.00</div>
+            </div>
+            <div class="summary-card balance">
+                <div class="label">Closing Balance</div>
+                <div class="value" id="closingBalance">₹ 5,25,000.00 Dr</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">🔍 Advanced Filters</div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Party Name</label>
+                    <div class="autocomplete-container">
+                        <input type="text" 
+                               id="partySearch" 
+                               placeholder="Type to search parties..." 
+                               value="ABC Constructions Pvt Ltd"
+                               autocomplete="off">
+                        <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>From Date</label>
+                    <input type="date" id="fromDate" value="2025-04-01">
+                </div>
+                <div class="filter-group">
+                    <label>To Date</label>
+                    <input type="date" id="toDate" value="2026-01-19">
+                </div>
+                <div class="filter-group">
+                    <label>Transaction Type</label>
+                    <select id="transactionType">
+                        <option value="all">All Transactions</option>
+                        <option value="sale">Sales Only</option>
+                        <option value="receipt">Receipts Only</option>
+                        <option value="payment">Payments Only</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Amount</label>
+                    <input type="number" id="minAmount" placeholder="0">
+                </div>
+                <div class="filter-group">
+                    <label>Max Amount</label>
+                    <input type="number" id="maxAmount" placeholder="Unlimited">
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="applyFilters()">🔎 Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">🔄 Reset</button>
+                <button class="btn btn-success" onclick="exportPDF()">📄 Export PDF</button>
+                <button class="btn btn-warning" onclick="exportExcel()">📊 Export Excel</button>
+                <button class="btn btn-secondary" onclick="emailLedger()">📧 Email Ledger</button>
+                <button class="btn btn-secondary" onclick="printLedger()">🖨️ Print</button>
+            </div>
+        </div>
+
+        <!-- Party Info -->
+        <div class="party-info">
+            <div class="party-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Party Name:</span>
+                    <span class="info-value">ABC Constructions Pvt Ltd</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value">Andheri East, Mumbai</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">GST Number:</span>
+                    <span class="info-value">27ABCDE1234F1Z5</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Period:</span>
+                    <span class="info-value">01-Apr-2025 to 19-Jan-2026</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="ledger-table-container">
+            <div class="table-header">
+                <h3>📋 Transaction Details</h3>
+                <div class="table-actions">
+                    <span style="color: var(--text-muted); font-size: 13px;">Total: <strong style="color: var(--cyan-bright);">4 Entries</strong></span>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="ledger-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Voucher No</th>
+                            <th>Type</th>
+                            <th>Particulars</th>
+                            <th style="text-align: right;">Debit (₹)</th>
+                            <th style="text-align: right;">Credit (₹)</th>
+                            <th style="text-align: right;">Balance (₹)</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01-04-2025</td>
+                            <td>-</td>
+                            <td><span class="type-badge type-opening">Opening</span></td>
+                            <td>Opening Balance B/F</td>
+                            <td style="text-align: right;" class="amount-debit">2,50,000.00</td>
+                            <td style="text-align: right;">-</td>
+                            <td style="text-align: right;" class="amount-balance">2,50,000.00 Dr</td>
+                            <td style="text-align: center;">
+                                <div class="row-actions">
+                                    <div class="action-icon" title="View Details">👁️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>15-04-2025</td>
+                            <td>INV-2025-001</td>
+                            <td><span class="type-badge type-sale">Sale</span></td>
+                            <td>M25 Grade - 50 CUM @ ₹4,500/CUM</td>
+                            <td style="text-align: right;" class="amount-debit">2,25,000.00</td>
+                            <td style="text-align: right;">-</td>
+                            <td style="text-align: right;" class="amount-balance">4,75,000.00 Dr</td>
+                            <td style="text-align: center;">
+                                <div class="row-actions">
+                                    <div class="action-icon" title="View Details">👁️</div>
+                                    <div class="action-icon" title="Download Invoice">📥</div>
+                                    <div class="action-icon" title="Print">🖨️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>20-04-2025</td>
+                            <td>RCT-001</td>
+                            <td><span class="type-badge type-receipt">Receipt</span></td>
+                            <td>Payment Received - Cheque No. 456789</td>
+                            <td style="text-align: right;">-</td>
+                            <td style="text-align: right;" class="amount-credit">1,00,000.00</td>
+                            <td style="text-align: right;" class="amount-balance">3,75,000.00 Dr</td>
+                            <td style="text-align: center;">
+                                <div class="row-actions">
+                                    <div class="action-icon" title="View Details">👁️</div>
+                                    <div class="action-icon" title="Download Receipt">📥</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>05-05-2025</td>
+                            <td>INV-2025-012</td>
+                            <td><span class="type-badge type-sale">Sale</span></td>
+                            <td>M30 Grade - 30 CUM @ ₹5,000/CUM</td>
+                            <td style="text-align: right;" class="amount-debit">1,50,000.00</td>
+                            <td style="text-align: right;">-</td>
+                            <td style="text-align: right;" class="amount-balance">5,25,000.00 Dr</td>
+                            <td style="text-align: center;">
+                                <div class="row-actions">
+                                    <div class="action-icon" title="View Details">👁️</div>
+                                    <div class="action-icon" title="Download Invoice">📥</div>
+                                    <div class="action-icon" title="Print">🖨️</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="ledger-footer">
+                <div class="footer-summary">
+                    <div class="footer-item">
+                        <span class="footer-label">Total Debit:</span>
+                        <span class="footer-value amount-debit">₹ 6,25,000.00</span>
+                    </div>
+                    <div class="footer-item">
+                        <span class="footer-label">Total Credit:</span>
+                        <span class="footer-value amount-credit">₹ 1,00,000.00</span>
+                    </div>
+                    <div class="footer-item">
+                        <span class="footer-label">Net Balance:</span>
+                        <span class="footer-value amount-balance">₹ 5,25,000.00 Dr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // PROFESSIONAL LEDGER FUNCTIONS
+        // ============================================
+
+        // Sample Party Database (simulating real data)
+        const partyDatabase = [
+            { id: 1, name: 'ABC Constructions Pvt Ltd', mobile: '9876543210', city: 'Mumbai', type: 'Customer', gst: '27AAACA1234A1Z5', balance: '2,50,000.00 Dr' },
+            { id: 2, name: 'AEPL Infrastructure Pvt Ltd', mobile: '9123456789', city: 'Mumbai', type: 'Customer', gst: '27AAACA2345B2Z6', balance: '4,75,000.00 Dr' },
+            { id: 3, name: 'Adarsh Petrolium', mobile: '9988776655', city: 'Pune', type: 'Supplier', gst: '27BBBCA3456C3Z7', balance: '1,25,000.00 Cr' },
+            { id: 4, name: 'Om Shiv Engineering', mobile: '9765432198', city: 'Nashik', type: 'Customer', gst: '27CCCCA4567D4Z8', balance: '75,000.00 Dr' },
+            { id: 5, name: 'Reliance Construction Ltd', mobile: '9112233445', city: 'Thane', type: 'Customer', gst: '27DDDCA5678E5Z9', balance: '5,67,800.00 Dr' },
+            { id: 6, name: 'Shree Cement Suppliers', mobile: '9223344556', city: 'Mumbai', type: 'Supplier', gst: '27EEECA6789F6Z0', balance: '3,45,000.00 Cr' },
+            { id: 7, name: 'Tata Projects Limited', mobile: '9334455667', city: 'Mumbai', type: 'Customer', gst: '27FFFCA7890G7Z1', balance: '12,50,000.00 Dr' },
+            { id: 8, name: 'Larsen & Toubro Ltd', mobile: '9445566778', city: 'Mumbai', type: 'Customer', gst: '27GGGCA8901H8Z2', balance: '8,90,000.00 Dr' },
+            { id: 9, name: 'Shapoorji Pallonji', mobile: '9556677889', city: 'Mumbai', type: 'Customer', gst: '27HHHCA9012I9Z3', balance: '6,75,000.00 Dr' },
+            { id: 10, name: 'Hindustan Construction', mobile: '9667788990', city: 'Mumbai', type: 'Customer', gst: '27IIICA0123J0Z4', balance: '4,25,000.00 Dr' }
+        ];
+
+        let selectedPartyIndex = -1;
+
+        function applyFilters() {
+            console.log('🔎 Applying filters...');
+            alert('✅ Filters Applied!\n\nShowing filtered results based on your selection.');
+        }
+
+        function resetFilters() {
+            document.getElementById('partySearch').value = 'ABC Constructions Pvt Ltd';
+            document.getElementById('fromDate').value = '2025-04-01';
+            document.getElementById('toDate').value = '2026-01-19';
+            document.getElementById('transactionType').value = 'all';
+            document.getElementById('minAmount').value = '';
+            document.getElementById('maxAmount').value = '';
+            closeAutocomplete();
+            console.log('🔄 Filters reset');
+            alert('🔄 Filters Reset!\n\nShowing all transactions.');
+        }
+
+        function exportPDF() {
+            console.log('📄 Exporting to PDF...');
+            alert('📄 PDF Export\n\nGenerating PDF report...\n✅ Download will start shortly!');
+        }
+
+        function exportExcel() {
+            console.log('📊 Exporting to Excel...');
+            alert('📊 Excel Export\n\nGenerating Excel spreadsheet...\n✅ Download will start shortly!');
+        }
+
+        function emailLedger() {
+            console.log('📧 Sending email...');
+            const email = prompt('📧 Email Ledger\n\nEnter recipient email address:');
+            if (email) {
+                alert(`✅ Email Sent!\n\nLedger report sent to: ${email}`);
+            }
+        }
+
+        function printLedger() {
+            console.log('🖨️ Printing ledger...');
+            window.print();
+        }
+
+        // Professional Autocomplete with Dropdown
+        const partyInput = document.getElementById('partySearch');
+        const dropdown = document.getElementById('autocompleteDropdown');
+
+        partyInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm.length < 2) {
+                closeAutocomplete();
+                return;
+            }
+
+            // Filter parties based on search
+            const filteredParties = partyDatabase.filter(party => 
+                party.name.toLowerCase().includes(searchTerm) ||
+                party.mobile.includes(searchTerm) ||
+                party.city.toLowerCase().includes(searchTerm) ||
+                party.gst.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredParties.length > 0) {
+                displayAutocomplete(filteredParties);
+            } else {
+                showNoResults();
+            }
+        });
+
+        function displayAutocomplete(parties) {
+            dropdown.innerHTML = parties.map((party, index) => `
+                <div class="autocomplete-item" data-index="${index}" onclick="selectParty(${party.id})">
+                    <div class="autocomplete-item-left">
+                        <div class="autocomplete-item-name">${party.name}</div>
+                        <div class="autocomplete-item-details">
+                            📱 ${party.mobile} • 📍 ${party.city} • 💰 Bal: ${party.balance}
+                        </div>
+                    </div>
+                    <span class="autocomplete-item-badge ${party.type.toLowerCase()}">${party.type}</span>
+                </div>
+            `).join('');
+            dropdown.classList.add('active');
+            selectedPartyIndex = -1;
+        }
+
+        function showNoResults() {
+            dropdown.innerHTML = '<div class="autocomplete-no-results">❌ No parties found matching your search</div>';
+            dropdown.classList.add('active');
+        }
+
+        function selectParty(partyId) {
+            const party = partyDatabase.find(p => p.id === partyId);
+            if (party) {
+                partyInput.value = party.name;
+                closeAutocomplete();
+                console.log('✅ Selected party:', party.name);
+                
+                // Update party info section
+                updatePartyInfo(party);
+            }
+        }
+
+        function updatePartyInfo(party) {
+            // This would update the party details section dynamically
+            console.log('📋 Updating party info for:', party.name);
+            alert(`✅ Party Selected!\n\nName: ${party.name}\nMobile: ${party.mobile}\nCity: ${party.city}\nType: ${party.type}\nBalance: ${party.balance}`);
+        }
+
+        function closeAutocomplete() {
+            dropdown.classList.remove('active');
+            selectedPartyIndex = -1;
+        }
+
+        // Keyboard navigation for autocomplete
+        partyInput.addEventListener('keydown', function(e) {
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            
+            if (items.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedPartyIndex = (selectedPartyIndex + 1) % items.length;
+                highlightItem(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedPartyIndex = selectedPartyIndex <= 0 ? items.length - 1 : selectedPartyIndex - 1;
+                highlightItem(items);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedPartyIndex >= 0 && items[selectedPartyIndex]) {
+                    items[selectedPartyIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                closeAutocomplete();
+            }
+        });
+
+        function highlightItem(items) {
+            items.forEach((item, index) => {
+                if (index === selectedPartyIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!partyInput.contains(e.target) && !dropdown.contains(e.target)) {
+                closeAutocomplete();
+            }
+        });
+
+        // Date range validation
+        document.getElementById('toDate').addEventListener('change', function() {
+            const fromDate = new Date(document.getElementById('fromDate').value);
+            const toDate = new Date(this.value);
+            
+            if (toDate < fromDate) {
+                alert('⚠️ Invalid Date Range\n\nTo Date cannot be earlier than From Date!');
+                this.value = document.getElementById('fromDate').value;
+            }
+        });
+
+        console.log('✅ Professional Party Ledger with Autocomplete Loaded!');
+    </script>
+</body>
+</html>

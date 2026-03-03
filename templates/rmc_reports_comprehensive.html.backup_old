@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMC Reports - Comprehensive System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .reports-container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .reports-header {
+            margin-bottom: 40px;
+        }
+
+        .reports-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .reports-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Report Categories */
+        .report-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .category-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .category-count {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Report Modal */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .report-modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #2c3e50;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 50px auto;
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 2px solid #34495e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #e74c3c;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Report Filters */
+        .report-filters {
+            background: #34495e;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-control {
+            background: #2c3e50;
+            border: 2px solid #445566;
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .filter-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #445566;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-info {
+            background: #3498db;
+            color: white;
+        }
+
+        /* Report Content */
+        .report-content {
+            background: #34495e;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .report-table thead {
+            background: #2c3e50;
+        }
+
+        .report-table th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #aaa;
+            border-bottom: 2px solid #445566;
+        }
+
+        .report-table td {
+            padding: 15px;
+            border-bottom: 1px solid #445566;
+            font-size: 14px;
+        }
+
+        .report-table tbody tr:hover {
+            background: #2c3e50;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .badge-warning {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+            border: 1px solid #f39c12;
+        }
+
+        .badge-danger {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .badge-info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .summary-card.orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .summary-card.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .summary-detail {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Chart Placeholder */
+        .chart-container {
+            background: #34495e;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+        }
+
+        /* Report List */
+        .report-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .report-item {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .report-item:hover {
+            background: #3d4e63;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .report-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .report-item-desc {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .report-item-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #445566;
+            margin-bottom: 25px;
+        }
+
+        .report-tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #aaa;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .report-tab:hover {
+            color: #fff;
+        }
+
+        .report-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .reports-container {
+                padding: 15px;
+            }
+
+            .report-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reports-container">
+        <div class="reports-header">
+            <h1>📊 Comprehensive Reports System</h1>
+            <p>Complete reporting suite for production, sales, rates, and financial analysis</p>
+        </div>
+
+        <!-- Report Categories -->
+        <div class="report-categories">
+            <!-- Production Reports -->
+            <div class="category-card" onclick="openReportCategory('production')">
+                <div class="category-icon">🏗️</div>
+                <div class="category-title">Production Reports</div>
+                <div class="category-desc">Daily production, grade-wise analysis, vehicle tracking, and efficiency metrics</div>
+                <div class="category-count">8 Reports Available</div>
+            </div>
+
+            <!-- Sales Reports -->
+            <div class="category-card" onclick="openReportCategory('sales')">
+                <div class="category-icon">💼</div>
+                <div class="category-title">Sales Reports</div>
+                <div class="category-desc">Party-wise sales, site-wise dispatch, revenue analysis, and trends</div>
+                <div class="category-count">6 Reports Available</div>
+            </div>
+
+            <!-- Rate Reports -->
+            <div class="category-card" onclick="openReportCategory('rate')">
+                <div class="category-icon">💹</div>
+                <div class="category-title">Rate Reports</div>
+                <div class="category-desc">Rate history, changes timeline, impact analysis, and comparison</div>
+                <div class="category-count">7 Reports Available</div>
+            </div>
+
+            <!-- Party Reports -->
+            <div class="category-card" onclick="openReportCategory('party')">
+                <div class="category-icon">👥</div>
+                <div class="category-title">Party Reports</div>
+                <div class="category-desc">Ledger, statements, outstanding, payment history, and summaries</div>
+                <div class="category-count">9 Reports Available</div>
+            </div>
+
+            <!-- Financial Reports -->
+            <div class="category-card" onclick="openReportCategory('financial')">
+                <div class="category-icon">💰</div>
+                <div class="category-title">Financial Reports</div>
+                <div class="category-desc">Revenue, profitability, cash flow, outstanding, and collection analysis</div>
+                <div class="category-count">5 Reports Available</div>
+            </div>
+
+            <!-- GST Reports -->
+            <div class="category-card" onclick="openReportCategory('gst')">
+                <div class="category-icon">🧾</div>
+                <div class="category-title">GST Reports</div>
+                <div class="category-desc">GSTR-1 data, tax summary, invoice register, and compliance reports</div>
+                <div class="category-count">4 Reports Available</div>
+            </div>
+
+            <!-- Cash vs Billing -->
+            <div class="category-card" onclick="openReportCategory('cashbilling')">
+                <div class="category-icon">⚖️</div>
+                <div class="category-title">Cash vs Billing Analysis</div>
+                <div class="category-desc">Compare cash and billing production, revenue mix, and trends</div>
+                <div class="category-count">3 Reports Available</div>
+            </div>
+
+            <!-- Dual Rate System -->
+            <div class="category-card" onclick="openReportCategory('dualrate')">
+                <div class="category-icon">🔐</div>
+                <div class="category-title">Dual Rate System</div>
+                <div class="category-desc">Internal profitability vs party reports (Admin only)</div>
+                <div class="category-count">4 Reports Available</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Production Reports Modal -->
+    <div id="productionModal" class="report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🏗️ Production Reports</div>
+                <div class="modal-close" onclick="closeModal('productionModal')">×</div>
+            </div>
+            <div class="modal-body">
+                <div class="report-list">
+                    <div class="report-item" onclick="showDailyProductionOptions()">
+                        <div class="report-item-title">📅 Daily Production Register</div>
+                        <div class="report-item-desc">Complete day-wise production with time, party, grade, quantity, and vehicle details</div>
+                        <div class="report-item-meta">
+                            <span>⏱️ Real-time</span>
+                            <span>📊 Detailed</span>
+                            <span>🖨️ Print Ready</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-grade')">
+                        <div class="report-item-title">🎯 Grade-wise Production</div>
+                        <div class="report-item-desc">M20, M25, M30, M40 production breakdown with quantities and percentages</div>
+                        <div class="report-item-meta">
+                            <span>📈 Analytics</span>
+                            <span>📊 Charts</span>
+                            <span>📥 Excel Export</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-vehicle')">
+                        <div class="report-item-title">🚛 Vehicle-wise Production</div>
+                        <div class="report-item-desc">Track trips by vehicle, driver efficiency, and utilization metrics</div>
+                        <div class="report-item-meta">
+                            <span>🚚 Fleet Tracking</span>
+                            <span>⚡ Efficiency</span>
+                            <span>📍 Route Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-shift')">
+                        <div class="report-item-title">⏰ Shift-wise Production</div>
+                        <div class="report-item-desc">Morning, afternoon, evening shift analysis with peak hours</div>
+                        <div class="report-item-meta">
+                            <span>🕐 Time Analysis</span>
+                            <span>📊 Peak Hours</span>
+                            <span>👷 Workforce</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-monthly')">
+                        <div class="report-item-title">📊 Monthly Production Summary</div>
+                        <div class="report-item-desc">Month-wise trends, comparisons, and growth analysis</div>
+                        <div class="report-item-meta">
+                            <span>📈 Trends</span>
+                            <span>📉 Comparison</span>
+                            <span>🎯 Targets</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-party')">
+                        <div class="report-item-title">👥 Party-wise Production</div>
+                        <div class="report-item-desc">Production supplied to each party with quantities and values</div>
+                        <div class="report-item-meta">
+                            <span>🏢 Customers</span>
+                            <span>💰 Revenue</span>
+                            <span>📊 Top Parties</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-site')">
+                        <div class="report-item-title">📍 Site-wise Dispatch</div>
+                        <div class="report-item-desc">Delivery locations analysis with quantities and frequencies</div>
+                        <div class="report-item-meta">
+                            <span>🗺️ Location</span>
+                            <span>📦 Dispatch</span>
+                            <span>🎯 Coverage</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('production-variance')">
+                        <div class="report-item-title">⚖️ Quantity Variance Report</div>
+                        <div class="report-item-desc">Ordered vs Delivered quantity differences with reasons</div>
+                        <div class="report-item-meta">
+                            <span>⚠️ Differences</span>
+                            <span>📋 Reasons</span>
+                            <span>🔍 Audit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rate Reports Modal -->
+    <div id="rateModal" class="report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💹 Rate Reports & Analysis</div>
+                <div class="modal-close" onclick="closeModal('rateModal')">×</div>
+            </div>
+            <div class="modal-body">
+                <div class="report-list">
+                    <div class="report-item" onclick="generateReport('rate-history')">
+                        <div class="report-item-title">📜 Rate Change History</div>
+                        <div class="report-item-desc">Complete timeline of all rate changes with old/new rates and reasons</div>
+                        <div class="report-item-meta">
+                            <span>📅 Timeline</span>
+                            <span>📊 All Changes</span>
+                            <span>✍️ Reasons</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-party-wise')">
+                        <div class="report-item-title">👥 Party-wise Rate Card</div>
+                        <div class="report-item-desc">Current rates for each party across all grades with effective dates</div>
+                        <div class="report-item-meta">
+                            <span>🏢 All Parties</span>
+                            <span>📋 Grade Rates</span>
+                            <span>📅 Effective Date</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-comparison')">
+                        <div class="report-item-title">🔄 Rate Comparison Report</div>
+                        <div class="report-item-desc">Compare rates across parties, identify highest/lowest, market positioning</div>
+                        <div class="report-item-meta">
+                            <span>📊 Comparison</span>
+                            <span>🎯 Market Position</span>
+                            <span>📈 Range Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-impact')">
+                        <div class="report-item-title">💰 Revenue Impact Analysis</div>
+                        <div class="report-item-desc">Financial impact of rate changes on revenue and profitability</div>
+                        <div class="report-item-meta">
+                            <span>💵 Revenue</span>
+                            <span>📈 Impact</span>
+                            <span>🎯 Projection</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-before-after')">
+                        <div class="report-item-title">⚖️ Before vs After Comparison</div>
+                        <div class="report-item-desc">Volume and revenue comparison before and after rate changes</div>
+                        <div class="report-item-meta">
+                            <span>📊 Volume</span>
+                            <span>💰 Revenue</span>
+                            <span>📉 Trends</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-timeline')">
+                        <div class="report-item-title">📅 Rate Change Timeline</div>
+                        <div class="report-item-desc">Chronological view of all rate changes with visual timeline</div>
+                        <div class="report-item-meta">
+                            <span>🗓️ Timeline</span>
+                            <span>👁️ Visual</span>
+                            <span>📍 Milestones</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('rate-audit')">
+                        <div class="report-item-title">🔍 Rate Audit Trail</div>
+                        <div class="report-item-desc">Complete audit log - who changed what, when, and approval status</div>
+                        <div class="report-item-meta">
+                            <span>👤 User Tracking</span>
+                            <span>✅ Approvals</span>
+                            <span>🔐 Compliance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Party Reports Modal -->
+    <div id="partyModal" class="report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👥 Party Reports</div>
+                <div class="modal-close" onclick="closeModal('partyModal')">×</div>
+            </div>
+            <div class="modal-body">
+                <div class="report-list">
+                    <div class="report-item" onclick="generateReport('party-ledger')">
+                        <div class="report-item-title">📒 Party Ledger (Detailed)</div>
+                        <div class="report-item-desc">Complete transaction history with challan-wise details and running balance</div>
+                        <div class="report-item-meta">
+                            <span>📋 All Transactions</span>
+                            <span>💰 Balance</span>
+                            <span>🖨️ Statement</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-summary-grade')">
+                        <div class="report-item-title">🎯 Grade-wise Summary</div>
+                        <div class="report-item-desc">Party consumption grouped by grade with quantities and amounts</div>
+                        <div class="report-item-meta">
+                            <span>📊 Grouped</span>
+                            <span>🎯 By Grade</span>
+                            <span>💵 Totals</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-summary-site')">
+                        <div class="report-item-title">📍 Site-wise Summary</div>
+                        <div class="report-item-desc">Party deliveries grouped by site/location with consumption details</div>
+                        <div class="report-item-meta">
+                            <span>🗺️ By Site</span>
+                            <span>📦 Deliveries</span>
+                            <span>📊 Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-summary-date')">
+                        <div class="report-item-title">📅 Date-wise Summary</div>
+                        <div class="report-item-desc">Daily/monthly summary of party transactions and payments</div>
+                        <div class="report-item-meta">
+                            <span>📆 Date Range</span>
+                            <span>📊 Summary</span>
+                            <span>💰 Totals</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-invoice-register')">
+                        <div class="report-item-title">📄 Invoice Register</div>
+                        <div class="report-item-desc">All invoices raised to party with GST details and payment status</div>
+                        <div class="report-item-meta">
+                            <span>🧾 Invoices</span>
+                            <span>📋 GST Details</span>
+                            <span>💳 Payment</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-outstanding')">
+                        <div class="report-item-title">💳 Outstanding Statement</div>
+                        <div class="report-item-desc">Pending invoices with aging analysis (0-30, 31-60, 60+ days)</div>
+                        <div class="report-item-meta">
+                            <span>⏰ Aging</span>
+                            <span>💰 Outstanding</span>
+                            <span>📊 Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-payment-history')">
+                        <div class="report-item-title">💰 Payment History</div>
+                        <div class="report-item-desc">All payments received from party with mode, date, and reference</div>
+                        <div class="report-item-meta">
+                            <span>💵 Payments</span>
+                            <span>📅 History</span>
+                            <span>🔍 Details</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-rate-history')">
+                        <div class="report-item-title">📊 Party Rate History</div>
+                        <div class="report-item-desc">Rate changes specific to this party over time</div>
+                        <div class="report-item-meta">
+                            <span>💹 Rates</span>
+                            <span>📈 Changes</span>
+                            <span>📅 Timeline</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('party-consumption-trend')">
+                        <div class="report-item-title">📈 Consumption Trend</div>
+                        <div class="report-item-desc">Monthly consumption pattern and growth analysis</div>
+                        <div class="report-item-meta">
+                            <span>📊 Trends</span>
+                            <span>📈 Growth</span>
+                            <span>🎯 Patterns</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dual Rate System Modal -->
+    <div id="dualrateModal" class="report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔐 Dual Rate System Reports (Admin Only)</div>
+                <div class="modal-close" onclick="closeModal('dualrateModal')">×</div>
+            </div>
+            <div class="modal-body">
+                <div style="background: rgba(231, 76, 60, 0.1); border: 2px solid #e74c3c; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>⚠️ Confidential Reports</strong><br>
+                    <small>These reports show both cost and billing rates. Only accessible to Admin users. Never share with parties.</small>
+                </div>
+
+                <div class="report-list">
+                    <div class="report-item" onclick="generateReport('dualrate-profitability')">
+                        <div class="report-item-title">💰 Profitability Analysis</div>
+                        <div class="report-item-desc">Cost vs Billing rate comparison with margin % and profit amounts</div>
+                        <div class="report-item-meta">
+                            <span>🔐 Internal Only</span>
+                            <span>💵 Margins</span>
+                            <span>📈 Profit</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('dualrate-party-profitability')">
+                        <div class="report-item-title">🏢 Party-wise Profitability</div>
+                        <div class="report-item-desc">Which parties are most profitable, margin analysis by customer</div>
+                        <div class="report-item-meta">
+                            <span>👥 By Party</span>
+                            <span>💰 Margins</span>
+                            <span>🎯 Top Profitable</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('dualrate-grade-profitability')">
+                        <div class="report-item-title">🎯 Grade-wise Profitability</div>
+                        <div class="report-item-desc">Which grades give best margins, cost vs selling price analysis</div>
+                        <div class="report-item-meta">
+                            <span>📊 By Grade</span>
+                            <span>💵 Best Margins</span>
+                            <span>📈 Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('dualrate-hidden-profit')">
+                        <div class="report-item-title">🔒 Hidden Profit Report</div>
+                        <div class="report-item-desc">Total hidden margins that parties don't see in their statements</div>
+                        <div class="report-item-meta">
+                            <span>🔐 Confidential</span>
+                            <span>💰 Hidden Margins</span>
+                            <span>📊 Total Profit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cash vs Billing Modal -->
+    <div id="cashbillingModal" class="report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">⚖️ Cash vs Billing Analysis</div>
+                <div class="modal-close" onclick="closeModal('cashbillingModal')">×</div>
+            </div>
+            <div class="modal-body">
+                <div class="report-list">
+                    <div class="report-item" onclick="generateReport('cashbilling-comparison')">
+                        <div class="report-item-title">📊 Cash vs Billing Comparison</div>
+                        <div class="report-item-desc">Side-by-side comparison of cash and billing production with percentages</div>
+                        <div class="report-item-meta">
+                            <span>⚖️ Comparison</span>
+                            <span>📊 Mix Analysis</span>
+                            <span>📈 Trends</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('cashbilling-revenue')">
+                        <div class="report-item-title">💰 Revenue Mix Analysis</div>
+                        <div class="report-item-desc">Revenue contribution from cash vs billing with growth rates</div>
+                        <div class="report-item-meta">
+                            <span>💵 Revenue</span>
+                            <span>📈 Growth</span>
+                            <span>🎯 Mix</span>
+                        </div>
+                    </div>
+
+                    <div class="report-item" onclick="generateReport('cashbilling-grade')">
+                        <div class="report-item-title">🎯 Grade-wise Cash vs Billing</div>
+                        <div class="report-item-desc">Which grades are preferred in cash vs billing segments</div>
+                        <div class="report-item-meta">
+                            <span>📊 By Grade</span>
+                            <span>⚖️ Preference</span>
+                            <span>📈 Pattern</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Production Type Selection Modal -->
+    <div id="dailyProductionTypeModal" class="report-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title">📅 Select Production Type</div>
+                <div class="modal-close" onclick="closeDailyProductionModal()">×</div>
+            </div>
+            <div class="modal-body">
+                <div style="padding: 20px 0;">
+                    <p style="color: #8aa4c4; margin-bottom: 30px; text-align: center;">Choose the type of production register you want to view:</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Cash Production -->
+                        <div class="production-type-card" onclick="openDailyProduction('cash')">
+                            <div class="type-icon" style="background: rgba(0, 255, 136, 0.1); color: #00FF88;">💵</div>
+                            <div class="type-title">Cash Production</div>
+                            <div class="type-desc">Non-GST transactions</div>
+                            <div class="type-features">
+                                <span>✓ Direct billing</span>
+                                <span>✓ No GST</span>
+                                <span>✓ Immediate payment</span>
+                            </div>
+                        </div>
+
+                        <!-- Billing/GST Production -->
+                        <div class="production-type-card" onclick="openDailyProduction('billing')">
+                            <div class="type-icon" style="background: rgba(33, 150, 243, 0.1); color: #2196F3;">📋</div>
+                            <div class="type-title">Billing Production</div>
+                            <div class="type-desc">GST transactions (18% GST)</div>
+                            <div class="type-features">
+                                <span>✓ GST invoice</span>
+                                <span>✓ CGST 9% + SGST 9%</span>
+                                <span>✓ Credit period</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .production-type-card {
+            background: linear-gradient(135deg, #1a2942 0%, #2a3f5f 100%);
+            border: 2px solid #2a3f5f;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .production-type-card:hover {
+            border-color: #00FF88;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .type-icon {
+            font-size: 40px;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .type-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .type-desc {
+            font-size: 13px;
+            color: #8aa4c4;
+            margin-bottom: 20px;
+        }
+
+        .type-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .type-features span {
+            font-size: 12px;
+            color: #8aa4c4;
+            text-align: left;
+        }
+    </style>
+
+    <script>
+        // Open report category modal
+        function openReportCategory(category) {
+            const modalMap = {
+                'production': 'productionModal',
+                'rate': 'rateModal',
+                'party': 'partyModal',
+                'dualrate': 'dualrateModal',
+                'cashbilling': 'cashbillingModal',
+                'sales': 'partyModal', // Using party modal as placeholder
+                'financial': 'partyModal', // Placeholder
+                'gst': 'partyModal' // Placeholder
+            };
+
+            const modalId = modalMap[category];
+            if (modalId) {
+                document.getElementById(modalId).classList.add('active');
+            }
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Generate report (placeholder)
+        function generateReport(reportType) {
+            // Map report types to their HTML files
+            const reportFiles = {
+                'production-daily': 'daily_production_register.html',
+                'production-grade': 'grade_wise_production.html',
+                'production-vehicle': 'vehicle_wise_production.html',
+                'production-shift': 'shift_wise_production.html',
+                'production-monthly': 'monthly_production_summary.html',
+                'production-party': 'party_wise_production.html',
+                'production-site': 'site_wise_dispatch.html',
+                'production-variance': 'quantity_variance_report.html'
+            };
+            
+            const reportFile = reportFiles[reportType];
+            
+            if (reportFile) {
+                // Load the report in parent iframe
+                if (window.parent && window.parent.document.querySelector('iframe')) {
+                    window.parent.document.querySelector('iframe').src = reportFile;
+                    // Close all modals
+                    document.querySelectorAll('.report-modal').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                } else {
+                    // Fallback: open in same window
+                    window.location.href = reportFile;
+                }
+            } else {
+                alert(`Report ${reportType} is under development.`);
+            }
+        }
+
+        // Show Daily Production type selection
+        function showDailyProductionOptions() {
+            // Close production modal first
+            closeModal('productionModal');
+            // Show type selection modal
+            document.getElementById('dailyProductionTypeModal').classList.add('active');
+        }
+
+        // Close Daily Production modal
+        function closeDailyProductionModal() {
+            document.getElementById('dailyProductionTypeModal').classList.remove('active');
+        }
+
+        // Open Daily Production with selected type
+        function openDailyProduction(type) {
+            closeDailyProductionModal();
+            
+            // Load appropriate register based on type
+            if (type === 'cash') {
+                // Cash production - non-GST
+                if (window.parent && window.parent.document.querySelector('iframe')) {
+                    window.parent.document.querySelector('iframe').src = 'daily_production_register.html?type=cash';
+                } else {
+                    window.location.href = 'daily_production_register.html?type=cash';
+                }
+            } else if (type === 'billing') {
+                // Billing production - GST (18% - CGST 9% + SGST 9%)
+                if (window.parent && window.parent.document.querySelector('iframe')) {
+                    window.parent.document.querySelector('iframe').src = 'billing_production_register.html';
+                } else {
+                    window.location.href = 'billing_production_register.html';
+                }
+            }
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.report-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Keyboard shortcut - ESC to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.report-modal').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

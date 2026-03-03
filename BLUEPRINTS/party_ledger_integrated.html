@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Party Ledger - Integrated View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            padding: 8px;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(74, 107, 138, 0.03) 49px, rgba(74, 107, 138, 0.03) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(74, 107, 138, 0.03) 49px, rgba(74, 107, 138, 0.03) 50px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ledger-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        .page-subtitle {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid #6a8aaa;
+            color: #c8d9f0;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+        }
+
+        .btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        /* Party Selection */
+        .party-selection {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .autocomplete-container {
+            position: relative;
+            max-width: 500px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 2px solid rgba(74, 107, 138, 0.4);
+            color: #c8d9f0;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6a8aaa;
+            background: rgba(10, 20, 40, 0.6);
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(15, 30, 50, 0.98);
+            border: 1px solid #6a8aaa;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(106, 138, 170, 0.2);
+        }
+
+        .autocomplete-item-name {
+            font-size: 14px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        .autocomplete-item-details {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-top: 3px;
+        }
+
+        /* Party Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        .summary-value.positive {
+            color: #90d090;
+        }
+
+        .summary-value.negative {
+            color: #d08090;
+        }
+
+        .summary-subtext {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-top: 6px;
+        }
+
+        /* Ledger Table */
+        .ledger-table-container {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .table-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c8d9f0;
+            text-transform: uppercase;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid rgba(106, 138, 170, 0.3);
+            color: #8aa4c4;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(10, 20, 40, 0.2);
+        }
+
+        .ledger-table thead {
+            background: rgba(15, 30, 50, 0.6);
+        }
+
+        .ledger-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a6b8a;
+            border-right: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .ledger-table th:first-child {
+            background: rgba(106, 138, 170, 0.12);
+            color: #c8d9f0;
+            border-right: 2px solid rgba(106, 138, 170, 0.3);
+        }
+
+        .ledger-table tbody tr {
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .ledger-table tbody tr:hover {
+            background: rgba(106, 138, 170, 0.1);
+        }
+
+        .ledger-table td {
+            padding: 12px 10px;
+            font-size: 12px;
+            color: #c8d9f0;
+            border-right: 1px solid rgba(74, 107, 138, 0.15);
+        }
+
+        .ledger-table td:first-child {
+            font-weight: 600;
+            background: rgba(106, 138, 170, 0.08);
+            border-right: 2px solid rgba(106, 138, 170, 0.2);
+            white-space: nowrap;
+        }
+
+        /* Transaction Type Badges */
+        .trans-type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .type-production {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        .type-payment {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        /* Service Badges */
+        .service-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .service-rmc {
+            background: rgba(100, 149, 237, 0.2);
+            border: 1px solid #6495ED;
+            color: #6495ED;
+        }
+
+        .service-pump {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid #FFA500;
+            color: #FFA500;
+        }
+
+        .service-none {
+            background: rgba(128, 128, 128, 0.15);
+            border: 1px solid #808080;
+            color: #999;
+        }
+
+        /* Mode Badges */
+        .mode-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .mode-cash {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .mode-billing {
+            background: rgba(135, 206, 250, 0.2);
+            border: 1px solid #87CEEB;
+            color: #87CEEB;
+        }
+
+        .mode-payment {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+        }
+
+        /* Amount Styling */
+        .amount-debit {
+            color: #ffb464;
+            font-weight: 700;
+        }
+
+        .amount-credit {
+            color: #90d090;
+            font-weight: 700;
+        }
+
+        .amount-balance {
+            color: #c8d9f0;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Link Button */
+        .link-btn {
+            padding: 4px 8px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid rgba(106, 138, 170, 0.3);
+            color: #8aa4c4;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 2px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .link-btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            color: #c8d9f0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8aa4c4;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-subtext {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="ledger-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <div class="page-title">📊 PARTY LEDGER - INTEGRATED VIEW</div>
+                <div class="page-subtitle">Complete transaction history: Production + Payments</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="printLedger()">🖨️ PRINT</button>
+                <button class="btn" onclick="exportLedger()">📤 EXPORT</button>
+                <button class="btn btn-primary" onclick="addPayment()">💰 ADD PAYMENT</button>
+            </div>
+        </div>
+
+        <!-- Party Selection -->
+        <div class="party-selection">
+            <div style="display: grid; grid-template-columns: 1fr 200px 200px 120px; gap: 12px; align-items: end;">
+                <!-- Party Search -->
+                <div class="autocomplete-container">
+                    <label style="display: block; font-size: 10px; color: #8aa4c4; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                        Party Name
+                    </label>
+                    <input type="text" class="form-control" id="partySearch" 
+                           placeholder="🔍 Search party by name, mobile, or GST number..." 
+                           autocomplete="off"
+                           oninput="handlePartySearch(this.value)">
+                    <div class="autocomplete-dropdown" id="partyDropdown"></div>
+                </div>
+                
+                <!-- From Date -->
+                <div>
+                    <label style="display: block; font-size: 10px; color: #8aa4c4; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                        From Date
+                    </label>
+                    <input type="date" class="form-control" id="fromDate" 
+                           value="2026-01-01"
+                           onchange="filterByDateRange()">
+                </div>
+                
+                <!-- To Date -->
+                <div>
+                    <label style="display: block; font-size: 10px; color: #8aa4c4; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                        To Date
+                    </label>
+                    <input type="date" class="form-control" id="toDate" 
+                           value="2026-01-31"
+                           onchange="filterByDateRange()">
+                </div>
+                
+                <!-- Apply Filter Button -->
+                <div>
+                    <button class="btn btn-primary" onclick="filterByDateRange()" 
+                            style="width: 100%; padding: 12px; font-size: 11px;">
+                        🔍 FILTER
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid" id="summaryGrid" style="display: none;">
+            <div class="summary-card">
+                <div class="summary-label">Total Production</div>
+                <div class="summary-value amount-debit" id="totalProduction">₹ 0</div>
+                <div class="summary-subtext">Goods supplied (Debit)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Total Payments</div>
+                <div class="summary-value amount-credit" id="totalPayments">₹ 0</div>
+                <div class="summary-subtext">Amount received (Credit)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Outstanding Balance</div>
+                <div class="summary-value positive" id="outstandingBalance">₹ 0</div>
+                <div class="summary-subtext">Amount due from party</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Last Transaction</div>
+                <div class="summary-value" id="lastTransaction" style="font-size: 16px;">-</div>
+                <div class="summary-subtext">Recent activity</div>
+            </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="ledger-table-container" id="ledgerContainer" style="display: none;">
+            <div class="table-header">
+                <div class="table-title">📜 Transaction History</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterTransactions('all')">ALL</button>
+                    <button class="filter-btn" onclick="filterTransactions('payment')">CASH</button>
+                    <button class="filter-btn" onclick="filterTransactions('production')">BILLING</button>
+                </div>
+            </div>
+
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>TYPE</th>
+                        <th>SERVICE</th>
+                        <th>MODE</th>
+                        <th>REFERENCE</th>
+                        <th>DESCRIPTION</th>
+                        <th style="text-align: right;">DEBIT (Dr)</th>
+                        <th style="text-align: right;">CREDIT (Cr)</th>
+                        <th style="text-align: right;">BALANCE</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerTableBody">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-text">Select a party to view ledger</div>
+            <div class="empty-state-subtext">Use the search box above to find a party</div>
+        </div>
+    </div>
+
+    <script>
+        // Sample integrated data: Production + Payments
+        const partyDatabase = [
+            { 
+                name: 'XYZ Infra', 
+                contact: 'Anil Kumar', 
+                mobile: '9876543210',
+                transactions: [
+                    { date: '19-01-2026', type: 'production', service: 'RMC', mode: 'Billing', ref: 'CHL002546', desc: 'M25 - 4.50 CUM', debit: 20250, credit: 0 },
+                    { date: '21-01-2026', type: 'payment', service: '-', mode: 'Payment', ref: 'PAY-001', desc: 'Cash payment received', debit: 0, credit: 50000 }
+                ]
+            },
+            { 
+                name: 'ABC Constructions', 
+                contact: 'Sanjay Mehta', 
+                mobile: '9876543211',
+                transactions: [
+                    { date: '18-01-2026', type: 'production', service: 'RMC', mode: 'Billing', ref: 'CHL002540', desc: 'M30 - 5.00 CUM', debit: 22500, credit: 0 },
+                    { date: '20-01-2026', type: 'payment', service: '-', mode: 'Payment', ref: 'PAY-002', desc: 'Cheque #458296', debit: 0, credit: 125000 }
+                ]
+            },
+            { 
+                name: 'PQR Builders', 
+                contact: 'Dinesh Patel', 
+                mobile: '9876543212',
+                transactions: [
+                    { date: '18-01-2026', type: 'production', service: 'RMC', mode: 'Billing', ref: 'CHL002539', desc: 'M30 - 4.00 CUM', debit: 18000, credit: 0 },
+                    { date: '19-01-2026', type: 'production', service: 'Pump', mode: 'Cash', ref: 'PUMP-045', desc: 'Concrete Pump - 4 hrs', debit: 8000, credit: 0 },
+                    { date: '18-01-2026', type: 'payment', service: '-', mode: 'Payment', ref: 'PAY-003', desc: 'NEFT transfer', debit: 0, credit: 200000 }
+                ]
+            }
+        ];
+
+        let selectedParty = null;
+        let currentFilter = 'all';
+
+        // Handle party search input - Check if empty
+        function handlePartySearch(searchTerm) {
+            // If search field is empty or cleared
+            if (!searchTerm || searchTerm.trim() === '') {
+                // Clear selected party
+                selectedParty = null;
+                
+                // Hide dropdown
+                document.getElementById('partyDropdown').classList.remove('show');
+                
+                // Hide ledger and summary
+                document.getElementById('summaryGrid').style.display = 'none';
+                document.getElementById('ledgerContainer').style.display = 'none';
+                
+                // Show empty state
+                document.getElementById('emptyState').style.display = 'block';
+                
+                return;
+            }
+            
+            // Otherwise show dropdown
+            showPartyDropdown(searchTerm);
+        }
+
+        // Show party autocomplete
+        function showPartyDropdown(searchTerm) {
+            const dropdown = document.getElementById('partyDropdown');
+            
+            // Minimum 1 character required
+            if (searchTerm.length < 1) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const filtered = partyDatabase.filter(party => 
+                party.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                party.mobile.includes(searchTerm) ||
+                party.contact.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            // Show "no results" message if no matches
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="autocomplete-item" style="cursor: default; opacity: 0.6;">
+                        <div class="autocomplete-item-name">❌ No parties found</div>
+                        <div class="autocomplete-item-details">Try searching by name, mobile, or contact person</div>
+                    </div>
+                `;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(party => {
+                html += `
+                    <div class="autocomplete-item" onclick='selectParty(${JSON.stringify(party)})'>
+                        <div class="autocomplete-item-name">${party.name}</div>
+                        <div class="autocomplete-item-details">📞 ${party.mobile} • ${party.contact}</div>
+                    </div>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        // Select party and load ledger
+        function selectParty(party) {
+            selectedParty = party;
+            document.getElementById('partySearch').value = party.name;
+            document.getElementById('partyDropdown').classList.remove('show');
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('summaryGrid').style.display = 'grid';
+            document.getElementById('ledgerContainer').style.display = 'block';
+            
+            loadLedger();
+        }
+
+        // Load ledger data
+        function loadLedger() {
+            if (!selectedParty) return;
+
+            // Get date range
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            const transactions = selectedParty.transactions;
+            let balance = 0;
+            let totalProduction = 0;
+            let totalPayments = 0;
+            let filteredCount = 0;
+
+            // Build table rows
+            let html = '';
+            transactions.forEach(trans => {
+                // Check if transaction is within date range
+                if (fromDate && toDate) {
+                    if (!isDateInRange(trans.date, fromDate, toDate)) {
+                        return; // Skip this transaction
+                    }
+                }
+
+                filteredCount++;
+                balance += trans.debit - trans.credit;
+                
+                if (trans.type === 'production') totalProduction += trans.debit;
+                if (trans.type === 'payment') totalPayments += trans.credit;
+
+                const typeClass = trans.type === 'production' ? 'type-production' : 'type-payment';
+                const typeIcon = trans.type === 'production' ? '🏗️ PRODUCTION' : '💰 PAYMENT';
+                
+                // Service badge color
+                const serviceClass = trans.service === 'RMC' ? 'service-rmc' : trans.service === 'Pump' ? 'service-pump' : 'service-none';
+                
+                // Mode badge color
+                const modeClass = trans.mode === 'Cash' ? 'mode-cash' : trans.mode === 'Billing' ? 'mode-billing' : 'mode-payment';
+
+                html += `
+                    <tr data-type="${trans.type}" data-date="${trans.date}">
+                        <td>${trans.date}</td>
+                        <td><span class="trans-type-badge ${typeClass}">${typeIcon}</span></td>
+                        <td><span class="service-badge ${serviceClass}">${trans.service}</span></td>
+                        <td><span class="mode-badge ${modeClass}">${trans.mode}</span></td>
+                        <td style="font-weight: 600; color: #8aa4c4;">${trans.ref}</td>
+                        <td>${trans.desc}</td>
+                        <td style="text-align: right;">
+                            ${trans.debit > 0 ? '<span class="amount-debit">₹ ' + trans.debit.toLocaleString('en-IN') + '</span>' : '-'}
+                        </td>
+                        <td style="text-align: right;">
+                            ${trans.credit > 0 ? '<span class="amount-credit">₹ ' + trans.credit.toLocaleString('en-IN') + '</span>' : '-'}
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="amount-balance">₹ ${balance.toLocaleString('en-IN')}</span>
+                        </td>
+                        <td>
+                            <button class="link-btn" onclick="viewTransaction('${trans.ref}')">👁️ View</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Show message if no transactions in date range
+            if (filteredCount === 0) {
+                html = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #8aa4c4;">
+                            📅 No transactions found in selected date range
+                        </td>
+                    </tr>
+                `;
+            }
+            document.getElementById('ledgerTableBody').innerHTML = html;
+
+            // Update summary cards
+            document.getElementById('totalProduction').textContent = '₹ ' + totalProduction.toLocaleString('en-IN');
+            document.getElementById('totalPayments').textContent = '₹ ' + totalPayments.toLocaleString('en-IN');
+            document.getElementById('outstandingBalance').textContent = '₹ ' + balance.toLocaleString('en-IN');
+            document.getElementById('lastTransaction').textContent = transactions[transactions.length - 1].date;
+
+            // Color code outstanding balance
+            const balanceElem = document.getElementById('outstandingBalance');
+            balanceElem.className = 'summary-value ' + (balance > 0 ? 'positive' : balance < 0 ? 'negative' : '');
+        }
+
+        // Filter transactions
+        function filterTransactions(type) {
+            currentFilter = type;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide rows
+            document.querySelectorAll('#ledgerTableBody tr').forEach(row => {
+                if (type === 'all' || row.dataset.type === type) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter transactions by date range
+        function filterByDateRange() {
+            if (!selectedParty) {
+                alert('⚠️ Please select a party first!');
+                return;
+            }
+
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (!fromDate || !toDate) {
+                alert('⚠️ Please select both From and To dates!');
+                return;
+            }
+
+            if (new Date(fromDate) > new Date(toDate)) {
+                alert('⚠️ From Date cannot be greater than To Date!');
+                return;
+            }
+
+            // Reload ledger with date filter
+            loadLedger();
+        }
+
+        // Convert DD-MM-YYYY to YYYY-MM-DD for comparison
+        function convertDateFormat(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
+            }
+            return dateStr;
+        }
+
+        // Check if transaction date is within range
+        function isDateInRange(transDate, fromDate, toDate) {
+            const trans = new Date(convertDateFormat(transDate));
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
+            
+            return trans >= from && trans <= to;
+        }
+
+        // Filter transactions by date range
+        function filterByDateRange() {
+            if (!selectedParty) {
+                alert('⚠️ Please select a party first!');
+                return;
+            }
+
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (!fromDate || !toDate) {
+                alert('⚠️ Please select both From and To dates!');
+                return;
+            }
+
+            if (new Date(fromDate) > new Date(toDate)) {
+                alert('⚠️ From Date cannot be greater than To Date!');
+                return;
+            }
+
+            // Reload ledger with date filter
+            loadLedger();
+        }
+
+        // View transaction details
+        function viewTransaction(ref) {
+            alert('Opening transaction: ' + ref);
+        }
+
+        // Add payment
+        function addPayment() {
+            if (selectedParty) {
+                alert('Opening payment entry for: ' + selectedParty.name);
+                // In real implementation, open payment entry module with pre-filled party
+            } else {
+                alert('Please select a party first');
+            }
+        }
+
+        // Print ledger
+        function printLedger() {
+            if (selectedParty) {
+                window.print();
+            } else {
+                alert('Please select a party first');
+            }
+        }
+
+        // Export ledger
+        function exportLedger() {
+            if (selectedParty) {
+                alert('Exporting ledger for: ' + selectedParty.name);
+            } else {
+                alert('Please select a party first');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('partyDropdown').classList.remove('show');
+            }
+        });
+
+        // 🔗 Auto-load party if coming from Production Entry
+        window.addEventListener('DOMContentLoaded', function() {
+            const preSelectedParty = sessionStorage.getItem('selectedPartyForLedger');
+            
+            if (preSelectedParty) {
+                // Find party in database
+                const party = partyDatabase.find(p => p.name === preSelectedParty);
+                
+                if (party) {
+                    // Auto-select party
+                    selectParty(party);
+                    
+                    // Show notification
+                    setTimeout(() => {
+                        alert('📊 Ledger loaded for: ' + preSelectedParty);
+                    }, 500);
+                }
+                
+                // Clear sessionStorage
+                sessionStorage.removeItem('selectedPartyForLedger');
+            }
+        });
+    </script>
+</body>
+</html>

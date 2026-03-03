@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛽ Diesel Management - SKCON RMC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0B1929 0%, #1A2942 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #152238 0%, #1A2942 100%);
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a6b8a;
+        }
+
+        .page-header h1 {
+            font-size: 26px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h1 .icon {
+            font-size: 32px;
+        }
+
+        .page-header p {
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-top: 8px;
+            margin-left: 44px;
+        }
+
+        /* Stats Dashboard */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #152238 0%, #1A2942 100%);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid #4a6b8a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.cyan {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(0, 217, 255, 0.05));
+            color: #00d9ff;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, rgba(144, 208, 144, 0.15), rgba(144, 208, 144, 0.05));
+            color: #90d090;
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, rgba(255, 180, 100, 0.15), rgba(255, 180, 100, 0.05));
+            color: #ffb464;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, rgba(100, 180, 255, 0.15), rgba(100, 180, 255, 0.05));
+            color: #64b4ff;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .content-section {
+            background: linear-gradient(135deg, #152238 0%, #1A2942 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a6b8a;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #00d9ff;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            color: #0B1929;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00e5ff, #00aadd);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Filters */
+        .filters-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 12px;
+            background: #0B1929;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #4a6b8a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0B1929;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #1A2942, #152238);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            color: #00d9ff;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a6b8a;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #2a3f5a;
+            color: #e0e0e0;
+            font-size: 13px;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .serial-col {
+            width: 50px;
+            text-align: center;
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.purpose-delivery {
+            background: rgba(144, 208, 144, 0.15);
+            color: #90d090;
+            border: 1px solid rgba(144, 208, 144, 0.3);
+        }
+
+        .badge.purpose-transport {
+            background: rgba(100, 180, 255, 0.15);
+            color: #64b4ff;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+        }
+
+        .badge.purpose-maintenance {
+            background: rgba(255, 180, 100, 0.15);
+            color: #ffb464;
+            border: 1px solid rgba(255, 180, 100, 0.3);
+        }
+
+        .badge.purpose-other {
+            background: rgba(208, 128, 144, 0.15);
+            color: #d08090;
+            border: 1px solid rgba(208, 128, 144, 0.3);
+        }
+
+        /* Vehicle Badge */
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .vehicle-number {
+            font-weight: 600;
+            color: #00d9ff;
+        }
+
+        .vehicle-type {
+            font-size: 11px;
+            color: #90d090;
+        }
+
+        /* Mileage Display */
+        .mileage-value {
+            font-weight: 600;
+            color: #90d090;
+        }
+
+        .mileage-low {
+            color: #ffb464;
+        }
+
+        .mileage-very-low {
+            color: #d08090;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.4; }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: rgba(100, 180, 255, 0.15);
+            color: #64b4ff;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+        }
+
+        .btn-edit:hover {
+            background: rgba(100, 180, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+            background: rgba(208, 128, 144, 0.15);
+            color: #d08090;
+            border: 1px solid rgba(208, 128, 144, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: rgba(208, 128, 144, 0.25);
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #152238 0%, #1A2942 100%);
+            margin: 3% auto;
+            padding: 0;
+            border: 1px solid #4a6b8a;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: #00d9ff;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #00d9ff;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            background: #0B1929;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .form-group .help-text {
+            font-size: 11px;
+            color: #90d090;
+            margin-top: 4px;
+        }
+
+        .calculated-field {
+            background: rgba(0, 217, 255, 0.05) !important;
+            border-color: #00d9ff !important;
+            font-weight: 600;
+            color: #00d9ff !important;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background: rgba(176, 176, 176, 0.1);
+            color: #b0b0b0;
+            border: 1px solid #4a6b8a;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(176, 176, 176, 0.2);
+            color: #ffffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span class="icon">⛽</span>
+            DIESEL MANAGEMENT
+        </h1>
+        <p>Track vehicle diesel consumption, calculate mileage, and manage fuel expenses</p>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon cyan">
+                <span>⛽</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="currentStock">250 Ltrs</div>
+                <div class="stat-label">Current Diesel Stock</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <span>📅</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="todayIssue">85 Ltrs</div>
+                <div class="stat-label">Today's Issue</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <span>📊</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="monthlyIssue">1,240 Ltrs</div>
+                <div class="stat-label">This Month Issue</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <span>📈</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="avgMileage">5.8 Km/L</div>
+                <div class="stat-label">Average Mileage</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Actions -->
+    <div class="content-section">
+        <div class="section-header">
+            <div class="section-title">📋 Diesel Issue Register</div>
+            <button class="btn btn-primary" onclick="openIssueModal()">
+                <span>➕</span>
+                Add Diesel Issue
+            </button>
+        </div>
+
+        <div class="filters-container">
+            <div class="filter-group">
+                <label>Search Vehicle</label>
+                <input type="text" id="searchVehicle" placeholder="e.g., GJ-05-AB-1234" onkeyup="filterIssues()">
+            </div>
+            <div class="filter-group">
+                <label>From Date</label>
+                <input type="date" id="filterFromDate" onchange="filterIssues()">
+            </div>
+            <div class="filter-group">
+                <label>To Date</label>
+                <input type="date" id="filterToDate" onchange="filterIssues()">
+            </div>
+            <div class="filter-group">
+                <label>Purpose</label>
+                <select id="filterPurpose" onchange="filterIssues()">
+                    <option value="">All Purposes</option>
+                    <option value="RMC Delivery">RMC Delivery</option>
+                    <option value="Material Transport">Material Transport</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Diesel Issue Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="serial-col">#</th>
+                        <th>Date & Time</th>
+                        <th>Vehicle</th>
+                        <th>Driver</th>
+                        <th>Prev Reading</th>
+                        <th>Current Reading</th>
+                        <th>Distance (Km)</th>
+                        <th>Diesel (Ltrs)</th>
+                        <th>Mileage (Km/L)</th>
+                        <th>Rate (₹/Ltr)</th>
+                        <th>Amount (₹)</th>
+                        <th>Purpose</th>
+                        <th>Issued By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="issuesTableBody">
+                    <!-- Sample Data -->
+                    <tr data-id="1">
+                        <td class="serial-col">1</td>
+                        <td>21-Jan-2026 08:30 AM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-05-AB-1234</span>
+                                <span class="vehicle-type">Mixer Truck 6 Cu.M</span>
+                            </div>
+                        </td>
+                        <td>Ramesh Patel</td>
+                        <td>12450</td>
+                        <td>12500</td>
+                        <td>50</td>
+                        <td>8.5</td>
+                        <td><span class="mileage-value">5.9</span></td>
+                        <td>95.00</td>
+                        <td>807.50</td>
+                        <td><span class="badge purpose-delivery">RMC Delivery</span></td>
+                        <td>Vinod</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(1)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(1)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-id="2">
+                        <td class="serial-col">2</td>
+                        <td>20-Jan-2026 02:15 PM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-05-CD-5678</span>
+                                <span class="vehicle-type">Transit Mixer 8 Cu.M</span>
+                            </div>
+                        </td>
+                        <td>Suresh Kumar</td>
+                        <td>8720</td>
+                        <td>8780</td>
+                        <td>60</td>
+                        <td>10.0</td>
+                        <td><span class="mileage-value">6.0</span></td>
+                        <td>95.00</td>
+                        <td>950.00</td>
+                        <td><span class="badge purpose-delivery">RMC Delivery</span></td>
+                        <td>Gunvant</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(2)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(2)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-id="3">
+                        <td class="serial-col">3</td>
+                        <td>20-Jan-2026 09:45 AM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-05-EF-9012</span>
+                                <span class="vehicle-type">Dumper 10 Ton</span>
+                            </div>
+                        </td>
+                        <td>Vijay Singh</td>
+                        <td>15200</td>
+                        <td>15230</td>
+                        <td>30</td>
+                        <td>7.0</td>
+                        <td><span class="mileage-value mileage-low">4.3</span></td>
+                        <td>95.00</td>
+                        <td>665.00</td>
+                        <td><span class="badge purpose-transport">Material Transport</span></td>
+                        <td>Vinod</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(3)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(3)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-id="4">
+                        <td class="serial-col">4</td>
+                        <td>19-Jan-2026 04:00 PM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-06-GH-3456</span>
+                                <span class="vehicle-type">Mixer Truck 7 Cu.M</span>
+                            </div>
+                        </td>
+                        <td>Amit Shah</td>
+                        <td>9800</td>
+                        <td>9855</td>
+                        <td>55</td>
+                        <td>9.5</td>
+                        <td><span class="mileage-value">5.8</span></td>
+                        <td>95.00</td>
+                        <td>902.50</td>
+                        <td><span class="badge purpose-delivery">RMC Delivery</span></td>
+                        <td>Gunvant</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(4)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(4)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-id="5">
+                        <td class="serial-col">5</td>
+                        <td>19-Jan-2026 10:30 AM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-05-IJ-7890</span>
+                                <span class="vehicle-type">Pickup 1 Ton</span>
+                            </div>
+                        </td>
+                        <td>Prakash Yadav</td>
+                        <td>32100</td>
+                        <td>32140</td>
+                        <td>40</td>
+                        <td>5.0</td>
+                        <td><span class="mileage-value">8.0</span></td>
+                        <td>95.00</td>
+                        <td>475.00</td>
+                        <td><span class="badge purpose-transport">Material Transport</span></td>
+                        <td>Vinod</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(5)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(5)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-id="6">
+                        <td class="serial-col">6</td>
+                        <td>18-Jan-2026 03:20 PM</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <span class="vehicle-number">GJ-05-KL-2345</span>
+                                <span class="vehicle-type">Transit Mixer 10 Cu.M</span>
+                            </div>
+                        </td>
+                        <td>Rajesh Verma</td>
+                        <td>11500</td>
+                        <td>11545</td>
+                        <td>45</td>
+                        <td>12.0</td>
+                        <td><span class="mileage-value mileage-very-low">3.8</span></td>
+                        <td>95.00</td>
+                        <td>1140.00</td>
+                        <td><span class="badge purpose-maintenance">Maintenance</span></td>
+                        <td>Gunvant</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-edit" onclick="editIssue(6)" title="Edit">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteIssue(6)" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Diesel Issue Modal -->
+    <div id="issueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <span>⛽</span>
+                    <span id="modalTitle">Add Diesel Issue</span>
+                </h2>
+                <span class="close-btn" onclick="closeIssueModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="issueForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Issue Date & Time *</label>
+                            <input type="datetime-local" id="issueDateTime" required>
+                            <span class="help-text">When was diesel filled</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Vehicle Number *</label>
+                            <select id="vehicleNumber" required onchange="onVehicleChange()">
+                                <option value="">-- Select Vehicle --</option>
+                                <option value="GJ-05-AB-1234">GJ-05-AB-1234 - Mixer Truck 6 Cu.M</option>
+                                <option value="GJ-05-CD-5678">GJ-05-CD-5678 - Transit Mixer 8 Cu.M</option>
+                                <option value="GJ-05-EF-9012">GJ-05-EF-9012 - Dumper 10 Ton</option>
+                                <option value="GJ-06-GH-3456">GJ-06-GH-3456 - Mixer Truck 7 Cu.M</option>
+                                <option value="GJ-05-IJ-7890">GJ-05-IJ-7890 - Pickup 1 Ton</option>
+                                <option value="GJ-05-KL-2345">GJ-05-KL-2345 - Transit Mixer 10 Cu.M</option>
+                                <option value="GJ-05-OP-0123">GJ-05-OP-0123 - Mixer Truck 8 Cu.M</option>
+                            </select>
+                            <span class="help-text">Active vehicles from Vehicle Master</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Driver Name *</label>
+                            <input type="text" id="driverName" required readonly>
+                            <span class="help-text">Auto-filled from Vehicle Master</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Previous Odometer Reading *</label>
+                            <input type="number" id="prevReading" required onchange="calculateDistance()">
+                            <span class="help-text">Last recorded reading in Km</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Current Odometer Reading *</label>
+                            <input type="number" id="currentReading" required onchange="calculateDistance()">
+                            <span class="help-text">Today's reading in Km</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Distance Covered (Km)</label>
+                            <input type="number" id="distanceCovered" class="calculated-field" readonly>
+                            <span class="help-text">Auto-calculated: Current - Previous</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diesel Quantity (Ltrs) *</label>
+                            <input type="number" id="dieselQuantity" step="0.1" required onchange="calculateMileageAndAmount()">
+                            <span class="help-text">Enter diesel filled in litres</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rate per Litre (₹) *</label>
+                            <input type="number" id="ratePerLtr" step="0.01" value="95.00" required onchange="calculateMileageAndAmount()">
+                            <span class="help-text">Current diesel rate</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Total Amount (₹)</label>
+                            <input type="number" id="totalAmount" class="calculated-field" readonly>
+                            <span class="help-text">Auto-calculated: Qty × Rate</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mileage (Km/Ltr)</label>
+                            <input type="number" id="mileage" class="calculated-field" readonly>
+                            <span class="help-text">Auto-calculated: Distance ÷ Diesel</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Purpose *</label>
+                            <select id="purpose" required>
+                                <option value="">-- Select Purpose --</option>
+                                <option value="RMC Delivery">RMC Delivery</option>
+                                <option value="Material Transport">Material Transport</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="help-text">Why diesel was issued</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Issued By *</label>
+                            <input type="text" id="issuedBy" required>
+                            <span class="help-text">Staff member name</span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Remarks</label>
+                            <textarea id="remarks" placeholder="Any additional notes..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeIssueModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveIssue()">
+                    <span>💾</span>
+                    Save Diesel Issue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vehicle Master Data (imported from Vehicle Master module)
+        const vehicleData = {
+            'GJ-05-AB-1234': { driver: 'Ramesh Patel', type: 'Mixer Truck 6 Cu.M', lastReading: 12500 },
+            'GJ-05-CD-5678': { driver: 'Suresh Kumar', type: 'Transit Mixer 8 Cu.M', lastReading: 8780 },
+            'GJ-05-EF-9012': { driver: 'Vijay Singh', type: 'Dumper 10 Ton', lastReading: 15230 },
+            'GJ-06-GH-3456': { driver: 'Amit Shah', type: 'Mixer Truck 7 Cu.M', lastReading: 9855 },
+            'GJ-05-IJ-7890': { driver: 'Prakash Yadav', type: 'Pickup 1 Ton', lastReading: 32140 },
+            'GJ-05-KL-2345': { driver: 'Rajesh Verma', type: 'Transit Mixer 10 Cu.M', lastReading: 11545 },
+            'GJ-05-OP-0123': { driver: 'Dinesh Patel', type: 'Mixer Truck 8 Cu.M', lastReading: 18920 }
+        };
+
+        // Set today's date and time
+        function setDefaultDateTime() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+            document.getElementById('issueDateTime').value = localISOTime;
+        }
+
+        // Open modal
+        function openIssueModal() {
+            document.getElementById('issueModal').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Add Diesel Issue';
+            document.getElementById('issueForm').reset();
+            setDefaultDateTime();
+            document.getElementById('ratePerLtr').value = '95.00'; // Default rate
+        }
+
+        // Close modal
+        function closeIssueModal() {
+            document.getElementById('issueModal').style.display = 'none';
+        }
+
+        // Vehicle selection change
+        function onVehicleChange() {
+            const vehicleNum = document.getElementById('vehicleNumber').value;
+            if (vehicleNum && vehicleData[vehicleNum]) {
+                const vehicle = vehicleData[vehicleNum];
+                document.getElementById('driverName').value = vehicle.driver;
+                document.getElementById('prevReading').value = vehicle.lastReading;
+            } else {
+                document.getElementById('driverName').value = '';
+                document.getElementById('prevReading').value = '';
+            }
+            calculateDistance();
+        }
+
+        // Calculate distance
+        function calculateDistance() {
+            const prevReading = parseFloat(document.getElementById('prevReading').value) || 0;
+            const currentReading = parseFloat(document.getElementById('currentReading').value) || 0;
+            const distance = currentReading - prevReading;
+            document.getElementById('distanceCovered').value = distance > 0 ? distance.toFixed(0) : '';
+            calculateMileageAndAmount();
+        }
+
+        // Calculate mileage and amount
+        function calculateMileageAndAmount() {
+            const distance = parseFloat(document.getElementById('distanceCovered').value) || 0;
+            const diesel = parseFloat(document.getElementById('dieselQuantity').value) || 0;
+            const rate = parseFloat(document.getElementById('ratePerLtr').value) || 0;
+
+            // Calculate mileage
+            if (distance > 0 && diesel > 0) {
+                const mileage = distance / diesel;
+                document.getElementById('mileage').value = mileage.toFixed(2);
+            } else {
+                document.getElementById('mileage').value = '';
+            }
+
+            // Calculate amount
+            if (diesel > 0 && rate > 0) {
+                const amount = diesel * rate;
+                document.getElementById('totalAmount').value = amount.toFixed(2);
+            } else {
+                document.getElementById('totalAmount').value = '';
+            }
+        }
+
+        // Get mileage class for display
+        function getMileageClass(mileage) {
+            if (mileage >= 5.5) return 'mileage-value';
+            if (mileage >= 4.0) return 'mileage-value mileage-low';
+            return 'mileage-value mileage-very-low';
+        }
+
+        // Get purpose badge class
+        function getPurposeBadge(purpose) {
+            const badges = {
+                'RMC Delivery': 'purpose-delivery',
+                'Material Transport': 'purpose-transport',
+                'Maintenance': 'purpose-maintenance',
+                'Other': 'purpose-other'
+            };
+            return badges[purpose] || 'purpose-other';
+        }
+
+        // Save diesel issue
+        function saveIssue() {
+            const form = document.getElementById('issueForm');
+            if (!form.checkValidity()) {
+                alert('Please fill all required fields!');
+                return;
+            }
+
+            const dateTime = new Date(document.getElementById('issueDateTime').value);
+            const formattedDateTime = dateTime.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            const vehicleNum = document.getElementById('vehicleNumber').value;
+            const vehicleType = vehicleData[vehicleNum].type;
+            const driverName = document.getElementById('driverName').value;
+            const prevReading = document.getElementById('prevReading').value;
+            const currentReading = document.getElementById('currentReading').value;
+            const distance = document.getElementById('distanceCovered').value;
+            const diesel = parseFloat(document.getElementById('dieselQuantity').value).toFixed(1);
+            const mileage = document.getElementById('mileage').value;
+            const rate = parseFloat(document.getElementById('ratePerLtr').value).toFixed(2);
+            const amount = document.getElementById('totalAmount').value;
+            const purpose = document.getElementById('purpose').value;
+            const issuedBy = document.getElementById('issuedBy').value;
+
+            const tbody = document.getElementById('issuesTableBody');
+            const newRow = tbody.insertRow(0);
+            const newId = Date.now();
+            newRow.setAttribute('data-id', newId);
+
+            const mileageClass = getMileageClass(parseFloat(mileage));
+            const purposeBadge = getPurposeBadge(purpose);
+
+            newRow.innerHTML = `
+                <td class="serial-col">1</td>
+                <td>${formattedDateTime}</td>
+                <td>
+                    <div class="vehicle-info">
+                        <span class="vehicle-number">${vehicleNum}</span>
+                        <span class="vehicle-type">${vehicleType}</span>
+                    </div>
+                </td>
+                <td>${driverName}</td>
+                <td>${prevReading}</td>
+                <td>${currentReading}</td>
+                <td>${distance}</td>
+                <td>${diesel}</td>
+                <td><span class="${mileageClass}">${mileage}</span></td>
+                <td>${rate}</td>
+                <td>${amount}</td>
+                <td><span class="badge ${purposeBadge}">${purpose}</span></td>
+                <td>${issuedBy}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-icon btn-edit" onclick="editIssue(${newId})" title="Edit">✏️</button>
+                        <button class="btn-icon btn-delete" onclick="deleteIssue(${newId})" title="Delete">🗑️</button>
+                    </div>
+                </td>
+            `;
+
+            renumberRows();
+            updateStats();
+            closeIssueModal();
+
+            // Show success message
+            alert(`✅ Diesel Issue recorded successfully!\n\nVehicle: ${vehicleNum}\nDiesel: ${diesel} Ltrs\nMileage: ${mileage} Km/L\nAmount: ₹${amount}`);
+        }
+
+        // Edit issue
+        function editIssue(issueId) {
+            alert('Edit functionality - Backend integration pending\nIssue ID: ' + issueId);
+        }
+
+        // Delete issue
+        function deleteIssue(issueId) {
+            const row = document.querySelector(`tr[data-id="${issueId}"]`);
+            const vehicleNum = row.querySelector('.vehicle-number').textContent;
+            
+            if (confirm(`⚠️ Delete this diesel issue?\n\nVehicle: ${vehicleNum}\n\nThis action cannot be undone!`)) {
+                row.remove();
+                renumberRows();
+                updateStats();
+                alert('✅ Diesel issue deleted successfully!');
+            }
+        }
+
+        // Renumber rows
+        function renumberRows() {
+            const rows = document.querySelectorAll('#issuesTableBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.serial-col').textContent = index + 1;
+            });
+        }
+
+        // Update stats
+        function updateStats() {
+            const rows = document.querySelectorAll('#issuesTableBody tr');
+            let totalDiesel = 0;
+            let todayDiesel = 0;
+            let monthDiesel = 0;
+            let totalMileage = 0;
+            let mileageCount = 0;
+
+            const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            rows.forEach(row => {
+                const cells = row.cells;
+                const dateText = cells[1].textContent;
+                const diesel = parseFloat(cells[7].textContent);
+                const mileage = parseFloat(cells[8].querySelector('span').textContent);
+
+                totalDiesel += diesel;
+
+                // Check if today's entry
+                if (dateText.includes(today.split('-')[0] + '-' + today.split('-')[1])) {
+                    todayDiesel += diesel;
+                }
+
+                // Check if this month's entry
+                const entryDate = new Date(dateText);
+                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                    monthDiesel += diesel;
+                }
+
+                // Calculate average mileage
+                if (!isNaN(mileage)) {
+                    totalMileage += mileage;
+                    mileageCount++;
+                }
+            });
+
+            const avgMileage = mileageCount > 0 ? (totalMileage / mileageCount).toFixed(1) : '0.0';
+
+            // Update stats (keeping current stock as is from Material Master)
+            document.getElementById('todayIssue').textContent = todayDiesel.toFixed(0) + ' Ltrs';
+            document.getElementById('monthlyIssue').textContent = monthDiesel.toLocaleString() + ' Ltrs';
+            document.getElementById('avgMileage').textContent = avgMileage + ' Km/L';
+        }
+
+        // Filter issues
+        function filterIssues() {
+            const searchVehicle = document.getElementById('searchVehicle').value.toUpperCase();
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+            const filterPurpose = document.getElementById('filterPurpose').value;
+
+            const rows = document.querySelectorAll('#issuesTableBody tr');
+
+            rows.forEach(row => {
+                const vehicleNum = row.querySelector('.vehicle-number').textContent;
+                const dateText = row.cells[1].textContent;
+                const purpose = row.querySelector('.badge').textContent;
+
+                let showRow = true;
+
+                // Search vehicle
+                if (searchVehicle && !vehicleNum.includes(searchVehicle)) {
+                    showRow = false;
+                }
+
+                // Filter by purpose
+                if (filterPurpose && purpose !== filterPurpose) {
+                    showRow = false;
+                }
+
+                // Date range filter (basic check)
+                if (fromDate || toDate) {
+                    // Convert date text to Date object for comparison
+                    const entryDate = new Date(dateText);
+                    if (fromDate && entryDate < new Date(fromDate)) {
+                        showRow = false;
+                    }
+                    if (toDate && entryDate > new Date(toDate)) {
+                        showRow = false;
+                    }
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+
+            renumberRows();
+        }
+
+        // Initialize
+        updateStats();
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('issueModal');
+            if (event.target === modal) {
+                closeIssueModal();
+            }
+        };
+    </script>
+
+</body>
+</html>

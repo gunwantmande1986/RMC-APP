@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Master - Fleet Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            overflow-x: hidden;
+        }
+
+        /* Page Container */
+        .page-container {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a6b8a;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: #8aa4c4;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .header-btn.report {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .header-btn.export {
+            background: rgba(144, 208, 144, 0.2);
+            color: #90d090;
+            border: 1px solid #90d090;
+        }
+
+        .header-btn.add {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            border: 1px solid #00d9ff;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Stats Cards */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .stat-icon.total {
+            background: rgba(0, 217, 255, 0.15);
+        }
+
+        .stat-icon.active {
+            background: rgba(144, 208, 144, 0.15);
+        }
+
+        .stat-icon.maintenance {
+            background: rgba(255, 180, 100, 0.15);
+        }
+
+        .stat-icon.inactive {
+            background: rgba(208, 128, 144, 0.15);
+        }
+
+        .stat-details {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 250px 200px 200px 1fr 120px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 10px 12px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        /* Vehicles Table */
+        .vehicles-table-section {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vehicles-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vehicles-table th {
+            background: rgba(11, 25, 41, 0.8);
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            border: 1px solid #4a6b8a;
+            letter-spacing: 0.5px;
+        }
+
+        .vehicles-table td {
+            padding: 12px 10px;
+            border: 1px solid #4a6b8a;
+            font-size: 12px;
+        }
+
+        .vehicles-table tbody tr:hover {
+            background: rgba(26, 41, 66, 0.5);
+        }
+
+        /* Vehicle Type Badge */
+        .type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .type-mixer {
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+        }
+
+        .type-transit {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .type-dumper {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        .type-pickup {
+            background: rgba(106, 138, 170, 0.2);
+            border: 1px solid #6a8aaa;
+            color: #6a8aaa;
+        }
+
+        /* Owner Badge */
+        .owner-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .owner-own {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .owner-hired {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.active {
+            background: #90d090;
+            box-shadow: 0 0 8px rgba(144, 208, 144, 0.6);
+        }
+
+        .status-indicator.maintenance {
+            background: #ffb464;
+            box-shadow: 0 0 8px rgba(255, 180, 100, 0.6);
+        }
+
+        .status-indicator.inactive {
+            background: #d08090;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.edit {
+            background: rgba(255, 180, 100, 0.2);
+            color: #ffb464;
+            border: 1px solid #ffb464;
+        }
+
+        .action-btn.delete {
+            background: rgba(208, 128, 144, 0.2);
+            color: #d08090;
+            border: 1px solid #d08090;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #152238;
+            border: 2px solid #4a6b8a;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d9ff;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #8aa4c4;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .modal-close:hover {
+            color: #d08090;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        .form-input, .form-select {
+            padding: 10px 12px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .help-text {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #4a6b8a;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .modal-btn.save {
+            background: linear-gradient(135deg, #00d9ff 0%, #0088cc 100%);
+            color: #0B1929;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0B1929;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a6b8a;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1>🚛 VEHICLE MASTER</h1>
+                <div class="page-subtitle">Manage fleet vehicles, mixers, transit trucks, and dumpers</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn report">📊 FLEET REPORT</button>
+                <button class="header-btn export">📤 EXPORT</button>
+                <button class="header-btn add" onclick="openVehicleModal('add')">➕ ADD VEHICLE</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon total">🚛</div>
+                <div class="stat-details">
+                    <div class="stat-label">Total Vehicles</div>
+                    <div class="stat-value" id="statTotal">8</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon active">✅</div>
+                <div class="stat-details">
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value" id="statActive">6</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon maintenance">🔧</div>
+                <div class="stat-details">
+                    <div class="stat-label">Maintenance</div>
+                    <div class="stat-value" id="statMaintenance">1</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon inactive">⛔</div>
+                <div class="stat-details">
+                    <div class="stat-label">Inactive</div>
+                    <div class="stat-value" id="statInactive">1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Search Vehicle</label>
+                    <input type="text" class="filter-input" id="searchVehicle" placeholder="Vehicle number..." oninput="filterVehicles()">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Vehicle Type</label>
+                    <select class="filter-select" id="filterType" onchange="filterVehicles()">
+                        <option value="">All Types</option>
+                        <option value="mixer">Mixer Truck</option>
+                        <option value="transit">Transit Mixer</option>
+                        <option value="dumper">Dumper</option>
+                        <option value="pickup">Pickup</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" id="filterStatus" onchange="filterVehicles()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn" onclick="resetFilters()">🔄 RESET</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicles Table -->
+        <div class="vehicles-table-section">
+            <div class="section-title">🚛 VEHICLE LIST</div>
+            <table class="vehicles-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th style="width: 130px;">VEHICLE NUMBER</th>
+                        <th style="width: 140px;">VEHICLE TYPE</th>
+                        <th style="width: 100px;">CAPACITY</th>
+                        <th style="width: 90px;">OWNER</th>
+                        <th style="width: 150px;">DRIVER NAME</th>
+                        <th style="width: 120px;">MOBILE</th>
+                        <th style="width: 110px;">FITNESS DATE</th>
+                        <th style="width: 100px;">STATUS</th>
+                        <th style="width: 130px;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="vehiclesTableBody">
+                    <!-- Sample Data -->
+                    <tr>
+                        <td>1</td>
+                        <td style="font-weight: 600; color: #00d9ff;">GJ-05-AB-1234</td>
+                        <td><span class="type-badge type-mixer">MIXER TRUCK</span></td>
+                        <td>6 Cu.M</td>
+                        <td><span class="owner-badge owner-own">OWN</span></td>
+                        <td>Ramesh Patel</td>
+                        <td>9876543210</td>
+                        <td>31-12-2026</td>
+                        <td>
+                            <div class="status-badge">
+                                <span class="status-indicator active"></span>
+                                <span style="color: #90d090; font-weight: 600;">Active</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openVehicleModal('edit', 1)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteVehicle(1)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td style="font-weight: 600; color: #00d9ff;">GJ-05-CD-5678</td>
+                        <td><span class="type-badge type-transit">TRANSIT MIXER</span></td>
+                        <td>8 Cu.M</td>
+                        <td><span class="owner-badge owner-own">OWN</span></td>
+                        <td>Suresh Kumar</td>
+                        <td>9123456789</td>
+                        <td>15-06-2026</td>
+                        <td>
+                            <div class="status-badge">
+                                <span class="status-indicator active"></span>
+                                <span style="color: #90d090; font-weight: 600;">Active</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openVehicleModal('edit', 2)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteVehicle(2)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td style="font-weight: 600; color: #00d9ff;">GJ-05-EF-9012</td>
+                        <td><span class="type-badge type-dumper">DUMPER</span></td>
+                        <td>10 Ton</td>
+                        <td><span class="owner-badge owner-hired">HIRED</span></td>
+                        <td>Vijay Singh</td>
+                        <td>9988776655</td>
+                        <td>20-08-2026</td>
+                        <td>
+                            <div class="status-badge">
+                                <span class="status-indicator maintenance"></span>
+                                <span style="color: #ffb464; font-weight: 600;">Maintenance</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openVehicleModal('edit', 3)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteVehicle(3)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td style="font-weight: 600; color: #00d9ff;">GJ-06-GH-3456</td>
+                        <td><span class="type-badge type-mixer">MIXER TRUCK</span></td>
+                        <td>7 Cu.M</td>
+                        <td><span class="owner-badge owner-own">OWN</span></td>
+                        <td>Amit Shah</td>
+                        <td>9876512340</td>
+                        <td>10-11-2026</td>
+                        <td>
+                            <div class="status-badge">
+                                <span class="status-indicator active"></span>
+                                <span style="color: #90d090; font-weight: 600;">Active</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openVehicleModal('edit', 4)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteVehicle(4)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td style="font-weight: 600; color: #00d9ff;">GJ-05-IJ-7890</td>
+                        <td><span class="type-badge type-pickup">PICKUP</span></td>
+                        <td>1 Ton</td>
+                        <td><span class="owner-badge owner-own">OWN</span></td>
+                        <td>Prakash Yadav</td>
+                        <td>9123498765</td>
+                        <td>25-03-2026</td>
+                        <td>
+                            <div class="status-badge">
+                                <span class="status-indicator active"></span>
+                                <span style="color: #90d090; font-weight: 600;">Active</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openVehicleModal('edit', 5)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteVehicle(5)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Vehicle Modal -->
+    <div class="modal" id="vehicleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">➕ ADD NEW VEHICLE</div>
+                <button class="modal-close" onclick="closeVehicleModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="vehicleForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Number <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="vehicleNumber" placeholder="e.g., GJ-05-AB-1234" required>
+                            <div class="help-text">Format: XX-##-XX-####</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Type <span class="required">*</span></label>
+                            <select class="form-select" id="vehicleType" required>
+                                <option value="">Select Type</option>
+                                <option value="mixer">Mixer Truck</option>
+                                <option value="transit">Transit Mixer</option>
+                                <option value="dumper">Dumper</option>
+                                <option value="pickup">Pickup</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Capacity <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="capacity" placeholder="e.g., 6 Cu.M or 10 Ton" required>
+                            <div class="help-text">Mixer: Cu.M | Dumper: Ton</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Owner Type <span class="required">*</span></label>
+                            <select class="form-select" id="ownerType" required>
+                                <option value="">Select Owner</option>
+                                <option value="own">Own Vehicle</option>
+                                <option value="hired">Hired Vehicle</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Driver Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="driverName" placeholder="Enter driver name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mobile Number <span class="required">*</span></label>
+                            <input type="tel" class="form-input" id="mobile" placeholder="10-digit mobile" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fitness Certificate Date</label>
+                            <input type="date" class="form-input" id="fitnessDate">
+                            <div class="help-text">Vehicle fitness validity</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Insurance Expiry Date</label>
+                            <input type="date" class="form-input" id="insuranceDate">
+                            <div class="help-text">Insurance validity</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Status <span class="required">*</span></label>
+                            <select class="form-select" id="vehicleStatus" required>
+                                <option value="active">Active</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Registration Year</label>
+                            <input type="number" class="form-input" id="regYear" placeholder="e.g., 2020">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeVehicleModal()">❌ CANCEL</button>
+                <button class="modal-btn save" onclick="saveVehicle()">💾 SAVE VEHICLE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'add';
+        let editingVehicleId = null;
+
+        // Open vehicle modal
+        function openVehicleModal(mode, vehicleId = null) {
+            currentMode = mode;
+            editingVehicleId = vehicleId;
+            
+            const modal = document.getElementById('vehicleModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            if (mode === 'add') {
+                modalTitle.textContent = '➕ ADD NEW VEHICLE';
+                resetVehicleForm();
+            } else {
+                modalTitle.textContent = '✏️ EDIT VEHICLE';
+                // Load vehicle data would go here
+            }
+            
+            modal.classList.add('show');
+        }
+
+        // Close vehicle modal
+        function closeVehicleModal() {
+            document.getElementById('vehicleModal').classList.remove('show');
+            resetVehicleForm();
+        }
+
+        // Reset vehicle form
+        function resetVehicleForm() {
+            document.getElementById('vehicleForm').reset();
+        }
+
+        // Save vehicle
+        function saveVehicle() {
+            const number = document.getElementById('vehicleNumber').value;
+            const type = document.getElementById('vehicleType').value;
+            const capacity = document.getElementById('capacity').value;
+            const owner = document.getElementById('ownerType').value;
+            const driver = document.getElementById('driverName').value;
+            const mobile = document.getElementById('mobile').value;
+            const status = document.getElementById('vehicleStatus').value;
+
+            if (!number || !type || !capacity || !owner || !driver || !mobile || !status) {
+                alert('❌ Please fill all required fields!');
+                return;
+            }
+
+            if (currentMode === 'add') {
+                const tbody = document.getElementById('vehiclesTableBody');
+                const newRow = tbody.insertRow(0);
+                const rowCount = tbody.rows.length;
+                
+                const typeBadge = getTypeBadge(type);
+                const ownerBadge = getOwnerBadge(owner);
+                const statusBadge = getStatusBadge(status);
+                
+                newRow.innerHTML = `
+                    <td>${rowCount}</td>
+                    <td style="font-weight: 600; color: #00d9ff;">${number}</td>
+                    <td>${typeBadge}</td>
+                    <td>${capacity}</td>
+                    <td>${ownerBadge}</td>
+                    <td>${driver}</td>
+                    <td>${mobile}</td>
+                    <td>${document.getElementById('fitnessDate').value || '-'}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" onclick="openVehicleModal('edit', ${rowCount})">✏️ Edit</button>
+                            <button class="action-btn delete" onclick="deleteVehicle(${rowCount})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                alert(`✅ Vehicle Added Successfully!\n\n🚛 ${number}\n📋 Type: ${type}\n👤 Driver: ${driver}\n\n✅ Vehicle is now available for:\n• Delivery Challan entry\n• Diesel consumption tracking\n• Fleet reports`);
+            } else {
+                alert(`✅ Vehicle Updated Successfully!\n\n🚛 ${number}\n\n✅ Changes saved to vehicle master.`);
+            }
+
+            closeVehicleModal();
+            updateStats();
+        }
+
+        // Get type badge
+        function getTypeBadge(type) {
+            const badges = {
+                'mixer': '<span class="type-badge type-mixer">MIXER TRUCK</span>',
+                'transit': '<span class="type-badge type-transit">TRANSIT MIXER</span>',
+                'dumper': '<span class="type-badge type-dumper">DUMPER</span>',
+                'pickup': '<span class="type-badge type-pickup">PICKUP</span>'
+            };
+            return badges[type] || '';
+        }
+
+        // Get owner badge
+        function getOwnerBadge(owner) {
+            return owner === 'own' 
+                ? '<span class="owner-badge owner-own">OWN</span>'
+                : '<span class="owner-badge owner-hired">HIRED</span>';
+        }
+
+        // Get status badge
+        function getStatusBadge(status) {
+            const badges = {
+                'active': '<div class="status-badge"><span class="status-indicator active"></span><span style="color: #90d090; font-weight: 600;">Active</span></div>',
+                'maintenance': '<div class="status-badge"><span class="status-indicator maintenance"></span><span style="color: #ffb464; font-weight: 600;">Maintenance</span></div>',
+                'inactive': '<div class="status-badge"><span class="status-indicator inactive"></span><span style="color: #d08090; font-weight: 600;">Inactive</span></div>'
+            };
+            return badges[status] || badges['active'];
+        }
+
+        // Delete vehicle
+        function deleteVehicle(vehicleId) {
+            const tbody = document.getElementById('vehiclesTableBody');
+            const row = tbody.rows[vehicleId - 1];
+            
+            if (!row) {
+                alert('❌ Vehicle not found!');
+                return;
+            }
+            
+            const vehicleNumber = row.cells[1].textContent;
+            
+            if (confirm(`⚠️ DELETE VEHICLE?\n\n🚛 Vehicle: ${vehicleNumber}\n\n⚠️ WARNING:\n• This action CANNOT be undone\n• Delivery history will remain\n• Diesel consumption records preserved\n• Vehicle won't appear in new entries\n\nAre you sure you want to DELETE?`)) {
+                tbody.deleteRow(vehicleId - 1);
+                
+                // Renumber rows
+                for (let i = 0; i < tbody.rows.length; i++) {
+                    tbody.rows[i].cells[0].textContent = i + 1;
+                }
+                
+                alert(`✅ Vehicle Deleted!\n\n🚛 ${vehicleNumber} has been removed from fleet.\n\n✅ Vehicle will no longer appear in:\n• Delivery Challan dropdown\n• Fleet reports\n• New diesel entries\n\n⚠️ Note: Historical records are preserved.`);
+                
+                updateStats();
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const tbody = document.getElementById('vehiclesTableBody');
+            document.getElementById('statTotal').textContent = tbody.rows.length;
+        }
+
+        // Filter vehicles
+        function filterVehicles() {
+            console.log('Filtering vehicles...');
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('searchVehicle').value = '';
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterStatus').value = '';
+        }
+
+        // Close modal on outside click
+        document.getElementById('vehicleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVehicleModal();
+            }
+        });
+    </script>
+</body>
+</html>

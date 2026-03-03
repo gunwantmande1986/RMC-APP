@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMC Plant ERP - Enterprise Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a1628;
+            color: #c8d9f0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        html {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Top Header */
+        /* Top Header - COMPACT */
+        .top-header {
+            height: 48px;
+            background: linear-gradient(135deg, #1a2942 0%, #0f1e32 100%);
+            border-bottom: 2px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 38px;
+            height: 38px;
+            background: rgba(106, 138, 170, 0.2);
+            border: 2px solid #6a8aaa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .company-name {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: #c8d9f0;
+            line-height: 1.2;
+        }
+
+        .company-tagline {
+            font-size: 9px;
+            color: #8aa4c4;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-left: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .info-label {
+            font-size: 8px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .info-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: #c8d9f0;
+            line-height: 1.2;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-profile:hover {
+            background: rgba(106, 138, 170, 0.25);
+            border-color: #6a8aaa;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #6a8aaa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 9px;
+            color: #8aa4c4;
+        }
+
+        .header-btn {
+            padding: 8px 15px;
+            background: rgba(106, 138, 170, 0.1);
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(106, 138, 170, 0.2);
+            border-color: #6a8aaa;
+        }
+
+        .header-btn.logout {
+            background: rgba(208, 128, 144, 0.15);
+            border-color: #8a6a6a;
+            color: #d08090;
+        }
+
+        .header-btn.logout:hover {
+            background: rgba(208, 128, 144, 0.25);
+        }
+
+        /* Main Container - COMPACT */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 48px);
+            margin-top: 48px;
+        }
+
+        /* Side Navigation - COMPACT */
+        .side-navigation {
+            width: 220px;
+            background: #0f1e32;
+            border-right: 2px solid #4a6b8a;
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-section {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .nav-section-title {
+            padding: 6px 16px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            line-height: 1.2;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            color: #c8d9f0;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            line-height: 1.3;
+        }
+
+        .nav-item:hover {
+            background: rgba(106, 138, 170, 0.1);
+            border-left-color: #6a8aaa;
+        }
+
+        .nav-item.active {
+            background: rgba(106, 138, 170, 0.2);
+            border-left-color: #90d090;
+            color: #90d090;
+        }
+
+        .nav-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 2px 8px;
+            background: rgba(208, 160, 144, 0.2);
+            border: 1px solid #d0a090;
+            border-radius: 10px;
+            font-size: 10px;
+            color: #d0a090;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background: #0a1628;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 48px);
+            border: none;
+            background: transparent;
+            display: block;
+        }
+
+        /* Footer in Navigation */
+        .nav-footer {
+            margin-top: auto;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(74, 107, 138, 0.3);
+            font-size: 10px;
+            color: #8aa4c4;
+            text-align: center;
+        }
+
+        .version-info {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        /* Scrollbar Styling */
+        .side-navigation::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .side-navigation::-webkit-scrollbar-track {
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        .side-navigation::-webkit-scrollbar-thumb {
+            background: rgba(106, 138, 170, 0.3);
+            border-radius: 3px;
+        }
+
+        .side-navigation::-webkit-scrollbar-thumb:hover {
+            background: rgba(106, 138, 170, 0.5);
+        }
+
+        /* Collapse Button */
+        .nav-collapse-btn {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 60px;
+            background: #0f1e32;
+            border: 2px solid #4a6b8a;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #8aa4c4;
+            font-size: 16px;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .nav-collapse-btn:hover {
+            background: rgba(106, 138, 170, 0.2);
+            color: #c8d9f0;
+        }
+
+        .side-navigation.collapsed {
+            width: 70px;
+        }
+
+        .side-navigation.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px 10px;
+        }
+
+        .side-navigation.collapsed .nav-text,
+        .side-navigation.collapsed .nav-badge,
+        .side-navigation.collapsed .nav-section-title,
+        .side-navigation.collapsed .nav-footer {
+            display: none;
+        }
+
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        
+        /* Hamburger Menu Button - Hidden on desktop */
+        .mobile-menu-btn {
+            display: none;
+            width: 45px;
+            height: 45px;
+            background: rgba(106, 138, 170, 0.2);
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            font-size: 24px;
+            color: #c8d9f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(106, 138, 170, 0.3);
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            backdrop-filter: blur(2px);
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        /* Tablet Styles (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .header-info {
+                gap: 15px;
+                margin-left: 20px;
+            }
+
+            .info-item {
+                font-size: 11px;
+            }
+
+            .side-navigation {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+            }
+
+            .content-iframe {
+                margin-left: 220px;
+            }
+        }
+
+        /* Mobile Styles (< 768px) */
+        @media (max-width: 768px) {
+            /* Show hamburger menu */
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            /* Hide desktop header info */
+            .header-info {
+                display: none;
+            }
+
+            /* Adjust header layout */
+            .top-header {
+                padding: 0 15px;
+            }
+
+            .logo-section {
+                gap: 8px;
+            }
+
+            .logo {
+                width: 35px;
+                height: 35px;
+                font-size: 20px;
+            }
+
+            .company-name {
+                font-size: 16px;
+            }
+
+            .company-tagline {
+                font-size: 9px;
+            }
+
+            /* Hide some header buttons */
+            .header-btn:not(.logout) {
+                display: none;
+            }
+
+            /* Adjust user profile */
+            .user-info {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            /* Sidebar - Hidden by default on mobile */
+            .side-navigation {
+                position: fixed;
+                left: -280px;
+                top: 60px;
+                width: 280px;
+                height: calc(100vh - 60px);
+                z-index: 999;
+                transition: left 0.3s ease;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            }
+
+            .side-navigation.mobile-open {
+                left: 0;
+            }
+
+            /* Hide collapse button on mobile */
+            .nav-collapse-btn {
+                display: none;
+            }
+
+            /* Main content full width */
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .content-iframe {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            /* Logout button compact */
+            .header-btn.logout {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+        }
+
+        /* Small Mobile Styles (< 480px) */
+        @media (max-width: 480px) {
+            .top-header {
+                height: 55px;
+                padding: 0 10px;
+            }
+
+            .logo {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+
+            .company-name {
+                font-size: 14px;
+            }
+
+            .company-tagline {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .header-btn.logout {
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+
+            .mobile-menu-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .side-navigation {
+                width: 260px;
+                left: -260px;
+            }
+
+            .nav-item {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+
+            .main-content {
+                margin-top: 55px;
+            }
+
+            .content-iframe {
+                top: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <!-- Mobile Menu Button (Hamburger) -->
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            
+            <div class="logo-section">
+                <div class="logo">🏭</div>
+                <div>
+                    <div class="company-name">RMC PLANT ERP</div>
+                    <div class="company-tagline">Enterprise Management System</div>
+                </div>
+            </div>
+            
+            <div class="header-info">
+                <div class="info-item">
+                    <div class="info-label">Plant</div>
+                    <div class="info-value">Plant A - XYZ</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Financial Year</div>
+                    <div class="info-value">2025-26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date</div>
+                    <div class="info-value">19-01-2026</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button class="header-btn">🔔 Notifications</button>
+            <button class="header-btn">⚙️ Settings</button>
+            <div class="user-profile">
+                <div class="user-avatar">GA</div>
+                <div class="user-info">
+                    <div class="user-name">Gunvant Admin</div>
+                    <div class="user-role">Super Administrator</div>
+                </div>
+            </div>
+            <button class="header-btn logout">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Mobile Overlay (for closing sidebar) -->
+        <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+        
+        <!-- Side Navigation -->
+        <nav class="side-navigation" id="sideNav">
+            <button class="nav-collapse-btn" onclick="toggleNav()">◀</button>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Main Menu</div>
+                <a href="#" class="nav-item active" onclick="loadModule('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('cash-production')">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Cash Production</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('billing-production')">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-text">Billing Production</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('invoices')">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">Generate Invoice</span>
+                    <span class="nav-badge">12</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('purchase-entry')">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-text">Purchase Entry</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('payment-entry')">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Payment Entry</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('diesel-management')">
+                    <span class="nav-icon">⛽</span>
+                    <span class="nav-text">Diesel Management</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('challans')">
+                    <span class="nav-icon">🚚</span>
+                    <span class="nav-text">Delivery Challans</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Pump Services</div>
+                <a href="#" class="nav-item" onclick="loadModule('pump-cash-service')">
+                    <span class="nav-icon">💵</span>
+                    <span class="nav-text">Cash Pump Service</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #FF6B6B;">🔥 NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('pump-billing-service')">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Billing Pump Service</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #FF6B6B;">🔥 NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('pump-master')">
+                    <span class="nav-icon">🚛</span>
+                    <span class="nav-text">Pump Master</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #FFB464;">● NEW</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Reports</div>
+                <a href="#" class="nav-item" onclick="loadModule('reports-production')">
+                    <span class="nav-icon">�</span>
+                    <span class="nav-text">Production Reports</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('reports-sales')">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Sales Reports</span>
+                </a>
+                <a href="#" class="nav-item" onclick="openPartyLedger()">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Party Ledger</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Masters</div>
+                <a href="#" class="nav-item" onclick="loadModule('material-master')">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Material Master</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="openPartyMaster()">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Party Master</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('customers')">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Party / Customers</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('sites')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">Sites</span>
+                </a>
+                <a href="#" class="nav-item" onclick="loadModule('vehicle-master')">
+                    <span class="nav-icon">🚛</span>
+                    <span class="nav-text">Vehicle Master</span>
+                    <span style="margin-left: auto; font-size: 10px; color: #00FF88;">● NEW</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <a href="#" class="nav-item" onclick="loadModule('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">App Settings</span>
+                </a>
+            </div>
+
+            <div class="nav-footer">
+                <div class="version-info">Version 1.0.0</div>
+                <div>© 2026 RMC Plant ERP</div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <iframe id="contentFrame" class="content-frame" src="rmc_dashboard_blueprint.html"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 🔥 AGGRESSIVE CACHE BUSTING SYSTEM
+        // ==========================================
+        let APP_VERSION = Date.now(); // Global version number
+        
+        // Fetch server version on load
+        fetch('/api/version')
+            .then(res => res.json())
+            .then(data => {
+                APP_VERSION = data.version;
+                console.log('✅ App Version:', APP_VERSION);
+            })
+            .catch(() => {
+                console.log('⚠️ Using client-side version');
+            });
+        
+        // Helper function to add version to URL
+        function addVersion(url) {
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}v=${APP_VERSION}&t=${Date.now()}`;
+        }
+        
+        // Navigation Collapse
+        function toggleNav() {
+            const nav = document.getElementById('sideNav');
+            nav.classList.toggle('collapsed');
+            
+            const btn = document.querySelector('.nav-collapse-btn');
+            if (nav.classList.contains('collapsed')) {
+                btn.innerHTML = '▶';
+            } else {
+                btn.innerHTML = '◀';
+            }
+        }
+
+        // Load Module
+        function loadModule(module) {
+            console.log('🔥 loadModule called with:', module);
+            
+            // Remove active class from all items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item (only if event exists - for sidebar navigation)
+            if (typeof event !== 'undefined' && event && event.target) {
+                const navItem = event.target.closest('.nav-item');
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            }
+            
+            // Load content based on module
+            const frame = document.getElementById('contentFrame');
+            console.log('📦 Frame element:', frame);
+            
+            switch(module) {
+                case 'dashboard':
+                    frame.src = addVersion('rmc_dashboard_blueprint.html');
+                    console.log('✅ Loading dashboard');
+                    break;
+                case 'cash-production':
+                    frame.src = addVersion('rmc_blueprint_exact.html');
+                    console.log('✅ Loading cash production');
+                    break;
+                case 'cash-view-entries':
+                    frame.src = addVersion('rmc_cash_entries_view.html');
+                    console.log('✅ Loading cash view entries');
+                    break;
+                case 'billing-production':
+                    frame.src = addVersion('rmc_billing_entry_blueprint.html');
+                    console.log('✅ Loading billing production');
+                    break;
+                case 'billing-view-entries':
+                    frame.src = addVersion('rmc_billing_entries_view.html');
+                    console.log('✅ Loading billing view entries');
+                    break;
+                case 'production':
+                    frame.src = addVersion('rmc_blueprint_exact.html');
+                    console.log('✅ Loading production');
+                    break;
+                case 'invoices':
+                    alert('📄 Invoice Generation module - Coming soon!');
+                    break;
+                case 'purchase-entry':
+                    frame.src = addVersion('rmc_purchase_entry_blueprint.html');
+                    console.log('✅ Loading purchase entry');
+                    break;
+                case 'payment-entry':
+                    frame.src = addVersion('rmc_payment_entry_blueprint.html');
+                    console.log('✅ Loading payment entry');
+                    break;
+                case 'party-ledger':
+                    frame.src = addVersion('party_ledger_unified.html');
+                    console.log('✅ Loading unified party ledger (Cash/Billing tabs)');
+                    break;
+                case 'diesel-management':
+                    frame.src = addVersion('rmc_diesel_management_blueprint.html');
+                    console.log('✅ Loading diesel management');
+                    break;
+                case 'challans':
+                    alert('🚚 Delivery Challans module - Coming soon!');
+                    break;
+                case 'material-master':
+                    frame.src = 'rmc_material_master_blueprint.html?v=' + Date.now();
+                    console.log('✅ Loading material master (cache busted)');
+                    break;
+                case 'vehicle-master':
+                    frame.src = 'rmc_vehicle_master_blueprint.html?v=' + Date.now();
+                    console.log('✅ Loading vehicle master (cache busted)');
+                    break;
+                case 'pump-cash-service':
+                    frame.src = 'rmc_pump_cash_service.html?v=' + Date.now();
+                    console.log('✅ Loading pump cash service (cache busted)');
+                    break;
+                case 'pump-billing-service':
+                    frame.src = 'rmc_pump_billing_service.html?v=' + Date.now();
+                    console.log('✅ Loading pump billing service (cache busted)');
+                    break;
+                case 'pump-master':
+                    frame.src = 'rmc_pump_master.html?v=' + Date.now();
+                    console.log('✅ Loading pump master (cache busted)');
+                    break;
+                default:
+                    alert('Module "' + module + '" - Coming soon!');
+            }
+        }
+
+        // Set current date on page load
+        window.onload = function() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }).replace(/\//g, '-');
+            
+            // Update date in header
+            const dateElement = document.querySelector('.header-info .info-value:nth-of-type(3)');
+            if (dateElement) {
+                dateElement.textContent = dateStr;
+            }
+            
+            // Dashboard is already loaded via iframe src attribute
+            console.log('✅ ERP System loaded - Dashboard active');
+        }
+
+        // ============================================
+        // MOBILE MENU FUNCTIONS
+        // ============================================
+        
+        /**
+         * Toggle Mobile Menu - Open/Close Sidebar
+         */
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sideNav');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (sidebar.classList.contains('mobile-open')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        }
+
+        /**
+         * Open Mobile Menu
+         */
+        function openMobileMenu() {
+            const sidebar = document.getElementById('sideNav');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+            
+            console.log('📱 Mobile menu opened');
+        }
+
+        /**
+         * Close Mobile Menu
+         */
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sideNav');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scroll
+            
+            console.log('📱 Mobile menu closed');
+        }
+
+        /**
+         * Close mobile menu when clicking on a nav item
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // Add click handler to each nav item
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // On mobile, close menu after clicking
+                    if (window.innerWidth <= 768) {
+                        setTimeout(closeMobileMenu, 300); // Small delay for smooth transition
+                    }
+                });
+            });
+
+            // Close menu on window resize if mobile menu is open
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeMobileMenu();
+                }
+            });
+
+            console.log('✅ Mobile menu handlers initialized');
+        });
+
+        // 🏢 Open Party Master Blueprint
+        function openPartyMaster() {
+            console.log('🏢 Opening Party Master Blueprint...');
+            const frame = document.getElementById('contentFrame');
+            if (frame) {
+                frame.src = 'party_master_blueprint.html';
+                console.log('✅ Party Master loaded in frame!');
+            } else {
+                console.error('❌ Content frame not found!');
+            }
+            
+            // Update active menu item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Close mobile menu if open
+            if (window.innerWidth <= 768) {
+                setTimeout(closeMobileMenu, 300);
+            }
+        }
+
+        // 📊 Open Party Ledger Blueprint - Integrated Version
+        function openPartyLedger() {
+            console.log('📊 Opening Party Ledger (Integrated)...');
+            const frame = document.getElementById('contentFrame');
+            if (frame) {
+                frame.src = 'party_ledger_integrated.html?v=' + Date.now();
+                console.log('✅ Integrated Party Ledger loaded in frame!');
+            } else {
+                console.error('❌ Content frame not found!');
+            }
+            
+            // Close mobile menu if open
+            if (window.innerWidth <= 768) {
+                setTimeout(closeMobileMenu, 300);
+            }
+        }
+    </script>
+</body>
+</html>

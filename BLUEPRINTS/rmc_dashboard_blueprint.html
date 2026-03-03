@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMC Dashboard - Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a1628;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: #c8d9f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            background: #1a2942;
+            position: relative;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Grid Background */
+        .dashboard-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 9px, rgba(100, 150, 200, 0.08) 9px, rgba(100, 150, 200, 0.08) 10px),
+                repeating-linear-gradient(90deg, transparent, transparent 9px, rgba(100, 150, 200, 0.08) 9px, rgba(100, 150, 200, 0.08) 10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dashboard-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #c8d9f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-top: 3px;
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid #6a8aaa;
+            color: #c8d9f0;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            border-color: #8aa4c4;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .kpi-card:hover {
+            border-color: #6a8aaa;
+            background: rgba(15, 30, 50, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .kpi-title {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .kpi-icon {
+            font-size: 24px;
+            opacity: 0.6;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c8d9f0;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .kpi-change.positive {
+            color: #90d090;
+        }
+
+        .kpi-change.negative {
+            color: #d08090;
+        }
+
+        .kpi-footer {
+            font-size: 9px;
+            color: #6a8aaa;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+        }
+
+        .chart-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #c8d9f0;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .chart-placeholder {
+            height: 250px;
+            background: rgba(10, 20, 40, 0.3);
+            border: 1px dashed #4a6b8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6a8aaa;
+            font-size: 12px;
+        }
+
+        /* Recent Activities */
+        .activities-section {
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+        }
+
+        .activities-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #c8d9f0;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(10, 20, 40, 0.3);
+            border-left: 3px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .activity-item:hover {
+            background: rgba(10, 20, 40, 0.5);
+            border-left-color: #6a8aaa;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 12px;
+            color: #c8d9f0;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .activity-meta {
+            font-size: 10px;
+            color: #8aa4c4;
+        }
+
+        .activity-badge {
+            padding: 4px 10px;
+            background: rgba(106, 138, 170, 0.2);
+            border: 1px solid #4a6b8a;
+            font-size: 10px;
+            color: #8aa4c4;
+            font-weight: 600;
+        }
+
+        .activity-badge.success {
+            background: rgba(144, 208, 144, 0.15);
+            border-color: #6a8a6a;
+            color: #90d090;
+        }
+
+        .activity-badge.pending {
+            background: rgba(208, 160, 144, 0.15);
+            border-color: #8a7a6a;
+            color: #d0a090;
+        }
+
+        /* Quick Stats Bar */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(10, 20, 40, 0.3);
+            border: 1px solid #4a6b8a;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        /* Scrollbar */
+        .dashboard-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .dashboard-container::-webkit-scrollbar-track {
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        .dashboard-container::-webkit-scrollbar-thumb {
+            background: rgba(106, 138, 170, 0.4);
+            border-radius: 5px;
+        }
+
+        .dashboard-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(106, 138, 170, 0.6);
+        }
+
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        
+        /* Tablet Styles (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Styles (< 768px) */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 10px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                padding: 15px;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .page-subtitle {
+                font-size: 10px;
+            }
+
+            .quick-actions {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .action-btn {
+                flex: 1;
+                min-width: calc(50% - 4px);
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            /* Stats Grid Single Column */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                font-size: 28px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 9px;
+            }
+
+            /* Charts Grid Single Column */
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .chart-card {
+                padding: 15px;
+            }
+
+            .chart-title {
+                font-size: 13px;
+            }
+
+            /* Activities Section */
+            .activities-section {
+                padding: 15px;
+            }
+
+            .activity-title {
+                font-size: 14px;
+            }
+
+            .activity-item {
+                padding: 12px;
+            }
+
+            .activity-title-text {
+                font-size: 12px;
+            }
+
+            .activity-time {
+                font-size: 10px;
+            }
+
+            .activity-details {
+                font-size: 11px;
+            }
+        }
+
+        /* Small Mobile Styles (< 480px) */
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 5px;
+            }
+
+            .page-header {
+                padding: 12px;
+            }
+
+            .page-title {
+                font-size: 16px;
+            }
+
+            .action-btn {
+                font-size: 9px;
+                padding: 6px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 18px;
+            }
+
+            .stat-icon {
+                font-size: 24px;
+            }
+
+            .chart-card {
+                padding: 12px;
+            }
+
+            .chart-title {
+                font-size: 12px;
+            }
+
+            .activity-item {
+                padding: 10px;
+            }
+
+            .activity-title-text {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <div class="page-title">
+                        📊 DASHBOARD
+                    </div>
+                    <div class="page-subtitle">Real-time overview of RMC Plant operations</div>
+                </div>
+                <button class="refresh-btn" onclick="refreshDashboard()">🔄 REFRESH</button>
+            </div>
+
+            <!-- Quick Stats Bar -->
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <div>
+                        <div class="stat-label">Today's Production</div>
+                        <div class="stat-value">245.50 CUM</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5;">🏭</div>
+                </div>
+                <div class="stat-item">
+                    <div>
+                        <div class="stat-label">Pending Billing</div>
+                        <div class="stat-value">12 Entries</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5;">📄</div>
+                </div>
+                <div class="stat-item">
+                    <div>
+                        <div class="stat-label">Active Vehicles</div>
+                        <div class="stat-value">18 Vehicles</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5;">🚚</div>
+                </div>
+                <div class="stat-item">
+                    <div>
+                        <div class="stat-label">Material Stock Alert</div>
+                        <div class="stat-value">3 Items</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5;">⚠️</div>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Total Production (MTD)</div>
+                        <div class="kpi-icon">🏭</div>
+                    </div>
+                    <div class="kpi-value">3,428.75 CUM</div>
+                    <div class="kpi-change positive">
+                        ▲ +12.5% from last month
+                    </div>
+                    <div class="kpi-footer">
+                        Target: 4,000 CUM • Achievement: 85.7%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Total Revenue (MTD)</div>
+                        <div class="kpi-icon">💰</div>
+                    </div>
+                    <div class="kpi-value">₹ 1.85 Cr</div>
+                    <div class="kpi-change positive">
+                        ▲ +8.3% from last month
+                    </div>
+                    <div class="kpi-footer">
+                        Outstanding: ₹ 45.2 L • Collection: 75.6%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Deliveries (Today)</div>
+                        <div class="kpi-icon">🚚</div>
+                    </div>
+                    <div class="kpi-value">48 Trips</div>
+                    <div class="kpi-change positive">
+                        ▲ +5 from yesterday
+                    </div>
+                    <div class="kpi-footer">
+                        Completed: 42 • In-transit: 6 • Avg: 5.1 CUM/trip
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Material Consumption</div>
+                        <div class="kpi-icon">📦</div>
+                    </div>
+                    <div class="kpi-value">85.4%</div>
+                    <div class="kpi-change negative">
+                        ▼ Stock low: Cement, 20mm
+                    </div>
+                    <div class="kpi-footer">
+                        Cement: 2 days • 20mm: 3 days • Other: Normal
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Quality Control</div>
+                        <div class="kpi-icon">✓</div>
+                    </div>
+                    <div class="kpi-value">98.2%</div>
+                    <div class="kpi-change positive">
+                        ▲ All tests passed
+                    </div>
+                    <div class="kpi-footer">
+                        Tests today: 24 • Passed: 24 • Failed: 0
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Plant Efficiency</div>
+                        <div class="kpi-icon">⚡</div>
+                    </div>
+                    <div class="kpi-value">92.7%</div>
+                    <div class="kpi-change positive">
+                        ▲ +3.2% this week
+                    </div>
+                    <div class="kpi-footer">
+                        Uptime: 22.5 hrs • Downtime: 1.5 hrs • Capacity: 350 CUM/day
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">📈 Production Trend (Last 7 Days)</div>
+                    <div class="chart-placeholder">
+                        Chart placeholder - Production line graph<br>
+                        <small style="margin-top: 10px; display: block; opacity: 0.7;">
+                            Daily production volume with grade-wise breakdown
+                        </small>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">📊 Grade-wise Distribution</div>
+                    <div class="chart-placeholder">
+                        Chart placeholder - Bar/Pie chart<br>
+                        <small style="margin-top: 10px; display: block; opacity: 0.7;">
+                            M20, M25, M30, M35, M40 production distribution
+                        </small>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">💹 Revenue vs Target</div>
+                    <div class="chart-placeholder">
+                        Chart placeholder - Area chart<br>
+                        <small style="margin-top: 10px; display: block; opacity: 0.7;">
+                            Monthly revenue vs projected targets
+                        </small>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">🚛 Vehicle Utilization</div>
+                    <div class="chart-placeholder">
+                        Chart placeholder - Stacked bar chart<br>
+                        <small style="margin-top: 10px; display: block; opacity: 0.7;">
+                            Active vs idle vehicles with trip counts
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="activities-section">
+                <div class="activities-header">
+                    <span>🕐 RECENT ACTIVITIES</span>
+                    <span style="font-size: 10px; color: #8aa4c4;">Last updated: 2 minutes ago</span>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Production Entry - P00245</div>
+                        <div class="activity-meta">
+                            M25 • 5.00 CUM • ABC Constructions • Site: Project Alpha
+                        </div>
+                        <div class="activity-meta" style="margin-top: 3px;">
+                            By: Gunvant Admin • 5 minutes ago
+                        </div>
+                    </div>
+                    <div class="activity-badge success">SAVED</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Billing Generated - INV-2026-0123</div>
+                        <div class="activity-meta">
+                            Party: XYZ Infra • Amount: ₹ 2,85,000 • 12 entries
+                        </div>
+                        <div class="activity-meta" style="margin-top: 3px;">
+                            By: Billing User • 12 minutes ago
+                        </div>
+                    </div>
+                    <div class="activity-badge success">COMPLETED</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Material Purchase Order - PO-245</div>
+                        <div class="activity-meta">
+                            Cement - 200 bags • Supplier: ABC Traders
+                        </div>
+                        <div class="activity-meta" style="margin-top: 3px;">
+                            By: Purchase Manager • 35 minutes ago
+                        </div>
+                    </div>
+                    <div class="activity-badge pending">PENDING</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Quality Test - QT-2026-089</div>
+                        <div class="activity-meta">
+                            Grade M30 • Slump: 120mm • Compressive Strength: Pass
+                        </div>
+                        <div class="activity-meta" style="margin-top: 3px;">
+                            By: QC Inspector • 1 hour ago
+                        </div>
+                    </div>
+                    <div class="activity-badge success">PASSED</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Vehicle Maintenance - MH12AB1234</div>
+                        <div class="activity-meta">
+                            Regular service • Next service: 20-02-2026
+                        </div>
+                        <div class="activity-meta" style="margin-top: 3px;">
+                            By: Fleet Manager • 2 hours ago
+                        </div>
+                    </div>
+                    <div class="activity-badge success">COMPLETED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function refreshDashboard() {
+            alert('📊 Dashboard refreshing...\n\nFetching latest data from server');
+            // Actual implementation would reload data via API
+        }
+
+        // Auto-refresh every 5 minutes
+        setInterval(function() {
+            console.log('Dashboard data refreshed at ' + new Date().toLocaleTimeString());
+        }, 300000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Payment Entry - RMC Plant ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            padding: 8px;
+            min-height: 100vh;
+        }
+
+        /* Background Grid Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(74, 107, 138, 0.03) 49px, rgba(74, 107, 138, 0.03) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(74, 107, 138, 0.03) 49px, rgba(74, 107, 138, 0.03) 50px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .payment-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #c8d9f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid #6a8aaa;
+            color: #c8d9f0;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+        }
+
+        .btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        .btn-primary:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* Payment Entry Form */
+        .payment-form {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #90d090;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid rgba(74, 107, 138, 0.4);
+            color: #c8d9f0;
+            font-size: 13px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6a8aaa;
+            background: rgba(10, 20, 40, 0.6);
+        }
+
+        .form-control::placeholder {
+            color: #6a8aaa;
+            opacity: 0.5;
+        }
+
+        /* Payment Type Tabs */
+        .payment-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid rgba(74, 107, 138, 0.4);
+            color: #8aa4c4;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: rgba(106, 138, 170, 0.15);
+            color: #c8d9f0;
+        }
+
+        .tab-btn.active {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: rgba(26, 41, 66, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            padding-top: 12px;
+            margin-top: 8px;
+            border-top: 2px solid #4a6b8a;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        .summary-value.total {
+            font-size: 16px;
+            color: #90d090;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: rgba(144, 208, 144, 0.2);
+            border: 2px solid #90d090;
+            color: #90d090;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            background: rgba(144, 208, 144, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(144, 208, 144, 0.3);
+        }
+
+        /* Payment History Table */
+        .payment-history {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c8d9f0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #90d090;
+            margin-top: 2px;
+        }
+
+        /* Table */
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(10, 20, 40, 0.2);
+        }
+
+        .payment-table thead {
+            background: rgba(15, 30, 50, 0.6);
+        }
+
+        .payment-table th {
+            padding: 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a6b8a;
+            border-right: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .payment-table th:first-child {
+            background: rgba(106, 138, 170, 0.12);
+            color: #c8d9f0;
+            border-right: 2px solid rgba(106, 138, 170, 0.3);
+        }
+
+        .payment-table tbody tr {
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .payment-table tbody tr:hover {
+            background: rgba(106, 138, 170, 0.1);
+        }
+
+        .payment-table td {
+            padding: 10px;
+            font-size: 12px;
+            color: #c8d9f0;
+            border-right: 1px solid rgba(74, 107, 138, 0.15);
+        }
+
+        .payment-table td:first-child {
+            font-weight: 600;
+            background: rgba(106, 138, 170, 0.08);
+            border-right: 2px solid rgba(106, 138, 170, 0.2);
+        }
+
+        /* Amount Styling */
+        .amount-positive {
+            color: #90d090;
+            font-weight: 700;
+        }
+
+        .amount-negative {
+            color: #d08090;
+            font-weight: 700;
+        }
+
+        /* Payment Type Badge */
+        .payment-type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .type-cash {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .type-cheque {
+            background: rgba(100, 180, 255, 0.2);
+            border: 1px solid #64b4ff;
+            color: #64b4ff;
+        }
+
+        .type-online {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        .type-adjustment {
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            background: rgba(106, 138, 170, 0.15);
+            border: 1px solid rgba(106, 138, 170, 0.3);
+            color: #8aa4c4;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+
+        .action-btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            color: #c8d9f0;
+        }
+
+        .action-btn.edit {
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(144, 208, 144, 0.2);
+        }
+
+        .action-btn.delete {
+            border-color: #d08090;
+            color: #d08090;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(208, 128, 144, 0.2);
+        }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: rgba(15, 30, 50, 0.98);
+            border: 1px solid #6a8aaa;
+            border-top: none;
+            border-radius: 0 0 3px 3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: rgba(106, 138, 170, 0.2);
+        }
+
+        .autocomplete-item-name {
+            font-size: 13px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        .autocomplete-item-details {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-top: 3px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(106, 138, 170, 0.4);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(106, 138, 170, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <div class="page-title">
+                    💰 PAYMENT ENTRY
+                </div>
+                <div class="page-subtitle">Record and manage client/supplier payments</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="viewPaymentReport()">📊 REPORT</button>
+                <button class="btn" onclick="exportPayments()">📤 EXPORT</button>
+                <button class="btn btn-primary" onclick="resetForm()">🔄 NEW PAYMENT</button>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Left: Payment Entry Form -->
+            <div class="payment-form">
+                <!-- Payment Type Tabs -->
+                <div class="payment-tabs">
+                    <button class="tab-btn active" onclick="selectPaymentType('client')" id="tab-client">
+                        👤 CLIENT PAYMENT
+                    </button>
+                    <button class="tab-btn" onclick="selectPaymentType('supplier')" id="tab-supplier">
+                        🏭 SUPPLIER PAYMENT
+                    </button>
+                    <button class="tab-btn" onclick="selectPaymentType('adjustment')" id="tab-adjustment">
+                        🔄 ADJUSTMENT
+                    </button>
+                </div>
+
+                <!-- Party Details - Single Party (Client/Supplier) -->
+                <div class="form-section" id="singlePartySection">
+                    <div class="section-title">📋 Party Details</div>
+                    
+                    <div class="form-group autocomplete-container">
+                        <label class="form-label" id="partyLabel">Party Name *</label>
+                        <input type="text" class="form-control" id="partyName" 
+                               placeholder="Search party by name..." 
+                               autocomplete="off"
+                               oninput="showPartyDropdown(this.value)">
+                        <div class="autocomplete-dropdown" id="partyDropdown"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="contactPerson" 
+                               placeholder="Enter contact person name" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="mobile" 
+                               placeholder="Mobile number" readonly>
+                    </div>
+                </div>
+
+                <!-- Adjustment Details - Dual Party (Customer → Supplier) -->
+                <div class="form-section" id="adjustmentPartySection" style="display: none;">
+                    <div class="section-title">🔄 Adjustment Details</div>
+                    
+                    <div class="form-group autocomplete-container">
+                        <label class="form-label">From Party (Customer) *</label>
+                        <input type="text" class="form-control" id="fromPartyName" 
+                               placeholder="Search customer..." 
+                               autocomplete="off"
+                               oninput="showFromPartyDropdown(this.value)">
+                        <div class="autocomplete-dropdown" id="fromPartyDropdown"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">From Contact</label>
+                        <input type="text" class="form-control" id="fromContactPerson" 
+                               placeholder="Customer contact" readonly>
+                    </div>
+
+                    <div class="form-group autocomplete-container">
+                        <label class="form-label">To Party (Supplier) *</label>
+                        <input type="text" class="form-control" id="toPartyName" 
+                               placeholder="Search supplier..." 
+                               autocomplete="off"
+                               oninput="showToPartyDropdown(this.value)">
+                        <div class="autocomplete-dropdown" id="toPartyDropdown"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">To Contact</label>
+                        <input type="text" class="form-control" id="toContactPerson" 
+                               placeholder="Supplier contact" readonly>
+                    </div>
+                </div>
+
+                <!-- Remove old Party Details section -->
+                <!-- Party Details -->
+                <div class="form-section" style="display: none;">
+                    <div class="section-title">📋 Party Details</div>
+                    
+                    <div class="form-group autocomplete-container">
+                        <label class="form-label">Party Name *</label>
+                        <input type="text" class="form-control" id="partyName_old" 
+                               placeholder="Search party by name..." 
+                               autocomplete="off"
+                               oninput="showPartyDropdown(this.value)">
+                        <div class="autocomplete-dropdown" id="partyDropdown_old"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="contactPerson" 
+                               placeholder="Enter contact person name" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="mobile" 
+                               placeholder="Mobile number" readonly>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                <div class="form-section">
+                    <div class="section-title">💳 Payment Details</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Payment Date *</label>
+                        <input type="date" class="form-control" id="paymentDate" 
+                               value="2026-01-21">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Payment Mode *</label>
+                        <select class="form-control" id="paymentMode">
+                            <option value="cash">💵 Cash</option>
+                            <option value="cheque">📝 Cheque</option>
+                            <option value="online">💻 Online Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="chequeDetailsGroup" style="display: none;">
+                        <label class="form-label">Cheque Number</label>
+                        <input type="text" class="form-control" id="chequeNumber" 
+                               placeholder="Enter cheque number">
+                    </div>
+
+                    <div class="form-group" id="transactionDetailsGroup" style="display: none;">
+                        <label class="form-label">Transaction ID</label>
+                        <input type="text" class="form-control" id="transactionId" 
+                               placeholder="Enter transaction ID">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amount *</label>
+                        <input type="number" class="form-control" id="amount" 
+                               placeholder="Enter payment amount" 
+                               oninput="updateSummary()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Remarks</label>
+                        <textarea class="form-control" id="remarks" 
+                                  rows="3" 
+                                  placeholder="Payment remarks or notes..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Payment Summary -->
+                <div class="summary-card">
+                    <div class="summary-item">
+                        <span class="summary-label">Payment Amount</span>
+                        <span class="summary-value" id="summaryAmount">₹ 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Payment Mode</span>
+                        <span class="summary-value" id="summaryMode">Cash</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total Payable</span>
+                        <span class="summary-value total" id="summaryTotal">₹ 0</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button class="btn-submit" onclick="savePayment()">
+                    💾 SAVE PAYMENT
+                </button>
+            </div>
+
+            <!-- Right: Payment History -->
+            <div class="payment-history">
+                <div class="history-header">
+                    <div class="history-title">📜 Recent Payments</div>
+                    <div class="history-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Today</div>
+                            <div class="stat-value">₹ 2.5L</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">This Week</div>
+                            <div class="stat-value">₹ 8.2L</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">This Month</div>
+                            <div class="stat-value">₹ 32.5L</div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>PARTY NAME</th>
+                            <th>TYPE</th>
+                            <th>MODE</th>
+                            <th>AMOUNT</th>
+                            <th>REMARKS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>21-01-2026</td>
+                            <td>XYZ Infra</td>
+                            <td><span class="payment-type-badge type-cash">CLIENT</span></td>
+                            <td><span class="payment-type-badge type-cash">💵 CASH</span></td>
+                            <td><span class="amount-positive">₹ 50,000</span></td>
+                            <td style="color: #8aa4c4; font-size: 11px;">Payment received</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>20-01-2026</td>
+                            <td>ABC Constructions</td>
+                            <td><span class="payment-type-badge type-cheque">CLIENT</span></td>
+                            <td><span class="payment-type-badge type-cheque">📝 CHEQUE</span></td>
+                            <td><span class="amount-positive">₹ 1,25,000</span></td>
+                            <td style="color: #8aa4c4; font-size: 11px;">Cheque #458296</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>19-01-2026</td>
+                            <td>Supreme Cement</td>
+                            <td><span class="payment-type-badge type-online">SUPPLIER</span></td>
+                            <td><span class="payment-type-badge type-online">💻 ONLINE</span></td>
+                            <td><span class="amount-negative">₹ 75,000</span></td>
+                            <td style="color: #8aa4c4; font-size: 11px;">Cement payment</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>18-01-2026</td>
+                            <td>PQR Builders</td>
+                            <td><span class="payment-type-badge type-cash">CLIENT</span></td>
+                            <td><span class="payment-type-badge type-online">💻 ONLINE</span></td>
+                            <td><span class="amount-positive">₹ 2,00,000</span></td>
+                            <td style="color: #8aa4c4; font-size: 11px;">NEFT transfer</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample party database
+        const partyDatabase = [
+            { name: 'XYZ Infra', contact: 'Anil Kumar', mobile: '9876543210', type: 'client' },
+            { name: 'ABC Constructions', contact: 'Sanjay Mehta', mobile: '9876543211', type: 'client' },
+            { name: 'PQR Builders', contact: 'Dinesh Patel', mobile: '9876543212', type: 'client' },
+            { name: 'Supreme Cement', contact: 'Rajesh Shah', mobile: '9876543213', type: 'supplier' },
+            { name: 'Steel India Ltd', contact: 'Vikram Singh', mobile: '9876543214', type: 'supplier' },
+            { name: 'Concrete Masters', contact: 'Ramesh Gupta', mobile: '9876543215', type: 'client' },
+        ];
+
+        let currentPaymentType = 'client';
+
+        // Select payment type (client/supplier/adjustment)
+        function selectPaymentType(type) {
+            currentPaymentType = type;
+            
+            // Update tab buttons
+            document.getElementById('tab-client').classList.toggle('active', type === 'client');
+            document.getElementById('tab-supplier').classList.toggle('active', type === 'supplier');
+            document.getElementById('tab-adjustment').classList.toggle('active', type === 'adjustment');
+            
+            // Show/hide sections based on type
+            const singlePartySection = document.getElementById('singlePartySection');
+            const adjustmentSection = document.getElementById('adjustmentPartySection');
+            
+            if (type === 'adjustment') {
+                singlePartySection.style.display = 'none';
+                adjustmentSection.style.display = 'block';
+                
+                // Update party label in summary
+                document.getElementById('partyLabel').textContent = 'Adjustment Payment';
+            } else {
+                singlePartySection.style.display = 'block';
+                adjustmentSection.style.display = 'none';
+                
+                // Update party label
+                if (type === 'client') {
+                    document.getElementById('partyLabel').textContent = 'Customer Name *';
+                } else {
+                    document.getElementById('partyLabel').textContent = 'Supplier Name *';
+                }
+            }
+            
+            // Reset form
+            resetForm();
+        }
+
+        // Show FROM party autocomplete (Customer)
+        function showFromPartyDropdown(searchTerm) {
+            const dropdown = document.getElementById('fromPartyDropdown');
+            
+            if (searchTerm.length < 1) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const filtered = partyDatabase.filter(party => 
+                party.type === 'client' &&
+                party.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="autocomplete-item" style="cursor: default;"><div class="autocomplete-item-name">❌ No customers found</div></div>`;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(party => {
+                html += `<div class="autocomplete-item" onclick="selectFromParty('${party.name}', '${party.contact}', '${party.mobile}')"><div class="autocomplete-item-name">${party.name}</div><div class="autocomplete-item-details">📞 ${party.mobile} • ${party.contact}</div></div>`;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        // Show TO party autocomplete (Supplier)
+        function showToPartyDropdown(searchTerm) {
+            const dropdown = document.getElementById('toPartyDropdown');
+            
+            if (searchTerm.length < 1) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const filtered = partyDatabase.filter(party => 
+                party.type === 'supplier' &&
+                party.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="autocomplete-item" style="cursor: default;"><div class="autocomplete-item-name">❌ No suppliers found</div></div>`;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(party => {
+                html += `<div class="autocomplete-item" onclick="selectToParty('${party.name}', '${party.contact}', '${party.mobile}')"><div class="autocomplete-item-name">${party.name}</div><div class="autocomplete-item-details">📞 ${party.mobile} • ${party.contact}</div></div>`;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        // Select FROM party (Customer)
+        function selectFromParty(name, contact, mobile) {
+            document.getElementById('fromPartyName').value = name;
+            document.getElementById('fromContactPerson').value = contact;
+            document.getElementById('fromPartyDropdown').classList.remove('show');
+            updateSummary();
+        }
+
+        // Select TO party (Supplier)
+        function selectToParty(name, contact, mobile) {
+            document.getElementById('toPartyName').value = name;
+            document.getElementById('toContactPerson').value = contact;
+            document.getElementById('toPartyDropdown').classList.remove('show');
+            updateSummary();
+        }
+
+        // Show party autocomplete dropdown
+        function showPartyDropdown(searchTerm) {
+            const dropdown = document.getElementById('partyDropdown');
+            
+            if (searchTerm.length < 2) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            // Filter parties based on current type and search term
+            const filtered = partyDatabase.filter(party => 
+                party.type === currentPaymentType &&
+                party.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            // Build dropdown HTML
+            let html = '';
+            filtered.forEach(party => {
+                html += `
+                    <div class="autocomplete-item" onclick="selectParty('${party.name}', '${party.contact}', '${party.mobile}')">
+                        <div class="autocomplete-item-name">${party.name}</div>
+                        <div class="autocomplete-item-details">📞 ${party.mobile} • ${party.contact}</div>
+                    </div>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        // Select party from dropdown
+        function selectParty(name, contact, mobile) {
+            document.getElementById('partyName').value = name;
+            document.getElementById('contactPerson').value = contact;
+            document.getElementById('mobile').value = mobile;
+            document.getElementById('partyDropdown').classList.remove('show');
+        }
+
+        // Update payment mode fields
+        document.getElementById('paymentMode').addEventListener('change', function() {
+            const mode = this.value;
+            const chequeGroup = document.getElementById('chequeDetailsGroup');
+            const transactionGroup = document.getElementById('transactionDetailsGroup');
+
+            chequeGroup.style.display = mode === 'cheque' ? 'block' : 'none';
+            transactionGroup.style.display = mode === 'online' ? 'block' : 'none';
+
+            updateSummary();
+        });
+
+        // Update summary card
+        function updateSummary() {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const mode = document.getElementById('paymentMode').selectedOptions[0].text;
+
+            document.getElementById('summaryAmount').textContent = '₹ ' + amount.toLocaleString('en-IN');
+            
+            // For adjustment payment, show FROM → TO parties
+            if (currentPaymentType === 'adjustment') {
+                const fromParty = document.getElementById('fromPartyName').value || 'Not Selected';
+                const toParty = document.getElementById('toPartyName').value || 'Not Selected';
+                document.getElementById('summaryMode').innerHTML = `<span style="font-size:11px;">${fromParty} → ${toParty}</span>`;
+            } else {
+                document.getElementById('summaryMode').textContent = mode;
+            }
+            
+            document.getElementById('summaryTotal').textContent = '₹ ' + amount.toLocaleString('en-IN');
+        }
+
+        // Save payment
+        function savePayment() {
+            const paymentDate = document.getElementById('paymentDate').value;
+            const amount = document.getElementById('amount').value;
+
+            // Validate based on payment type
+            if (currentPaymentType === 'adjustment') {
+                // For adjustment, validate both FROM and TO parties
+                const fromParty = document.getElementById('fromPartyName').value;
+                const toParty = document.getElementById('toPartyName').value;
+                
+                if (!fromParty || !toParty || !amount || !paymentDate) {
+                    alert('❌ Please fill all required fields:\n• FROM Party (Customer)\n• TO Party (Supplier)\n• Amount\n• Payment Date');
+                    return;
+                }
+
+                alert(`✅ Adjustment Payment Saved!\n\nFrom: ${fromParty} (Customer)\nTo: ${toParty} (Supplier)\nAmount: ₹ ${parseFloat(amount).toLocaleString('en-IN')}\nDate: ${paymentDate}\n\n📊 Both ledgers will be updated:\n• ${fromParty} ledger: Credit\n• ${toParty} ledger: Debit`);
+                
+            } else {
+                // For normal client/supplier payment
+                const partyName = document.getElementById('partyName').value;
+                
+                if (!partyName || !amount || !paymentDate) {
+                    alert('❌ Please fill all required fields (marked with *)');
+                    return;
+                }
+
+                alert(`✅ Payment Saved Successfully!\n\nParty: ${partyName}\nAmount: ₹ ${parseFloat(amount).toLocaleString('en-IN')}\nType: ${currentPaymentType.toUpperCase()}\nDate: ${paymentDate}`);
+            }
+            
+            // Reset form
+            resetForm();
+        }
+
+        // Reset form
+        function resetForm() {
+            // Reset common fields
+            document.getElementById('amount').value = '';
+            document.getElementById('remarks').value = '';
+            document.getElementById('paymentMode').value = 'cash';
+            document.getElementById('chequeNumber').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('chequeDetailsGroup').style.display = 'none';
+            document.getElementById('transactionDetailsGroup').style.display = 'none';
+            
+            // Reset single party section fields
+            document.getElementById('partyName').value = '';
+            document.getElementById('contactPerson').value = '';
+            document.getElementById('mobile').value = '';
+            
+            // Reset adjustment section fields
+            document.getElementById('fromPartyName').value = '';
+            document.getElementById('fromContactPerson').value = '';
+            document.getElementById('toPartyName').value = '';
+            document.getElementById('toContactPerson').value = '';
+            
+            updateSummary();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('partyDropdown').classList.remove('show');
+            }
+        });
+
+        // Export payments
+        function exportPayments() {
+            alert('📤 Exporting payment records...');
+        }
+
+        // View payment report
+        function viewPaymentReport() {
+            alert('📊 Opening payment report...');
+        }
+
+        // Initialize
+        updateSummary();
+    </script>
+</body>
+</html>

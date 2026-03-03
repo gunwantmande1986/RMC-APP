@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Mobile View Demo - RMC ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a9eff;
+        }
+
+        .demo-section {
+            margin-bottom: 40px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #90d090;
+        }
+
+        .size-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 10px 20px;
+            background: #2a4a6a;
+            border: 2px solid #4a6b8a;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .size-btn:hover {
+            background: #3a5a7a;
+            border-color: #6a8aaa;
+        }
+
+        .size-btn.active {
+            background: #4a9eff;
+            border-color: #6ab9ff;
+        }
+
+        .phone-frame {
+            background: #000;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            margin: 0 auto;
+            transition: all 0.5s;
+        }
+
+        .phone-frame.mobile {
+            width: 375px;
+            height: 667px;
+        }
+
+        .phone-frame.tablet {
+            width: 768px;
+            height: 1024px;
+        }
+
+        .phone-frame.desktop {
+            width: 100%;
+            height: 800px;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 20px;
+            background: #fff;
+        }
+
+        .info-box {
+            background: rgba(74, 107, 138, 0.2);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #90d090;
+            margin-bottom: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .checklist li::before {
+            content: '✅ ';
+            margin-right: 10px;
+        }
+
+        .current-size {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 RMC ERP - Mobile Responsive Demo</h1>
+
+        <div class="demo-section">
+            <div class="demo-title">🎮 Device Size Selector</div>
+            
+            <div class="size-selector">
+                <button class="size-btn active" onclick="changeSize('mobile')">
+                    📱 Mobile (375x667)
+                </button>
+                <button class="size-btn" onclick="changeSize('tablet')">
+                    📱 Tablet (768x1024)
+                </button>
+                <button class="size-btn" onclick="changeSize('desktop')">
+                    🖥️ Desktop (Full Width)
+                </button>
+            </div>
+
+            <div class="current-size" id="currentSize">
+                Current Size: 📱 Mobile - 375 x 667 px (iPhone SE)
+            </div>
+
+            <div id="phoneFrame" class="phone-frame mobile">
+                <iframe 
+                    id="appFrame"
+                    class="phone-screen" 
+                    src="http://localhost:8080"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups">
+                </iframe>
+            </div>
+
+            <div class="info-box">
+                <h3>🔍 Mobile Features ko Test Karo:</h3>
+                <ul class="checklist">
+                    <li>Login page पर inputs बड़े हैं (touch-friendly)</li>
+                    <li>Dashboard पर ☰ (hamburger) menu दिख रहा है</li>
+                    <li>Stats cards एक के नीचे एक stack हो गए</li>
+                    <li>☰ menu click करने पर sidebar slide होता है</li>
+                    <li>Forms single column में हैं</li>
+                    <li>Buttons full-width हैं</li>
+                    <li>Tables horizontally scroll होते हैं</li>
+                </ul>
+            </div>
+
+            <div class="info-box" style="margin-top: 20px; background: rgba(144, 208, 144, 0.1); border-color: #90d090;">
+                <h3>✅ Test करने के लिए:</h3>
+                <ol style="padding-left: 20px;">
+                    <li><strong>Login करो:</strong> admin / admin123</li>
+                    <li><strong>☰ Menu click करो:</strong> Top-left corner</li>
+                    <li><strong>Sidebar check करो:</strong> Left se slide hona chahiye</li>
+                    <li><strong>Menu item click करो:</strong> Auto-close hona chahiye</li>
+                    <li><strong>Form open करो:</strong> Fields single column में</li>
+                    <li><strong>View Entries:</strong> Table swipe karke dekho</li>
+                </ol>
+            </div>
+
+            <div class="info-box" style="margin-top: 20px; background: rgba(74, 158, 255, 0.1); border-color: #4a9eff;">
+                <h3>📱 Real Phone Testing:</h3>
+                <p style="margin: 10px 0;">
+                    <strong>Phone browser में type करो:</strong><br>
+                    <code style="background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; display: inline-block; margin-top: 5px;">
+                        http://192.168.1.22:8080
+                    </code>
+                </p>
+                <p style="margin-top: 10px; font-size: 12px; color: #8aa4c4;">
+                    💡 Computer aur phone same WiFi network pe hone chahiye
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeSize(size) {
+            const frame = document.getElementById('phoneFrame');
+            const sizeDisplay = document.getElementById('currentSize');
+            const buttons = document.querySelectorAll('.size-btn');
+
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Update frame size
+            frame.className = 'phone-frame ' + size;
+
+            // Update display text and active button
+            let displayText = '';
+            switch(size) {
+                case 'mobile':
+                    displayText = 'Current Size: 📱 Mobile - 375 x 667 px (iPhone SE)';
+                    buttons[0].classList.add('active');
+                    break;
+                case 'tablet':
+                    displayText = 'Current Size: 📱 Tablet - 768 x 1024 px (iPad)';
+                    buttons[1].classList.add('active');
+                    break;
+                case 'desktop':
+                    displayText = 'Current Size: 🖥️ Desktop - Full Width (1024px+)';
+                    buttons[2].classList.add('active');
+                    break;
+            }
+            sizeDisplay.textContent = displayText;
+
+            console.log('✅ Changed to:', size);
+        }
+
+        // Log when iframe loads
+        document.getElementById('appFrame').addEventListener('load', function() {
+            console.log('✅ ERP loaded in demo frame');
+        });
+    </script>
+</body>
+</html>

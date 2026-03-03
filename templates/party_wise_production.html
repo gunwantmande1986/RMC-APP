@@ -1,0 +1,828 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party-wise Production Report - Professional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #162238 100%);
+            color: #e8f1ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .report-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #1a2942 0%, #0f1e32 100%);
+            border-radius: 12px;
+            border: 2px solid #2d4a6f;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .report-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0d1f35 100%);
+            border-bottom: 3px solid #4a90e2;
+            padding: 25px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 48%, rgba(74, 144, 226, 0.1) 50%, transparent 52%);
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .report-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4a90e2;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .report-title::before {
+            content: '';
+            font-size: 32px;
+        }
+
+        .company-info {
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4a90e2;
+        }
+
+        .company-details {
+            font-size: 11px;
+            color: #8aa4c4;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: linear-gradient(135deg, #0f1f35 0%, #1a2942 100%);
+            border-bottom: 2px solid #2d4a6f;
+            padding: 20px 30px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #4a90e2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input {
+            background: #0a1628;
+            border: 1px solid #2d4a6f;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #e8f1ff;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background: #0d1f35;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        /* Date Input Styling */
+        input[type="date"].filter-input {
+            position: relative;
+            color: #e8f1ff;
+            cursor: pointer;
+        }
+
+        input[type="date"].filter-input::-webkit-calendar-picker-indicator {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%234a90e2"><rect x="1" y="3" width="14" height="12" rx="2" fill="none" stroke="%234a90e2" stroke-width="1.5"/><line x1="1" y1="6" x2="15" y2="6" stroke="%234a90e2" stroke-width="1.5"/><circle cx="5" cy="9" r="1" fill="%234a90e2"/><circle cx="8" cy="9" r="1" fill="%234a90e2"/><circle cx="11" cy="9" r="1" fill="%234a90e2"/><circle cx="5" cy="12" r="1" fill="%234a90e2"/><circle cx="8" cy="12" r="1" fill="%234a90e2"/><circle cx="11" cy="12" r="1" fill="%234a90e2"/></svg>') no-repeat;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        input[type="date"].filter-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Date input text color */
+        input[type="date"].filter-input::-webkit-datetime-edit {
+            color: #e8f1ff;
+        }
+
+        input[type="date"].filter-input::-webkit-datetime-edit-fields-wrapper {
+            color: #e8f1ff;
+        }
+
+        input[type="date"].filter-input::-webkit-datetime-edit-text {
+            color: #8aa4c4;
+        }
+
+        input[type="date"].filter-input::-webkit-datetime-edit-month-field,
+        input[type="date"].filter-input::-webkit-datetime-edit-day-field,
+        input[type="date"].filter-input::-webkit-datetime-edit-year-field {
+            color: #4a90e2;
+            font-weight: 600;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2d4a6f;
+            color: #e8f1ff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+            color: white;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            padding: 25px 30px;
+            border-bottom: 2px solid #2d4a6f;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4a90e2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2d4a6f;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #0d1f35 0%, #1a2942 100%);
+            border: 1px solid #2d4a6f;
+            border-radius: 8px;
+            padding: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            border-color: #4a90e2;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-icon {
+            font-size: 24px;
+            opacity: 0.6;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4a90e2;
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: #6a8aaa;
+        }
+
+        /* Data Table */
+        .table-section {
+            padding: 25px 30px;
+        }
+
+        .table-container {
+            background: #0a1628;
+            border: 2px solid #2d4a6f;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0d1f35 100%);
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        .data-table th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: #4a90e2;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #1a2942;
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: rgba(10, 22, 40, 0.3);
+        }
+
+        .data-table td {
+            padding: 12px;
+            color: #c8d9f0;
+        }
+
+        .data-table tfoot {
+            background: linear-gradient(135deg, #1a2942 0%, #0d1f35 100%);
+            border-top: 2px solid #4a90e2;
+        }
+
+        .data-table tfoot td {
+            padding: 14px 12px;
+            font-weight: 700;
+            color: #4a90e2;
+            font-size: 14px;
+        }
+
+        .cell-number {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .cell-center {
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+
+        .badge-warning {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+
+        .badge-danger {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* Footer */
+        .report-footer {
+            background: linear-gradient(135deg, #0d1f35 0%, #1a2942 100%);
+            border-top: 2px solid #2d4a6f;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            font-size: 11px;
+            color: #6a8aaa;
+        }
+
+        /* Toast Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="report-header">
+            <div class="header-top">
+                <div class="report-title">
+                    Party-wise Production Report
+                </div>
+                <div class="company-info">
+                    <div class="company-name">RMC PLANT ERP</div>
+                    <div class="company-details">Plant A - XYZ | FY 2025-26</div>
+                    <div class="company-details">Customer Analysis Report</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Panel -->
+        <div class="filter-panel">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label"> From Date</label>
+                    <input type="date" class="filter-input" id="fromDate" value="2026-01-01">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"> To Date</label>
+                    <input type="date" class="filter-input" id="toDate" value="2026-01-31">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"> Party Filter</label>
+                    <select class="filter-input" id="partyFilter">
+                        <option value="all" selected>All Parties</option>
+                        <option value="top10">Top 10 Parties</option>
+                        <option value="outstanding">With Outstanding</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"> Payment Status</label>
+                    <select class="filter-input" id="paymentFilter">
+                        <option value="all" selected>All Status</option>
+                        <option value="paid">Paid</option>
+                        <option value="partial">Partial</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"> Sort By</label>
+                    <select class="filter-input" id="sortBy">
+                        <option value="quantity" selected>Quantity (High to Low)</option>
+                        <option value="revenue">Revenue (High to Low)</option>
+                        <option value="name">Party Name (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="resetFilters()"> Reset</button>
+                <button class="btn btn-primary" onclick="generateReport()"> Generate</button>
+                <button class="btn btn-success" onclick="exportToExcel()"> Export Excel</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="section-title">
+                 PARTY PERFORMANCE OVERVIEW - JANUARY 2026
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Parties</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">24</div>
+                    <div class="card-subtitle">Active Customers</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Supply</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">3,428.75</div>
+                    <div class="card-subtitle">CUM Total Production</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Revenue</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">₹ 1.85 Cr</div>
+                    <div class="card-subtitle">Total Billing Amount</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Outstanding</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">₹ 45.2 L</div>
+                    <div class="card-subtitle">Pending Collection</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Collection %</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">75.6%</div>
+                    <div class="card-subtitle">Payment Received</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <div class="card-title">Avg Per Party</div>
+                        <div class="card-icon"></div>
+                    </div>
+                    <div class="card-value">142.86</div>
+                    <div class="card-subtitle">CUM per Customer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <div class="section-title">
+                 DETAILED PARTY-WISE BREAKDOWN
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>PARTY NAME</th>
+                            <th class="cell-center">DELIVERIES</th>
+                            <th class="cell-number">QTY (CUM)</th>
+                            <th class="cell-number">REVENUE (₹)</th>
+                            <th class="cell-number">PAID (₹)</th>
+                            <th class="cell-number">OUTSTANDING (₹)</th>
+                            <th class="cell-center">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>ABC Constructions Pvt Ltd</strong></td>
+                            <td class="cell-center">124</td>
+                            <td class="cell-number">612.50</td>
+                            <td class="cell-number">₹ 32,85,000</td>
+                            <td class="cell-number">₹ 30,00,000</td>
+                            <td class="cell-number">₹ 2,85,000</td>
+                            <td class="cell-center"><span class="badge badge-warning">Partial</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><strong>XYZ Infrastructure Ltd</strong></td>
+                            <td class="cell-center">98</td>
+                            <td class="cell-number">485.25</td>
+                            <td class="cell-number">₹ 26,12,500</td>
+                            <td class="cell-number">₹ 26,12,500</td>
+                            <td class="cell-number">₹ 0</td>
+                            <td class="cell-center"><span class="badge badge-success">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><strong>PQR Builders & Developers</strong></td>
+                            <td class="cell-center">87</td>
+                            <td class="cell-number">428.75</td>
+                            <td class="cell-number">₹ 23,45,000</td>
+                            <td class="cell-number">₹ 15,00,000</td>
+                            <td class="cell-number">₹ 8,45,000</td>
+                            <td class="cell-center"><span class="badge badge-danger">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><strong>LMN Housing Projects</strong></td>
+                            <td class="cell-center">76</td>
+                            <td class="cell-number">375.50</td>
+                            <td class="cell-number">₹ 20,12,000</td>
+                            <td class="cell-number">₹ 20,12,000</td>
+                            <td class="cell-number">₹ 0</td>
+                            <td class="cell-center"><span class="badge badge-success">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><strong>RST Enterprises</strong></td>
+                            <td class="cell-center">65</td>
+                            <td class="cell-number">321.25</td>
+                            <td class="cell-number">₹ 17,25,000</td>
+                            <td class="cell-number">₹ 12,00,000</td>
+                            <td class="cell-number">₹ 5,25,000</td>
+                            <td class="cell-center"><span class="badge badge-warning">Partial</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: #6a8aaa; font-style: italic; padding: 20px;">
+                                ... 19 more parties ...
+                            </td>
+                            <td class="cell-center">892</td>
+                            <td class="cell-number">1,205.50</td>
+                            <td class="cell-number">₹ 65,80,778</td>
+                            <td class="cell-number">₹ 52,75,500</td>
+                            <td class="cell-number">₹ 13,05,278</td>
+                            <td class="cell-center">-</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2"><strong>TOTAL (24 Parties)</strong></td>
+                            <td class="cell-center"><strong>1,342</strong></td>
+                            <td class="cell-number"><strong>3,428.75</strong></td>
+                            <td class="cell-number"><strong>₹ 1,85,60,278</strong></td>
+                            <td class="cell-number"><strong>₹ 1,40,00,000</strong></td>
+                            <td class="cell-number"><strong>₹ 45,60,278</strong></td>
+                            <td class="cell-center">-</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            <div class="footer-info">
+                <div>Generated: <strong>28-01-2026 09:06:07 PM</strong></div>
+                <div>By: <strong>Gunvant Admin</strong></div>
+                <div style="margin-top: 5px; color: #4a90e2;">RMC Plant ERP v2.0 |  2026 SKCON</div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="window.print()"> Print</button>
+                <button class="btn btn-primary" onclick="downloadPDF()"> PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        function generateReport() {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:white;padding:15px 25px;border-radius:8px;z-index:10000;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.6);animation:slideIn 0.3s ease;';
+            toast.innerHTML = ' Report Generated!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        function resetFilters() {
+            document.getElementById('fromDate').value = '2026-01-01';
+            document.getElementById('toDate').value = '2026-01-31';
+            document.getElementById('partyFilter').selectedIndex = 0;
+            document.getElementById('paymentFilter').selectedIndex = 0;
+            document.getElementById('sortBy').selectedIndex = 0;
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#2d4a6f 0%,#1a2942 100%);color:#4a90e2;padding:15px 25px;border-radius:8px;z-index:10000;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.6);animation:slideIn 0.3s ease;';
+            toast.innerHTML = ' Filters Reset';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 1500);
+        }
+
+        function exportToExcel() {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:white;padding:15px 25px;border-radius:8px;z-index:10000;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.6);animation:slideIn 0.3s ease;';
+            toast.innerHTML = ' Excel Exported!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape for better table fit
+            
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 15;
+            
+            // Header
+            pdf.setFillColor(26, 41, 66);
+            pdf.rect(0, 0, pageWidth, 35, 'F');
+            
+            pdf.setFillColor(74, 144, 226);
+            pdf.circle(25, 17.5, 7, 'F');
+            
+            pdf.setFontSize(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(74, 144, 226);
+            pdf.text('PARTY-WISE PRODUCTION REPORT', pageWidth / 2, 15, { align: 'center' });
+            
+            pdf.setFontSize(8);
+            pdf.setTextColor(138, 164, 196);
+            pdf.text('RMC PLANT ERP | Plant A - XYZ | FY 2025-26 | Month: January 2026', pageWidth / 2, 22, { align: 'center' });
+            
+            pdf.setDrawColor(74, 144, 226);
+            pdf.setLineWidth(0.5);
+            pdf.line(margin, 37, pageWidth - margin, 37);
+            
+            let yPos = 45;
+            
+            // Summary
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(74, 144, 226);
+            pdf.text('SUMMARY', margin, yPos);
+            yPos += 8;
+            
+            // Table Header
+            pdf.setFillColor(30, 58, 95);
+            pdf.rect(margin, yPos - 2, pageWidth - 2*margin, 8, 'F');
+            
+            pdf.setFontSize(8);
+            pdf.setTextColor(74, 144, 226);
+            
+            const headers = ['#', 'PARTY NAME', 'DELIVERIES', 'QTY (CUM)', 'REVENUE', 'PAID', 'OUTSTANDING', 'STATUS'];
+            const colX = [margin + 3, margin + 15, margin + 90, margin + 120, margin + 150, margin + 180, margin + 210, margin + 250];
+            
+            headers.forEach((h, i) => pdf.text(h, colX[i], yPos + 5));
+            yPos += 10;
+            
+            // Table Data
+            const data = [
+                ['1', 'ABC Constructions Pvt Ltd', '124', '612.50', 'Rs 32.85 L', 'Rs 30.00 L', 'Rs 2.85 L', 'Partial'],
+                ['2', 'XYZ Infrastructure Ltd', '98', '485.25', 'Rs 26.13 L', 'Rs 26.13 L', 'Rs 0', 'Paid'],
+                ['3', 'PQR Builders & Developers', '87', '428.75', 'Rs 23.45 L', 'Rs 15.00 L', 'Rs 8.45 L', 'Pending'],
+                ['4', 'LMN Housing Projects', '76', '375.50', 'Rs 20.12 L', 'Rs 20.12 L', 'Rs 0', 'Paid'],
+                ['5', 'RST Enterprises', '65', '321.25', 'Rs 17.25 L', 'Rs 12.00 L', 'Rs 5.25 L', 'Partial']
+            ];
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(7);
+            
+            data.forEach((row, idx) => {
+                if (idx % 2 === 0) {
+                    pdf.setFillColor(20, 35, 55);
+                } else {
+                    pdf.setFillColor(13, 25, 45);
+                }
+                pdf.rect(margin, yPos - 2, pageWidth - 2*margin, 7, 'F');
+                
+                pdf.setTextColor(255, 255, 255);
+                row.forEach((cell, i) => pdf.text(cell, colX[i], yPos + 3));
+                yPos += 7;
+            });
+            
+            // Total
+            pdf.setFillColor(26, 41, 66);
+            pdf.rect(margin, yPos, pageWidth - 2*margin, 8, 'F');
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(74, 144, 226);
+            pdf.setFontSize(8);
+            
+            pdf.text('TOTAL', margin + 3, yPos + 5);
+            pdf.text('1,342', colX[2], yPos + 5);
+            pdf.text('3,428.75', colX[3], yPos + 5);
+            pdf.text('Rs 1.85 Cr', colX[4], yPos + 5);
+            pdf.text('Rs 1.40 Cr', colX[5], yPos + 5);
+            pdf.text('Rs 45.60 L', colX[6], yPos + 5);
+            
+            // Footer
+            const footerY = pageHeight - 15;
+            pdf.setLineWidth(0.3);
+            pdf.line(margin, footerY, pageWidth - margin, footerY);
+            
+            pdf.setFontSize(7);
+            pdf.setTextColor(106, 138, 170);
+            pdf.text('Generated: 28-01-2026 | By: Gunvant Admin', margin, footerY + 5);
+            pdf.text('RMC Plant ERP v2.0 | (C) 2026 SKCON', pageWidth - margin, footerY + 5, { align: 'right' });
+            
+            pdf.save('Party_Wise_Production_January_2026.pdf');
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:white;padding:15px 25px;border-radius:8px;z-index:10000;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.6);animation:slideIn 0.3s ease;';
+            toast.innerHTML = ' PDF Downloaded!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        console.log('Party-wise Production Report loaded');
+    </script>
+</body>
+</html>
+
+
+

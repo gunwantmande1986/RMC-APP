@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMC Reports - Blueprint Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2332 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .reports-header {
+            background: rgba(10, 22, 40, 0.95);
+            padding: 25px 40px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #3498db;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: rgba(26, 35, 50, 0.8);
+            padding: 20px 40px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input {
+            background: rgba(10, 22, 40, 0.6);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #fff;
+            font-size: 14px;
+            min-width: 180px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px 40px;
+        }
+
+        /* Report Categories Grid */
+        .report-categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: rgba(26, 35, 50, 0.8);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .category-card:hover {
+            border-color: #3498db;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+
+        .category-desc {
+            font-size: 12px;
+            color: #95a5a6;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .category-count {
+            font-size: 11px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* Report List Section */
+        .report-section {
+            background: rgba(26, 35, 50, 0.6);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Report Items */
+        .report-items {
+            display: grid;
+            gap: 15px;
+        }
+
+        .report-item {
+            background: rgba(10, 22, 40, 0.6);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .report-item:hover {
+            border-color: #3498db;
+            background: rgba(26, 35, 50, 0.8);
+            transform: translateX(5px);
+        }
+
+        .report-info {
+            flex: 1;
+        }
+
+        .report-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .report-description {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+
+        .report-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-blue { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+        .tag-green { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+        .tag-purple { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+        .tag-orange { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(52, 152, 219, 0.4);
+            background: transparent;
+            color: #3498db;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .report-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .report-tab:hover {
+            color: #3498db;
+        }
+
+        .report-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: rgba(10, 22, 40, 0.8);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .preview-table thead {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .preview-table th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #3498db;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .preview-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+            font-size: 14px;
+        }
+
+        .preview-table tbody tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .badge-warning {
+            background: rgba(230, 126, 34, 0.2);
+            color: #e67e22;
+            border: 1px solid #e67e22;
+        }
+
+        .badge-info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .report-categories {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .report-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .report-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="reports-header">
+        <div class="header-top">
+            <h1 class="header-title">📊 RMC Reports System</h1>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total Reports</div>
+                    <div class="stat-value">42</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-value">8</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Recent</div>
+                    <div class="stat-value">12</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label class="filter-label">Report Category</label>
+            <select class="filter-input">
+                <option>All Reports</option>
+                <option>Production Reports</option>
+                <option>Sales Reports</option>
+                <option>Rate Reports</option>
+                <option>Party Reports</option>
+                <option>Financial Reports</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Date Range</label>
+            <input type="date" class="filter-input" value="2026-01-01">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">To Date</label>
+            <input type="date" class="filter-input" value="2026-01-31">
+        </div>
+        <div class="filter-group" style="margin-top: 20px;">
+            <button class="btn btn-primary">🔍 FILTER</button>
+        </div>
+        <div class="filter-group" style="margin-top: 20px; margin-left: auto;">
+            <button class="btn btn-success">📥 EXPORT</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Report Categories -->
+        <div class="report-categories">
+            <div class="category-card">
+                <div class="category-icon">🏗️</div>
+                <div class="category-title">Production Reports</div>
+                <div class="category-desc">Daily production, grade-wise analysis, vehicle tracking</div>
+                <div class="category-count">8 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">💼</div>
+                <div class="category-title">Sales Reports</div>
+                <div class="category-desc">Party-wise sales, site dispatch, revenue analysis</div>
+                <div class="category-count">6 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">💹</div>
+                <div class="category-title">Rate Reports</div>
+                <div class="category-desc">Rate history, changes, impact analysis</div>
+                <div class="category-count">7 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">👥</div>
+                <div class="category-title">Party Reports</div>
+                <div class="category-desc">Ledger, statements, outstanding</div>
+                <div class="category-count">9 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">💰</div>
+                <div class="category-title">Financial Reports</div>
+                <div class="category-desc">Revenue, profitability, cash flow</div>
+                <div class="category-count">5 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🧾</div>
+                <div class="category-title">GST Reports</div>
+                <div class="category-desc">GSTR-1, tax summary, compliance</div>
+                <div class="category-count">4 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">⚖️</div>
+                <div class="category-title">Cash vs Billing</div>
+                <div class="category-desc">Compare cash and billing production</div>
+                <div class="category-count">3 Reports</div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🔐</div>
+                <div class="category-title">Dual Rate System</div>
+                <div class="category-desc">Profitability analysis (Admin only)</div>
+                <div class="category-count">4 Reports</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="report-tabs">
+            <div class="report-tab active">All Reports</div>
+            <div class="report-tab">Production</div>
+            <div class="report-tab">Rate Analysis</div>
+            <div class="report-tab">Party Reports</div>
+            <div class="report-tab">Financial</div>
+        </div>
+
+        <!-- Production Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>🏗️</span>
+                    Production Reports
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📅 Daily Production Register</div>
+                        <div class="report-description">Complete day-wise production with time, party, grade, quantity details</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Real-time</span>
+                            <span class="tag tag-green">Detailed</span>
+                            <span class="tag tag-purple">Print Ready</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🎯 Grade-wise Production Analysis</div>
+                        <div class="report-description">M20, M25, M30, M40 production breakdown with quantities and percentages</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Analytics</span>
+                            <span class="tag tag-green">Charts</span>
+                            <span class="tag tag-orange">Excel Export</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🚛 Vehicle-wise Production Report</div>
+                        <div class="report-description">Track trips by vehicle, driver efficiency, utilization metrics</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Fleet Tracking</span>
+                            <span class="tag tag-green">Efficiency</span>
+                            <span class="tag tag-purple">Route Analysis</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>💹</span>
+                    Rate Reports & Analysis
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📜 Rate Change History</div>
+                        <div class="report-description">Complete timeline of all rate changes with old/new rates and reasons</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Timeline</span>
+                            <span class="tag tag-green">All Changes</span>
+                            <span class="tag tag-orange">Audit Trail</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💰 Revenue Impact Analysis</div>
+                        <div class="report-description">Financial impact of rate changes on revenue and profitability</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Revenue</span>
+                            <span class="tag tag-green">Impact</span>
+                            <span class="tag tag-purple">Projection</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🔄 Rate Comparison Report</div>
+                        <div class="report-description">Compare rates across parties, identify highest/lowest, market positioning</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Comparison</span>
+                            <span class="tag tag-green">Market Position</span>
+                            <span class="tag tag-orange">Range Analysis</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Party Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>👥</span>
+                    Party Reports
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📒 Party Ledger (Detailed)</div>
+                        <div class="report-description">Complete transaction history with challan-wise details and running balance</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">All Transactions</span>
+                            <span class="tag tag-green">Balance</span>
+                            <span class="tag tag-purple">Statement</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🎯 Grade-wise Summary</div>
+                        <div class="report-description">Party consumption grouped by grade with quantities and amounts</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Grouped</span>
+                            <span class="tag tag-green">By Grade</span>
+                            <span class="tag tag-orange">Totals</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💳 Outstanding Statement</div>
+                        <div class="report-description">Pending invoices with aging analysis (0-30, 31-60, 60+ days)</div>
+                        <div class="report-tags">
+                            <span class="tag tag-orange">Aging</span>
+                            <span class="tag tag-blue">Outstanding</span>
+                            <span class="tag tag-green">Analysis</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📧 Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dual Rate System (Admin Only) -->
+        <div class="report-section" style="border: 2px solid rgba(231, 76, 60, 0.3);">
+            <div class="section-header">
+                <h2 class="section-title" style="color: #e74c3c;">
+                    <span>🔐</span>
+                    Dual Rate System Reports (Admin Only)
+                </h2>
+                <span class="badge badge-warning">Confidential</span>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💰 Profitability Analysis</div>
+                        <div class="report-description">Cost vs Billing rate comparison with margin % and profit amounts</div>
+                        <div class="report-tags">
+                            <span class="tag tag-orange">Internal Only</span>
+                            <span class="tag tag-blue">Margins</span>
+                            <span class="tag tag-green">Profit</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🏢 Party-wise Profitability</div>
+                        <div class="report-description">Which parties are most profitable, margin analysis by customer</div>
+                        <div class="report-tags">
+                            <span class="tag tag-orange">By Party</span>
+                            <span class="tag tag-blue">Margins</span>
+                            <span class="tag tag-green">Top Profitable</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cash vs Billing Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>⚖️</span>
+                    Cash vs Billing Production Reports
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📊 Cash vs Billing Comparison</div>
+                        <div class="report-description">Side-by-side comparison of cash and billing production with quantities and amounts</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Comparison</span>
+                            <span class="tag tag-green">Analytics</span>
+                            <span class="tag tag-purple">Charts</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💰 Cash Production Register</div>
+                        <div class="report-description">All cash production entries (No GST) with party details and payment status</div>
+                        <div class="report-tags">
+                            <span class="tag tag-green">Cash Only</span>
+                            <span class="tag tag-blue">No GST</span>
+                            <span class="tag tag-orange">Payment Tracking</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🧾 Billing Production Register</div>
+                        <div class="report-description">All billing production entries with GST, invoice numbers and credit terms</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">With GST</span>
+                            <span class="tag tag-green">Invoiced</span>
+                            <span class="tag tag-purple">Credit Sales</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📈 Production Type Trends</div>
+                        <div class="report-description">Monthly trends showing cash vs billing ratio with revenue breakdown</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Trends</span>
+                            <span class="tag tag-green">Monthly</span>
+                            <span class="tag tag-orange">Revenue Mix</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>💰</span>
+                    Financial Reports
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💵 Revenue Summary Report</div>
+                        <div class="report-description">Total revenue by period with month-on-month growth analysis</div>
+                        <div class="report-tags">
+                            <span class="tag tag-green">Revenue</span>
+                            <span class="tag tag-blue">Growth</span>
+                            <span class="tag tag-purple">MoM Analysis</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📊 Chart</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💎 Profitability Dashboard</div>
+                        <div class="report-description">Gross profit, operating expenses, net profit margins with KPIs</div>
+                        <div class="report-tags">
+                            <span class="tag tag-green">Profit</span>
+                            <span class="tag tag-blue">Margins</span>
+                            <span class="tag tag-orange">KPIs</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💸 Cash Flow Statement</div>
+                        <div class="report-description">Cash inflows and outflows with opening/closing balance reconciliation</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">Cash Flow</span>
+                            <span class="tag tag-green">Reconciliation</span>
+                            <span class="tag tag-purple">Balance Sheet</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📊 Receivables vs Payables</div>
+                        <div class="report-description">Outstanding receivables and payables with aging and payment forecasts</div>
+                        <div class="report-tags">
+                            <span class="tag tag-orange">Aging</span>
+                            <span class="tag tag-blue">Forecast</span>
+                            <span class="tag tag-green">Working Capital</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GST Reports Section -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>🧾</span>
+                    GST Reports & Compliance
+                </h2>
+                <button class="btn btn-primary">View All</button>
+            </div>
+
+            <div class="report-items">
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">📋 GSTR-1 Report</div>
+                        <div class="report-description">Outward supplies with HSN code, taxable value, CGST, SGST, IGST details</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">GSTR-1</span>
+                            <span class="tag tag-green">Outward</span>
+                            <span class="tag tag-orange">Compliance</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">💹 GST Summary Report</div>
+                        <div class="report-description">Total taxable value, GST collected, input tax credit, net GST payable</div>
+                        <div class="report-tags">
+                            <span class="tag tag-green">Summary</span>
+                            <span class="tag tag-blue">Tax Liability</span>
+                            <span class="tag tag-purple">ITC</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">🎯 HSN-wise Summary</div>
+                        <div class="report-description">HSN code 25239000 (RMC) with quantity, value and tax breakup</div>
+                        <div class="report-tags">
+                            <span class="tag tag-blue">HSN Code</span>
+                            <span class="tag tag-green">Breakup</span>
+                            <span class="tag tag-orange">GSTR-1</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📥 Export</button>
+                    </div>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-name">✅ GST Compliance Checklist</div>
+                        <div class="report-description">Monthly compliance status, filing dates, pending returns and alerts</div>
+                        <div class="report-tags">
+                            <span class="tag tag-orange">Compliance</span>
+                            <span class="tag tag-blue">Filing</span>
+                            <span class="tag tag-green">Alerts</span>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn">👁️ View</button>
+                        <button class="action-btn">📧 Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Report Preview -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h3 class="preview-title">📊 Report Preview - Daily Production Register</h3>
+                <div>
+                    <button class="btn btn-primary">🖨️ Print</button>
+                    <button class="btn btn-success">📥 Export Excel</button>
+                </div>
+            </div>
+
+            <table class="preview-table">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>TIME</th>
+                        <th>PARTY</th>
+                        <th>GRADE</th>
+                        <th>QTY (CuM)</th>
+                        <th>RATE</th>
+                        <th>AMOUNT</th>
+                        <th>TYPE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>24-01-2026</td>
+                        <td>14:30</td>
+                        <td>XYZ Infra Pvt Ltd</td>
+                        <td>M25</td>
+                        <td>4.50</td>
+                        <td>₹5,400</td>
+                        <td>₹24,300</td>
+                        <td><span class="badge badge-info">Billing</span></td>
+                    </tr>
+                    <tr>
+                        <td>24-01-2026</td>
+                        <td>13:15</td>
+                        <td>Ramesh Kumar</td>
+                        <td>M20</td>
+                        <td>2.50</td>
+                        <td>₹4,800</td>
+                        <td>₹12,000</td>
+                        <td><span class="badge badge-success">Cash</span></td>
+                    </tr>
+                    <tr>
+                        <td>24-01-2026</td>
+                        <td>11:45</td>
+                        <td>ABC Constructions</td>
+                        <td>M30</td>
+                        <td>5.00</td>
+                        <td>₹5,800</td>
+                        <td>₹29,000</td>
+                        <td><span class="badge badge-info">Billing</span></td>
+                    </tr>
+                    <tr>
+                        <td>24-01-2026</td>
+                        <td>10:20</td>
+                        <td>PQR Builders</td>
+                        <td>M25</td>
+                        <td>4.00</td>
+                        <td>₹5,500</td>
+                        <td>₹22,000</td>
+                        <td><span class="badge badge-info">Billing</span></td>
+                    </tr>
+                    <tr style="background: rgba(52, 152, 219, 0.1); font-weight: 600;">
+                        <td colspan="4">TOTAL</td>
+                        <td>16.00 CuM</td>
+                        <td>-</td>
+                        <td>₹87,300</td>
+                        <td>4 Entries</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simple tab switching
+        document.querySelectorAll('.report-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Report item click
+        document.querySelectorAll('.report-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('action-btn')) {
+                    console.log('Opening report:', this.querySelector('.report-name').textContent);
+                }
+            });
+        });
+
+        // Category card click
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                console.log('Opening category:', this.querySelector('.category-title').textContent);
+            });
+        });
+    </script>
+</body>
+</html>

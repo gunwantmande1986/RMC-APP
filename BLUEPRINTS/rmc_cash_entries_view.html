@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>📊 View Entries - Cash (v2.0 - STATUS REMOVED)</title>
+    
+    <!-- Flatpickr - Professional Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a1628;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #c8d9f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .entries-container {
+            width: 100%;
+            min-height: 100vh;
+            background: #1a2942;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Grid Background */
+        .entries-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 9px, rgba(100, 150, 200, 0.08) 9px, rgba(100, 150, 200, 0.08) 10px),
+                repeating-linear-gradient(90deg, transparent, transparent 9px, rgba(100, 150, 200, 0.08) 9px, rgba(100, 150, 200, 0.08) 10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            background: rgba(15, 30, 50, 0.6);
+            border: 1px solid #4a6b8a;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #c8d9f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-top: 3px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid #6a8aaa;
+            background: rgba(106, 138, 170, 0.15);
+            color: #c8d9f0;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(106, 138, 170, 0.25);
+            border-color: #8aa4c4;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(144, 208, 144, 0.25) 0%, rgba(106, 186, 106, 0.2) 100%);
+            border: 1px solid #6a8a6a;
+            color: #90d090;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(144, 208, 144, 0.35) 0%, rgba(106, 186, 106, 0.3) 100%);
+            border-color: #90d090;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            opacity: 0.5;
+        }
+
+        /* Filters Panel */
+        .filters-panel {
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 8px 12px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            font-size: 12px;
+            min-width: 150px;
+        }
+
+        /* Professional Date Input Styling */
+        input[type="date"] {
+            position: relative;
+            padding-right: 35px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%238aa4c4" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        input[type="date"]:hover {
+            border-color: #6a8aaa;
+            background-color: rgba(10, 20, 40, 0.5);
+        }
+
+        input[type="date"]:focus {
+            border-color: #90d090;
+            box-shadow: 0 0 0 2px rgba(144, 208, 144, 0.1);
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #6a8aaa;
+            background: rgba(10, 20, 40, 0.6);
+        }
+
+        /* Data Grid */
+        .grid-container {
+            background: rgba(15, 30, 50, 0.4);
+            border: 1px solid #4a6b8a;
+            overflow: hidden;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .grid-toolbar {
+            padding: 12px 15px;
+            border-bottom: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 12px 8px 35px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            font-size: 12px;
+            width: 300px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #8aa4c4;
+        }
+
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(10, 20, 40, 0.2);
+        }
+
+        .grid-table thead {
+            background: rgba(15, 30, 50, 0.6);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .grid-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a6b8a;
+            border-right: 1px solid rgba(74, 107, 138, 0.3);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* DATE Header Highlight */
+        .grid-table th:first-child {
+            background: rgba(106, 138, 170, 0.12);
+            color: #c8d9f0;
+            font-weight: 700;
+            border-right: 2px solid rgba(106, 138, 170, 0.3);
+        }
+
+        .grid-table th:hover {
+            background: rgba(106, 138, 170, 0.1);
+            color: #c8d9f0;
+        }
+
+        .grid-table th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.3;
+        }
+
+        .grid-table tbody tr {
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .grid-table tbody tr:hover {
+            background: rgba(106, 138, 170, 0.1);
+        }
+
+        .grid-table td {
+            padding: 12px 10px;
+            font-size: 12px;
+            color: #c8d9f0;
+            border-right: 1px solid rgba(74, 107, 138, 0.15);
+        }
+
+        /* RATE Column - Wider for proper fit */
+        .grid-table th:nth-child(11),
+        .grid-table td:nth-child(11) {
+            min-width: 85px;
+            width: 85px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .entry-id {
+            font-weight: 700;
+            color: #90d090;
+        }
+
+        .entry-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(144, 208, 144, 0.15);
+            border: 1px solid #6a8a6a;
+            color: #90d090;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 10px;
+            border: 1px solid #4a6b8a;
+            background: rgba(106, 138, 170, 0.1);
+            color: #8aa4c4;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(106, 138, 170, 0.2);
+            border-color: #6a8aaa;
+            color: #c8d9f0;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(208, 128, 144, 0.2);
+            border-color: #d08090;
+            color: #d08090;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .status-cash {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #6a8a6a;
+            color: #90d090;
+        }
+
+        .status-credit {
+            background: rgba(100, 180, 255, 0.2);
+            border: 1px solid #4a8ac4;
+            color: #64b4ff;
+        }
+
+        .status-dummy {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #c48a4a;
+            color: #ffb464;
+        }
+
+        /* Clickable Row */
+        .data-row {
+            cursor: pointer;
+        }
+
+        .data-row:hover {
+            background: rgba(106, 138, 170, 0.15) !important;
+        }
+
+        /* Detail Drawer */
+        .detail-drawer {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 500px;
+            height: 100vh;
+            background: #1a2942;
+            border-left: 2px solid #4a6b8a;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .detail-drawer.open {
+            right: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+        }
+
+        .drawer-header {
+            padding: 20px;
+            border-bottom: 2px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            color: #d08090;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .drawer-close:hover {
+            color: #ff6b6b;
+        }
+
+        .drawer-content {
+            padding: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section-title {
+            font-size: 12px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: rgba(10, 20, 40, 0.4);
+            padding: 12px;
+            border: 1px solid #4a6b8a;
+            border-radius: 3px;
+        }
+
+        .detail-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        /* Pagination */
+        .grid-footer {
+            padding: 12px 15px;
+            border-top: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            background: rgba(106, 138, 170, 0.1);
+            border: 1px solid #4a6b8a;
+            color: #8aa4c4;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: rgba(106, 138, 170, 0.2);
+            color: #c8d9f0;
+        }
+
+        .page-btn.active {
+            background: rgba(144, 208, 144, 0.2);
+            border-color: #90d090;
+            color: #90d090;
+            font-weight: 700;
+        }
+
+        .page-info {
+            font-size: 11px;
+            color: #8aa4c4;
+        }
+
+        /* Scrollbar */
+        .grid-container::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .grid-container::-webkit-scrollbar-track {
+            background: rgba(10, 20, 40, 0.3);
+        }
+
+        .grid-container::-webkit-scrollbar-thumb {
+            background: rgba(106, 138, 170, 0.4);
+            border-radius: 5px;
+        }
+
+        .grid-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(106, 138, 170, 0.6);
+        }
+
+        /* Date Column Styling */
+        .data-row td:first-child {
+            font-weight: 600;
+            color: #c8d9f0;
+            background: rgba(106, 138, 170, 0.08);
+            border-right: 2px solid rgba(106, 138, 170, 0.2);
+            white-space: nowrap;
+        }
+
+        /* Amount highlight */
+        .amount {
+            font-weight: 700;
+            color: #90d090;
+        }
+
+        /* ============================================
+           PRINT STYLES - Professional Print Layout
+           ============================================ */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .entries-container::before,
+            .page-header .header-actions,
+            .filters-panel,
+            .grid-toolbar,
+            .action-btns,
+            .pagination,
+            button {
+                display: none !important;
+            }
+            
+            .page-header {
+                background: white;
+                border: 2px solid #000;
+                margin-bottom: 20px;
+            }
+            
+            .page-title {
+                color: #000;
+                font-size: 24px;
+                text-align: center;
+            }
+            
+            .page-subtitle {
+                color: #333;
+                text-align: center;
+            }
+            
+            .stat-card {
+                background: white;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+            
+            .stat-label, .stat-value {
+                color: #000;
+            }
+            
+            .grid-container {
+                max-height: none;
+                overflow: visible;
+                border: 2px solid #000;
+            }
+            
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            th, td {
+                border: 1px solid #000;
+                padding: 8px;
+                color: #000;
+                background: white;
+            }
+            
+            th {
+                background: #f0f0f0 !important;
+                font-weight: bold;
+            }
+            
+            tr:nth-child(even) {
+                background: #f9f9f9;
+            }
+            
+            .status-badge {
+                border: 1px solid #000;
+                color: #000;
+            }
+            
+            @page {
+                margin: 1.5cm;
+                size: A4 landscape;
+            }
+        }
+
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        
+        /* Tablet Styles (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+
+            .stat-card {
+                min-width: calc(50% - 10px);
+            }
+
+            .filters-panel {
+                flex-wrap: wrap;
+            }
+
+            .filter-group {
+                min-width: 150px;
+            }
+        }
+
+        /* Mobile Styles (< 768px) */
+        @media (max-width: 768px) {
+            .entries-container {
+                padding: 10px;
+            }
+
+            /* Page Header Mobile */
+            .page-header {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .page-subtitle {
+                font-size: 10px;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: calc(50% - 5px);
+                padding: 10px 12px;
+                font-size: 10px;
+            }
+
+            /* Stats Bar Stacked */
+            .stats-bar {
+                flex-direction: column;
+            }
+
+            .stat-card {
+                min-width: 100%;
+            }
+
+            .stat-value {
+                font-size: 18px;
+            }
+
+            .stat-label {
+                font-size: 9px;
+            }
+
+            /* Filters Panel Stacked */
+            .filters-panel {
+                flex-direction: column;
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .filter-group {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .filter-input,
+            .filter-select {
+                min-width: 100%;
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            /* Grid Toolbar Mobile */
+            .grid-toolbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .toolbar-left,
+            .toolbar-right {
+                width: 100%;
+            }
+
+            .search-box {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            /* Table Horizontal Scroll */
+            .grid-container {
+                max-height: calc(100vh - 450px);
+                overflow-x: auto;
+            }
+
+            .data-table {
+                min-width: 1200px; /* Force horizontal scroll */
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            /* Action Buttons Touch Friendly */
+            .action-btn {
+                padding: 8px;
+                font-size: 11px;
+                min-width: 32px;
+                min-height: 32px;
+            }
+
+            /* Pagination Mobile */
+            .pagination {
+                flex-wrap: wrap;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .page-btn {
+                min-width: 36px;
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            /* Detail Drawer Full Screen */
+            .detail-drawer {
+                width: 100%;
+            }
+
+            .detail-drawer.open {
+                right: 0;
+            }
+
+            .drawer-header {
+                padding: 15px;
+            }
+
+            .drawer-content {
+                padding: 15px;
+            }
+
+            .detail-section {
+                padding: 12px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Small Mobile Styles (< 480px) */
+        @media (max-width: 480px) {
+            .entries-container {
+                padding: 5px;
+            }
+
+            .page-header {
+                padding: 12px;
+            }
+
+            .page-title {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 9px;
+                padding: 8px 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .filter-input,
+            .filter-select {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            .action-btn {
+                padding: 6px;
+                font-size: 10px;
+                min-width: 28px;
+                min-height: 28px;
+            }
+
+            .drawer-header {
+                padding: 12px;
+            }
+
+            .drawer-title {
+                font-size: 16px;
+            }
+
+            .detail-value {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="entries-container">
+        <div class="content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <div class="page-title">
+                        📊 VIEW ENTRIES <span style="font-size: 10px; color: #00FF88;">(v2.0 - NO STATUS)</span>
+                    </div>
+                    <div class="page-subtitle">View, search, and manage cash production records</div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn" onclick="refreshData()">🔄 REFRESH</button>
+                    <button class="btn" onclick="exportData()">📤 EXPORT</button>
+                    <button class="btn" onclick="printData()">🖨️ PRINT</button>
+                    <button class="btn btn-primary" onclick="window.close()">← BACK TO ENTRY</button>
+                </div>
+            </div>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel">
+                <div class="filter-group">
+                    <div class="filter-label">📅 Date From</div>
+                    <input type="date" class="filter-input" id="dateFrom" value="2024-04-01" style="cursor: pointer;">
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">📅 Date To</div>
+                    <input type="date" class="filter-input" id="dateTo" value="2024-04-30" style="cursor: pointer;">
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Grade</div>
+                    <select class="filter-select" id="gradeFilter">
+                        <option value="">All Grades</option>
+                        <option value="M10">M10</option>
+                        <option value="M15">M15</option>
+                        <option value="M20">M20</option>
+                        <option value="M25">M25</option>
+                        <option value="M30">M30</option>
+                        <option value="M35">M35</option>
+                        <option value="M40">M40</option>
+                        <option value="M45">M45</option>
+                        <option value="M50">M50</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Party</div>
+                    <select class="filter-select" id="partyFilter" onchange="updateSubPartyOptions()">
+                        <option value="">All Parties</option>
+                        <option value="ABC">ABC Constructions</option>
+                        <option value="XYZ">XYZ Infra</option>
+                        <option value="PQR">PQR Builders</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Sub Party</div>
+                    <select class="filter-select" id="subPartyFilter">
+                        <option value="">All Sub Parties</option>
+                        <option value="Anil Kumar" data-party="XYZ">Anil Kumar</option>
+                        <option value="Vijay Patil" data-party="ABC">Vijay Patil</option>
+                        <option value="Ramesh Singh" data-party="PQR">Ramesh Singh</option>
+                        <option value="Suresh Nair" data-party="XYZ">Suresh Nair</option>
+                        <option value="Prakash Yadav" data-party="ABC">Prakash Yadav</option>
+                        <option value="Ravi Deshmukh" data-party="PQR">Ravi Deshmukh</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="margin-left: auto;">
+                    <div class="filter-label">&nbsp;</div>
+                    <button class="btn btn-primary" onclick="applyFilters()">🔍 APPLY FILTERS</button>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">&nbsp;</div>
+                    <button class="btn" onclick="clearFilters()">✖ CLEAR</button>
+                </div>
+            </div>
+
+            <!-- Data Grid -->
+            <div class="grid-container">
+                <div class="grid-toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" placeholder="Search by Party, Sub Party, Challan, Vehicle, Site..." id="searchBox">
+                        </div>
+                        <select class="filter-select" style="min-width: 100px;" id="pageSize">
+                            <option value="50">Show 50</option>
+                            <option value="100">Show 100</option>
+                            <option value="200">Show 200</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 11px; color: #8aa4c4;">
+                        Showing 1-50 of 132 entries
+                    </div>
+                </div>
+
+                <table class="grid-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable">DATE</th>
+                            <th class="sortable">TIME</th>
+                            <th class="sortable">PARTY</th>
+                            <th class="sortable">SUB PARTY</th>
+                            <th class="sortable">CHALLAN NO</th>
+                            <th class="sortable">ACTUAL GRADE</th>
+                            <th class="sortable">CHALLAN GRADE</th>
+                            <th class="sortable">ACTUAL QTY</th>
+                            <th class="sortable">CHALLAN QTY</th>
+                            <th class="sortable">DIFF QTY</th>
+                            <th class="sortable">RATE</th>
+                            <th class="sortable">VEHICLE</th>
+                            <th class="sortable">AMOUNT</th>
+                            <th class="sortable">SITE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>19-01-2026</td>
+                            <td style="color: #8aa4c4;">14:30</td>
+                            <td>XYZ Infra</td>
+                            <td style="color: #8aa4c4;">Anil Kumar</td>
+                            <td>CHL002546</td>
+                            <td>M25</td>
+                            <td>M25</td>
+                            <td>4.50</td>
+                            <td>4.50</td>
+                            <td style="color: #8aa4c4;">0.00</td>
+                            <td style="color: #c8d9f0;">₹ 4,500</td>
+                            <td>MH12CD5678</td>
+                            <td><span class="amount">₹ 20,250</span></td>
+                            <td>Site Alpha - Andheri</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit" onclick="event.stopPropagation(); editEntry(this)">✏️ Edit</button>
+                                    <button class="action-btn" onclick="event.stopPropagation()">👁️ View</button>
+                                    <button class="action-btn delete" onclick="event.stopPropagation(); deleteEntry(this)">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>18-01-2026</td>
+                            <td style="color: #8aa4c4;">11:15</td>
+                            <td>XYZ Infra</td>
+                            <td style="color: #8aa4c4;">Rajesh Sharma</td>
+                            <td>CHL002543</td>
+                            <td>M25</td>
+                            <td>M20</td>
+                            <td>3.50</td>
+                            <td>3.50</td>
+                            <td style="color: #8aa4c4;">0.00</td>
+                            <td style="color: #c8d9f0;">₹ 4,000</td>
+                            <td>MH12IJ7890</td>
+                            <td><span class="amount">₹ 14,000</span></td>
+                            <td>Site Gamma - Borivali</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>18-01-2026</td>
+                            <td style="color: #8aa4c4;">09:45</td>
+                            <td>ABC Constructions</td>
+                            <td style="color: #8aa4c4;">Vijay Patil</td>
+                            <td>CHL002540</td>
+                            <td>M30</td>
+                            <td>M30</td>
+                            <td>5.00</td>
+                            <td>5.00</td>
+                            <td style="color: #8aa4c4;">0.00</td>
+                            <td style="color: #c8d9f0;">₹ 4,500</td>
+                            <td>MH12MN4567</td>
+                            <td><span class="amount">₹ 22,500</span></td>
+                            <td>Site Delta - Vashi</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                        </tr>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>17-01-2026</td>
+                            <td style="color: #8aa4c4;">16:20</td>
+                            <td>PQR Builders</td>
+                            <td style="color: #8aa4c4;">Suresh Yadav</td>
+                            <td>CHL002539</td>
+                            <td>M30</td>
+                            <td>M25</td>
+                            <td>4.00</td>
+                            <td>4.00</td>
+                            <td style="color: #8aa4c4;">0.00</td>
+                            <td style="color: #c8d9f0;">₹ 4,500</td>
+                            <td>MH12OP8901</td>
+                            <td><span class="amount">₹ 18,000</span></td>
+                            <td>Project Epsilon - Mulund</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>17-01-2026</td>
+                            <td style="color: #8aa4c4;">13:00</td>
+                            <td>ABC Constructions</td>
+                            <td style="color: #8aa4c4;">Ramesh Gupta</td>
+                            <td>CHL002538</td>
+                            <td>M40</td>
+                            <td>M40</td>
+                            <td>5.80</td>
+                            <td>6.00</td>
+                            <td style="color: #d08090;">-0.20</td>
+                            <td style="color: #c8d9f0;">₹ 5,000</td>
+                            <td>MH12QR2345</td>
+                            <td><span class="amount">₹ 29,000</span></td>
+                            <td>Site No. 3 - Dadar</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="data-row" onclick="openDetailDrawer(this)">
+                            <td>16-01-2026</td>
+                            <td style="color: #8aa4c4;">10:30</td>
+                            <td>XYZ Infra</td>
+                            <td style="color: #8aa4c4;">Prakash Singh</td>
+                            <td>CHL002537</td>
+                            <td>M25</td>
+                            <td>M25</td>
+                            <td>5.60</td>
+                            <td>5.50</td>
+                            <td style="color: #90d090;">+0.10</td>
+                            <td style="color: #c8d9f0;">₹ 4,500</td>
+                            <td>MH12ST6789</td>
+                            <td><span class="amount">₹ 25,200</span></td>
+                            <td>Site Beta - Kandivali</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit">✏️ Edit</button>
+                                    <button class="action-btn">👁️ View</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- More rows... -->
+                        <tr>
+                            <td colspan="16" style="text-align: center; padding: 20px; color: #8aa4c4; font-style: italic;">
+                                ... More 126 entries (Load more or use pagination)
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Stats Bar (Moved to Bottom) -->
+                <div class="stats-bar" style="margin-top: 20px; margin-bottom: 10px;">
+                    <div class="stat-card" style="padding: 12px 15px;">
+                        <div class="stat-info">
+                            <div class="stat-label" style="font-size: 9px;">Total Entries</div>
+                            <div class="stat-value" style="font-size: 18px;" id="statsEntries">132</div>
+                        </div>
+                        <div class="stat-icon" style="font-size: 24px;">📋</div>
+                    </div>
+                    <div class="stat-card" style="padding: 12px 15px;">
+                        <div class="stat-info">
+                            <div class="stat-label" style="font-size: 9px;">Actual Total Qty</div>
+                            <div class="stat-value" style="font-size: 18px; color: #90d090;" id="statsActualQty">643.3 CUM</div>
+                        </div>
+                        <div class="stat-icon" style="font-size: 24px;">✅</div>
+                    </div>
+                    <div class="stat-card" style="padding: 12px 15px;">
+                        <div class="stat-info">
+                            <div class="stat-label" style="font-size: 9px;">Challan Total Qty</div>
+                            <div class="stat-value" style="font-size: 18px; color: #8aa4c4;" id="statsChallanQty">645.5 CUM</div>
+                        </div>
+                        <div class="stat-icon" style="font-size: 24px;">�</div>
+                    </div>
+                    <div class="stat-card" style="padding: 12px 15px;">
+                        <div class="stat-info">
+                            <div class="stat-label" style="font-size: 9px;">Difference Qty</div>
+                            <div class="stat-value" style="font-size: 18px; color: #d08090;" id="statsDiffQty">-2.2 CUM</div>
+                        </div>
+                        <div class="stat-icon" style="font-size: 24px;">⚖️</div>
+                    </div>
+                    <div class="stat-card" style="padding: 12px 15px;">
+                        <div class="stat-info">
+                            <div class="stat-label" style="font-size: 9px;">Total Amount</div>
+                            <div class="stat-value" style="font-size: 18px;" id="statsAmount">₹ 28.4 L</div>
+                        </div>
+                        <div class="stat-icon" style="font-size: 24px;">�</div>
+                    </div>
+                </div>
+
+                <div class="grid-footer">
+                    <div class="page-info">
+                        Showing 1 to 50 of 132 entries
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn" disabled>« First</button>
+                        <button class="page-btn" disabled>‹ Prev</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">Next ›</button>
+                        <button class="page-btn">Last »</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDetailDrawer()"></div>
+    <div class="detail-drawer" id="detailDrawer">
+        <div class="drawer-header">
+            <div class="drawer-title">📄 Entry Details</div>
+            <button class="drawer-close" onclick="closeDetailDrawer()">×</button>
+        </div>
+        <div class="drawer-content" id="drawerContent">
+            <!-- Content will be populated dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Refresh data
+        function refreshData() {
+            alert('🔄 Refreshing cash entries from server...\n\nLatest cash records will be loaded.');
+        }
+
+        // Export data
+        function exportData() {
+            alert('📤 Export Cash Entries:\n\n1. Excel (.xlsx)\n2. CSV (.csv)\n3. PDF Report\n\nSelect format to download.');
+        }
+
+        // Print data
+        function printData() {
+            alert('🖨️ Preparing print preview...\n\nCash Production Entries Report\nDate Range: 01-04-2024 to 30-04-2024');
+            window.print();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const grade = document.getElementById('gradeFilter').value;
+            const party = document.getElementById('partyFilter').value;
+            const subParty = document.getElementById('subPartyFilter').value;
+            
+            // Simulate filtered calculations (In real app, this will come from backend)
+            // For demo: showing how cards will update based on filters
+            updateStatsCards({
+                entries: party ? 52 : 132,
+                actualQty: party ? 253.8 : 643.3,
+                challanQty: party ? 255.0 : 645.5,
+                diffQty: party ? -1.2 : -2.2,
+                amount: party ? 11.2 : 28.4
+            });
+            
+            alert('🔍 Applying Filters:\n\n' +
+                'Date: ' + dateFrom + ' to ' + dateTo + '\n' +
+                'Grade: ' + (grade || 'All') + '\n' +
+                'Party: ' + (party || 'All') + '\n' +
+                'Sub Party: ' + (subParty || 'All') + '\n\n' +
+                'Filtered cash entries and stats updated!');
+        }
+
+        // Update stats cards with calculated data
+        function updateStatsCards(data) {
+            document.getElementById('statsEntries').textContent = data.entries;
+            document.getElementById('statsActualQty').textContent = data.actualQty.toFixed(1) + ' CUM';
+            document.getElementById('statsChallanQty').textContent = data.challanQty.toFixed(1) + ' CUM';
+            
+            const diffQty = data.diffQty;
+            const diffElement = document.getElementById('statsDiffQty');
+            diffElement.textContent = (diffQty >= 0 ? '+' : '') + diffQty.toFixed(1) + ' CUM';
+            diffElement.style.color = diffQty > 0 ? '#90d090' : (diffQty < 0 ? '#d08090' : '#8aa4c4');
+            
+            document.getElementById('statsAmount').textContent = '₹ ' + data.amount.toFixed(1) + ' L';
+        }
+
+        // Update Sub Party options based on selected Party
+        function updateSubPartyOptions() {
+            const partyFilter = document.getElementById('partyFilter').value;
+            const subPartyFilter = document.getElementById('subPartyFilter');
+            const options = subPartyFilter.options;
+            
+            // Show all options if no party selected
+            if (!partyFilter) {
+                for (let i = 0; i < options.length; i++) {
+                    options[i].style.display = '';
+                }
+                subPartyFilter.disabled = false;
+                return;
+            }
+            
+            // Filter options based on selected party
+            let visibleCount = 0;
+            for (let i = 1; i < options.length; i++) { // Skip "All Sub Parties"
+                const optionParty = options[i].getAttribute('data-party');
+                if (optionParty === partyFilter) {
+                    options[i].style.display = '';
+                    visibleCount++;
+                } else {
+                    options[i].style.display = 'none';
+                }
+            }
+            
+            // If no sub parties found for selected party
+            if (visibleCount === 0) {
+                subPartyFilter.disabled = true;
+                subPartyFilter.value = '';
+                options[0].text = 'No Sub Parties Available';
+            } else {
+                subPartyFilter.disabled = false;
+                options[0].text = 'All Sub Parties';
+            }
+            
+            // Reset sub party selection
+            subPartyFilter.value = '';
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('gradeFilter').value = '';
+            document.getElementById('partyFilter').value = '';
+            document.getElementById('subPartyFilter').value = '';
+            document.getElementById('searchBox').value = '';
+            
+            // Show all sub party options
+            updateSubPartyOptions();
+            
+            alert('✖ All filters cleared!\nShowing all cash entries.');
+        }
+
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+            // Real implementation will filter table rows
+        });
+
+        // Column sorting
+        document.querySelectorAll('.grid-table th.sortable').forEach(th => {
+            th.addEventListener('click', function() {
+                alert('🔄 Sorting by: ' + this.textContent.trim() + '\n\nAscending/Descending order will be applied.');
+            });
+        });
+
+        // ============================================
+        // EDIT ENTRY FUNCTIONALITY
+        // ============================================
+        function editEntry(button) {
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            // Extract all data from table row
+            const entryData = {
+                date: cells[0].textContent.trim(),
+                time: cells[1].textContent.trim(),
+                party: cells[2].textContent.trim(),
+                subParty: cells[3].textContent.trim(),
+                challanNo: cells[4].textContent.trim(),
+                actualGrade: cells[5].textContent.trim(),
+                challanGrade: cells[6].textContent.trim(),
+                actualQty: cells[7].textContent.trim(),
+                challanQty: cells[8].textContent.trim(),
+                diffQty: cells[9].textContent.trim(),
+                rate: cells[10].textContent.trim(),
+                vehicle: cells[11].textContent.trim(),
+                amount: cells[12].textContent.trim(),
+                site: cells[13].textContent.trim()
+            };
+            
+            // Store in sessionStorage for edit page
+            sessionStorage.setItem('editEntry', JSON.stringify(entryData));
+            sessionStorage.setItem('editMode', 'true');
+            
+            // Show confirmation with data preview
+            const confirmMsg = `✏️ EDIT ENTRY
+            
+📅 Date: ${entryData.date}
+🔢 Challan: ${entryData.challanNo}
+👤 Party: ${entryData.party}
+📊 Grade: ${entryData.actualGrade}
+📦 Quantity: ${entryData.actualQty} CUM
+💰 Amount: ${entryData.amount}
+
+Do you want to edit this entry?`;
+            
+            if (confirm(confirmMsg)) {
+                // Store data in sessionStorage
+                sessionStorage.setItem('editEntry', JSON.stringify(entryData));
+                sessionStorage.setItem('editMode', 'true');
+                
+                // Redirect to production entry form
+                window.location.href = 'rmc_blueprint_exact.html?mode=edit';
+                
+                // Note: Form will auto-load data from sessionStorage
+            }
+        }
+
+        // ============================================
+        // DELETE ENTRY FUNCTIONALITY
+        // ============================================
+        function deleteEntry(button) {
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            const challanNo = cells[5].textContent.trim();
+            const party = cells[3].textContent.trim();
+            const date = cells[0].textContent.trim();
+            const amount = cells[13].textContent.trim();
+            
+            // Confirmation dialog
+            const confirmMsg = `🗑️ DELETE ENTRY
+            
+⚠️ WARNING: This action cannot be undone!
+
+📅 Date: ${date}
+🔢 Challan: ${challanNo}
+👤 Party: ${party}
+💰 Amount: ${amount}
+
+Are you sure you want to delete this entry?
+
+Type 'DELETE' to confirm:`;
+            
+            const userInput = prompt(confirmMsg);
+            
+            if (userInput === 'DELETE') {
+                // Show processing
+                button.textContent = '⏳';
+                button.disabled = true;
+                
+                // Simulate delete operation
+                setTimeout(() => {
+                    // Remove row with animation
+                    row.style.transition = 'all 0.3s ease';
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(-20px)';
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        alert('✅ Entry deleted successfully!\n\nChallan: ' + challanNo + '\n\nDatabase updated.');
+                    }, 300);
+                }, 500);
+            } else if (userInput !== null) {
+                alert('❌ Delete cancelled!\n\nYou must type DELETE to confirm deletion.');
+            }
+        }
+
+        // ============================================
+        // DETAIL DRAWER (VIEW FUNCTIONALITY)
+        // ============================================
+
+        // Initialize Professional Date Pickers
+        flatpickr("#dateFrom", {
+            dateFormat: "d-m-Y",
+            defaultDate: "01-04-2024",
+            theme: "dark",
+            animate: true,
+            allowInput: true,
+            disableMobile: false
+        });
+
+        flatpickr("#dateTo", {
+            dateFormat: "d-m-Y",
+            defaultDate: "30-04-2024",
+            theme: "dark",
+            animate: true,
+            allowInput: true,
+            disableMobile: false
+        });
+
+        // Detail Drawer Functions
+        function openDetailDrawer(row) {
+            // Prevent opening if clicked on action buttons
+            if (event.target.closest('.action-btns')) {
+                return;
+            }
+
+            const cells = row.cells;
+            const drawerContent = document.getElementById('drawerContent');
+            
+            // Extract data from row
+            const data = {
+                date: cells[0].textContent,
+                time: cells[1].textContent,
+                status: cells[2].textContent.trim(),
+                party: cells[3].textContent,
+                subParty: cells[4].textContent,
+                challanNo: cells[5].textContent,
+                actualGrade: cells[6].textContent,
+                challanGrade: cells[7].textContent,
+                actualQty: cells[8].textContent,
+                challanQty: cells[9].textContent,
+                diffQty: cells[10].textContent,
+                rate: cells[11].textContent,
+                vehicle: cells[12].textContent,
+                amount: cells[13].textContent,
+                site: cells[14].textContent
+            };
+
+            // Populate drawer content
+            drawerContent.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-section-title">🏷️ Entry Information</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Date & Time</div>
+                            <div class="detail-value">${data.date} • ${data.time}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">${data.status}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Challan Number</div>
+                            <div class="detail-value">${data.challanNo}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Vehicle Number</div>
+                            <div class="detail-value">${data.vehicle}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">👤 Party Information</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Party Name</div>
+                            <div class="detail-value">${data.party}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Sub Party / Contact</div>
+                            <div class="detail-value">${data.subParty}</div>
+                        </div>
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <div class="detail-label">Delivery Site</div>
+                            <div class="detail-value">${data.site}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">📊 Production Details</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Actual Grade</div>
+                            <div class="detail-value" style="color: #90d090;">${data.actualGrade}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Challan Grade</div>
+                            <div class="detail-value" style="color: #8aa4c4;">${data.challanGrade}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Actual Quantity</div>
+                            <div class="detail-value" style="color: #90d090;">${data.actualQty} CUM</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Challan Quantity</div>
+                            <div class="detail-value" style="color: #8aa4c4;">${data.challanQty} CUM</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Difference</div>
+                            <div class="detail-value" style="color: ${parseFloat(data.diffQty) > 0 ? '#90d090' : parseFloat(data.diffQty) < 0 ? '#d08090' : '#8aa4c4'};">
+                                ${data.diffQty} CUM
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Rate per CUM</div>
+                            <div class="detail-value">${data.rate}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">💰 Financial Details</div>
+                    <div class="detail-grid">
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <div class="detail-label">Total Amount</div>
+                            <div class="detail-value" style="font-size: 20px; color: #90d090;">${data.amount}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Show drawer
+            document.getElementById('detailDrawer').classList.add('open');
+            document.getElementById('drawerOverlay').classList.add('active');
+        }
+
+        function closeDetailDrawer() {
+            document.getElementById('detailDrawer').classList.remove('open');
+            document.getElementById('drawerOverlay').classList.remove('active');
+        }
+
+        // Close drawer on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDetailDrawer();
+            }
+        });
+
+        // ============================================
+        // AUTO-ATTACH EVENTS TO ALL ACTION BUTTONS
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach Edit button events
+            document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    editEntry(this);
+                });
+            });
+
+            // Attach Delete button events
+            document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteEntry(this);
+                });
+            });
+
+            // Prevent View button from triggering row click
+            document.querySelectorAll('.action-btn:not(.edit):not(.delete)').forEach(btn => {
+                const btnText = btn.textContent.trim();
+                if (btnText.includes('View') || btnText.includes('👁️')) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // View functionality already handled by row click
+                    });
+                }
+            });
+
+            console.log('✅ Action buttons initialized successfully!');
+        });
+
+        // ============================================
+        // REFRESH, EXPORT, PRINT FUNCTIONS
+        // ============================================
+        
+        /**
+         * REFRESH DATA - Reload table data
+         */
+        function refreshData() {
+            // Show loading animation
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Refreshing...';
+            btn.disabled = true;
+            
+            // Simulate data refresh (in real app, this would fetch from database)
+            setTimeout(() => {
+                // Reload the page to get fresh data
+                window.location.reload();
+            }, 500);
+        }
+
+        /**
+         * EXPORT TO EXCEL - Professional Excel Export
+         */
+        function exportData() {
+            try {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Exporting...';
+                btn.disabled = true;
+
+                // Get table data
+                const table = document.querySelector('.data-table');
+                const rows = table.querySelectorAll('tbody tr');
+                
+                // Prepare data array
+                const data = [];
+                
+                // Add header row
+                data.push([
+                    'Date', 'Time', 'Status', 'Party', 'Sub Party', 
+                    'Challan No', 'Actual Grade', 'Challan Grade',
+                    'Actual Qty', 'Challan Qty', 'Diff Qty', 'Rate',
+                    'Vehicle', 'Amount', 'Site'
+                ]);
+                
+                // Add data rows
+                rows.forEach(row => {
+                    const cells = row.cells;
+                    if (cells.length > 0) {
+                        data.push([
+                            cells[0].textContent.trim(),
+                            cells[1].textContent.trim(),
+                            cells[2].textContent.trim(),
+                            cells[3].textContent.trim(),
+                            cells[4].textContent.trim(),
+                            cells[5].textContent.trim(),
+                            cells[6].textContent.trim(),
+                            cells[7].textContent.trim(),
+                            cells[8].textContent.trim(),
+                            cells[9].textContent.trim(),
+                            cells[10].textContent.trim(),
+                            cells[11].textContent.trim(),
+                            cells[12].textContent.trim(),
+                            cells[13].textContent.trim(),
+                            cells[14].textContent.trim()
+                        ]);
+                    }
+                });
+
+                // Create workbook and worksheet
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(data);
+
+                // Set column widths
+                ws['!cols'] = [
+                    { wch: 12 }, // Date
+                    { wch: 8 },  // Time
+                    { wch: 10 }, // Status
+                    { wch: 20 }, // Party
+                    { wch: 15 }, // Sub Party
+                    { wch: 12 }, // Challan No
+                    { wch: 10 }, // Actual Grade
+                    { wch: 10 }, // Challan Grade
+                    { wch: 10 }, // Actual Qty
+                    { wch: 10 }, // Challan Qty
+                    { wch: 10 }, // Diff Qty
+                    { wch: 12 }, // Rate
+                    { wch: 15 }, // Vehicle
+                    { wch: 12 }, // Amount
+                    { wch: 25 }  // Site
+                ];
+
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'Cash Production');
+
+                // Generate filename with current date
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const filename = `SKCON_Cash_Production_${dateStr}.xlsx`;
+
+                // Export file
+                XLSX.writeFile(wb, filename);
+
+                // Reset button
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    // Show success message
+                    alert('✅ Excel Export Successful!\n\n' + 
+                          `File: ${filename}\n` +
+                          `Records: ${data.length - 1} entries\n\n` +
+                          'File saved to your Downloads folder.');
+                }, 500);
+
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Export Failed!\n\nError: ' + error.message);
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+            }
+        }
+
+        /**
+         * PRINT DATA - Professional Print View
+         */
+        function printData() {
+            // Show preparing message
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Preparing...';
+            btn.disabled = true;
+
+            // Wait a moment for UI update
+            setTimeout(() => {
+                // Get current date for header
+                const now = new Date();
+                const printDate = now.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                // Add print header
+                const originalTitle = document.title;
+                document.title = 'SKCON RMC - Cash Production Report';
+
+                // Trigger browser print dialog
+                window.print();
+
+                // Reset after print
+                setTimeout(() => {
+                    document.title = originalTitle;
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 500);
+            }, 300);
+        }
+
+        // ============================================
+        // COLUMN VERIFICATION ON PAGE LOAD
+        // ============================================
+        window.addEventListener('DOMContentLoaded', function() {
+            const headerCols = document.querySelectorAll('thead th').length;
+            const firstRowCols = document.querySelectorAll('tbody tr:first-child td').length;
+            
+            console.log('✅ PAGE LOADED: v2.0 - NO STATUS COLUMN');
+            console.log('📊 Header Columns:', headerCols);
+            console.log('📊 Data Row Columns:', firstRowCols);
+            
+            if (headerCols !== firstRowCols) {
+                console.error('❌ COLUMN MISMATCH! Header:', headerCols, 'Data:', firstRowCols);
+                alert('⚠️ Column Mismatch Detected!\n\nHeader: ' + headerCols + ' columns\nData: ' + firstRowCols + ' columns\n\nPlease hard refresh (Ctrl+F5)');
+            } else {
+                console.log('✅ Columns perfectly aligned!');
+            }
+        });
+    </script>
+
+    <!-- Flatpickr Library -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{% extends "rmc_erp_full_layout.html" %}
+{% block content %}
+
+<div class="container">
+
+    <h2 class="page-title">📋 ORDER ENTRY</h2>
+
+    <div class="form-card">
+
+        <label>Party Name</label>
+        <input type="text" class="input-field">
+
+        <label>Sub Client</label>
+        <input type="text" class="input-field">
+
+        <label>Site Location</label>
+        <input type="text" class="input-field">
+
+        <label>Total Order Qty (CUM)</label>
+        <input type="number" class="input-field">
+
+        <label>Grade</label>
+        <select class="input-field">
+            <option>M20</option>
+            <option>M25</option>
+            <option>M30</option>
+        </select>
+
+        <label>Start Date</label>
+        <input type="date" class="input-field">
+
+        <label>Remarks</label>
+        <textarea class="input-field"></textarea>
+
+        <div class="btn-group">
+            <button class="btn-save">SAVE ORDER</button>
+            <button class="btn-cancel">CANCEL</button>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

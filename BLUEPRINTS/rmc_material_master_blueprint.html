@@ -1,0 +1,2406 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Inward Entry - Purchase Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            overflow-x: hidden;
+        }
+
+        /* Page Container */
+        .page-container {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a6b8a;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: #8aa4c4;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .header-btn.report {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .header-btn.report:hover {
+            background: rgba(106, 138, 170, 0.3);
+        }
+
+        .header-btn.export {
+            background: rgba(144, 208, 144, 0.2);
+            color: #90d090;
+            border: 1px solid #90d090;
+        }
+
+        .header-btn.export:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        .header-btn.add {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            border: 1px solid #00d9ff;
+        }
+
+        .header-btn.add:hover {
+            background: rgba(0, 217, 255, 0.3);
+        }
+
+        /* Export Dropdown */
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-dropdown-content {
+            display: none;
+            position: absolute;
+            background: #1a2942;
+            min-width: 200px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
+            z-index: 1;
+            border-radius: 4px;
+            border: 1px solid #4a6b8a;
+            margin-top: 5px;
+        }
+
+        .export-dropdown-content a {
+            color: #c8d9f0;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 13px;
+            transition: all 0.3s;
+            border-bottom: 1px solid #2c4564;
+        }
+
+        .export-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .export-dropdown-content a:hover {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00d9ff;
+        }
+
+        .export-dropdown:hover .export-dropdown-content {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .stat-icon.total {
+            background: rgba(0, 217, 255, 0.15);
+        }
+
+        .stat-icon.low {
+            background: rgba(255, 107, 107, 0.15);
+        }
+
+        .stat-icon.categories {
+            background: rgba(255, 180, 100, 0.15);
+        }
+
+        .stat-icon.value {
+            background: rgba(144, 208, 144, 0.15);
+        }
+
+        .stat-details {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c8d9f0;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 250px 200px 200px 1fr 120px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 10px 12px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #00d9ff;
+            background: rgba(11, 25, 41, 0.9);
+        }
+
+        /* Search Results Dropdown - Google Style */
+        .search-results-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0f1e32;
+            border: 1px solid #00d9ff;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            margin-top: -1px;
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(106, 138, 170, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-left: 3px solid #00d9ff;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-left {
+            flex: 1;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #c8d9f0;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .search-result-details {
+            font-size: 12px;
+            color: #8aa4c4;
+        }
+
+        .search-result-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .search-highlight {
+            background: rgba(255, 180, 100, 0.3);
+            color: #ffb464;
+            padding: 1px 3px;
+            border-radius: 2px;
+        }
+
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: #8aa4c4;
+            font-size: 13px;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 217, 255, 0.3);
+        }
+
+        /* Materials Table */
+        .materials-table-section {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #4a6b8a;
+        }
+
+        .materials-table th {
+            background: rgba(11, 25, 41, 0.9);
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            border: 1px solid #5a7b9a;
+            letter-spacing: 0.5px;
+        }
+
+        .materials-table td {
+            padding: 12px 10px;
+            border: 1px solid #3a5b7a;
+            font-size: 12px;
+        }
+
+        .materials-table tbody tr {
+            border-bottom: 1px solid #3a5b7a;
+        }
+
+        .materials-table tbody tr:hover {
+            background: rgba(26, 41, 66, 0.6);
+        }
+
+        /* Category Badge */
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .category-raw {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .category-chemical {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        .category-fuel {
+            background: rgba(208, 128, 144, 0.2);
+            border: 1px solid #d08090;
+            color: #d08090;
+        }
+
+        .category-consumable {
+            background: rgba(106, 138, 170, 0.2);
+            border: 1px solid #6a8aaa;
+            color: #6a8aaa;
+        }
+
+        .category-other {
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+        }
+
+        /* Stock Status */
+        .stock-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .stock-indicator.high {
+            background: #90d090;
+            box-shadow: 0 0 8px rgba(144, 208, 144, 0.6);
+        }
+
+        .stock-indicator.medium {
+            background: #ffb464;
+            box-shadow: 0 0 8px rgba(255, 180, 100, 0.6);
+        }
+
+        .stock-indicator.low {
+            background: #d08090;
+            box-shadow: 0 0 8px rgba(208, 128, 144, 0.6);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .stock-value {
+            font-weight: 700;
+        }
+
+        .stock-value.high {
+            color: #90d090;
+        }
+
+        .stock-value.medium {
+            color: #ffb464;
+        }
+
+        .stock-value.low {
+            color: #d08090;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.edit {
+            background: rgba(255, 180, 100, 0.2);
+            color: #ffb464;
+            border: 1px solid #ffb464;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(255, 180, 100, 0.3);
+        }
+
+        .action-btn.delete {
+            background: rgba(208, 128, 144, 0.2);
+            color: #d08090;
+            border: 1px solid #d08090;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(208, 128, 144, 0.3);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #152238;
+            border: 2px solid #4a6b8a;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d9ff;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #8aa4c4;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .modal-close:hover {
+            color: #d08090;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        .form-input, .form-select {
+            padding: 10px 12px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #00d9ff;
+            background: rgba(11, 25, 41, 0.9);
+        }
+
+        .form-input:disabled {
+            background: rgba(11, 25, 41, 0.3);
+            cursor: not-allowed;
+            color: #6a8aaa;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #4a6b8a;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(106, 138, 170, 0.3);
+        }
+
+        .modal-btn.save {
+            background: linear-gradient(135deg, #00d9ff 0%, #0088cc 100%);
+            color: #0B1929;
+        }
+
+        .modal-btn.save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0B1929;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a6b8a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6a8aaa;
+        }
+
+        /* Help Text */
+        .help-text {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-top: 4px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1>📦 MATERIAL INWARD ENTRY</h1>
+                <div class="page-subtitle">Record material received from suppliers with challan details</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn report" onclick="openInwardReportModal()">📊 INWARD REPORT</button>
+                <button class="header-btn report" onclick="openPlantReportModal()">🏭 PLANT REPORT</button>
+                <div class="export-dropdown">
+                    <button class="header-btn export">📤 EXPORT ▼</button>
+                    <div class="export-dropdown-content">
+                        <a href="javascript:void(0)" onclick="exportToExcel()">� Export to Excel (.csv)</a>
+                        <a href="javascript:void(0)" onclick="exportToPDF()">📄 Export to PDF</a>
+                    </div>
+                </div>
+                <button class="header-btn add" onclick="openMaterialModal('add')">➕ ADD INWARD ENTRY</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon total">📦</div>
+                <div class="stat-details">
+                    <div class="stat-label">Total Materials</div>
+                    <div class="stat-value" id="statTotal">12</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon low">⚠️</div>
+                <div class="stat-details">
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-value" id="statLowStock">3</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon categories">📋</div>
+                <div class="stat-details">
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-value" id="statCategories">5</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon value">💰</div>
+                <div class="stat-details">
+                    <div class="stat-label">Total Stock Value</div>
+                    <div class="stat-value" id="statValue">₹ 15.2L</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section" style="padding: 15px;">
+            <!-- All Filters in One Row -->
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div class="filter-group" style="flex: 0 0 200px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">🏢 SUPPLIER</label>
+                    <select class="filter-select" id="filterSupplier" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                        <option value="">All Suppliers</option>
+                        <option value="ABC Suppliers">ABC Suppliers</option>
+                        <option value="Shree Aggregates">Shree Aggregates</option>
+                        <option value="XYZ Cement Agency">XYZ Cement Agency</option>
+                        <option value="Mumbai Traders">Mumbai Traders</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" style="flex: 0 0 160px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">📅 FROM</label>
+                    <input type="date" class="filter-input" id="filterFromDate" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                </div>
+
+                <div class="filter-group" style="flex: 0 0 160px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">📅 TO</label>
+                    <input type="date" class="filter-input" id="filterToDate" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                </div>
+
+                <div class="filter-group" style="flex: 0 0 180px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">🏭 PLANT</label>
+                    <select class="filter-select" id="filterPlant" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                        <option value="">All Plants</option>
+                        <option value="Plant A - XYZ">Plant A - XYZ</option>
+                        <option value="Plant B - ABC">Plant B - ABC</option>
+                        <option value="Plant C - PQR">Plant C - PQR</option>
+                        <option value="Plant D - DEF">Plant D - DEF</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" style="flex: 0 0 180px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">📦 CATEGORY</label>
+                    <select class="filter-select" id="filterMaterial" onchange="updateFilterSubType()" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                        <option value="">All Materials</option>
+                        <option value="cement">Cement</option>
+                        <option value="aggregates">Aggregates</option>
+                        <option value="sand">Sand</option>
+                        <option value="chemical">Chemicals</option>
+                        <option value="fuel">Fuel</option>
+                        <option value="consumable">Consumables</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" style="flex: 0 0 180px; margin-bottom: 0;">
+                    <label class="filter-label" style="font-size: 10px; margin-bottom: 4px; display: block;">🏷️ TYPE</label>
+                    <select class="filter-select" id="filterSubType" style="padding: 8px 10px; font-size: 12px; width: 100%;">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+
+                <!-- Search & Reset Buttons - Side by side -->
+                <div style="flex: 0 0 240px; display: flex; gap: 8px; align-items: flex-end; margin-bottom: 0;">
+                    <button class="filter-btn" onclick="applyFilters()" style="flex: 1; background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; font-weight: 700; font-size: 11px; padding: 9px 12px; box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3); border: none; cursor: pointer; border-radius: 6px; height: 38px;">
+                        🔍 SEARCH
+                    </button>
+                    <button class="filter-btn" onclick="resetFilters()" style="flex: 1; background: #1a2942; color: #00d9ff; font-weight: 600; font-size: 11px; padding: 9px 12px; border: 1px solid #00d9ff; cursor: pointer; border-radius: 6px; height: 38px;">
+                        🔄 RESET
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materials Table -->
+        <div class="materials-table-section">
+            <div class="section-title">📋 MATERIAL LIST</div>
+            <table class="materials-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th style="width: 100px;">DATE</th>
+                        <th style="width: 180px;">PARTY NAME</th>
+                        <th style="width: 140px;">PLANT</th>
+                        <th style="width: 120px;">CHALLAN NO</th>
+                        <th style="width: 200px;">MATERIAL</th>
+                        <th style="width: 120px;">CATEGORY</th>
+                        <th style="width: 110px;">QUANTITY</th>
+                        <th style="width: 90px;">RATE</th>
+                        <th style="width: 110px;">AMOUNT</th>
+                        <th style="width: 130px;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="materialsTableBody">
+                    <!-- Sample Inward Entries -->
+                    <tr>
+                        <td>1</td>
+                        <td>19-01-2026</td>
+                        <td style="font-weight: 600;">ABC Suppliers</td>
+                        <td style="color: #00d9ff;">🏭 Plant A - XYZ</td>
+                        <td>CH/2026/101</td>
+                        <td style="font-weight: 600;">Cement - OPC</td>
+                        <td><span class="category-badge category-raw">CEMENT</span></td>
+                        <td style="font-weight: 600; color: #90d090;">50 Ton</td>
+                        <td>₹ 7,000.00</td>
+                        <td style="font-weight: 600; color: #90d090;">₹ 3,50,000.00</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openMaterialModal('edit', 1)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteMaterial(1)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>18-01-2026</td>
+                        <td style="font-weight: 600;">Shree Aggregates</td>
+                        <td style="color: #00d9ff;">🏭 Plant B - ABC</td>
+                        <td>CH/2026/095</td>
+                        <td style="font-weight: 600;">Aggregates - 20mm</td>
+                        <td><span class="category-badge category-raw">AGGREGATES</span></td>
+                        <td style="font-weight: 600; color: #90d090;">30 Ton</td>
+                        <td>₹ 1,500.00</td>
+                        <td style="font-weight: 600; color: #90d090;">₹ 45,000.00</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="openMaterialModal('edit', 2)">✏️ Edit</button>
+                                <button class="action-btn delete" onclick="deleteMaterial(2)">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Material Modal -->
+    <div class="modal" id="materialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">➕ ADD MATERIAL INWARD</div>
+                <button class="modal-close" onclick="closeMaterialModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="materialForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Date <span class="required">*</span></label>
+                            <input type="date" class="form-input" id="inwardDate" required>
+                            <div class="help-text">Material inward date</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Party Name <span class="required">*</span></label>
+                            <select class="form-select" id="partyName" required>
+                                <option value="">Select Supplier</option>
+                                <option value="ABC Suppliers">ABC Suppliers</option>
+                                <option value="XYZ Cement Agency">XYZ Cement Agency</option>
+                                <option value="Shree Aggregates">Shree Aggregates</option>
+                                <option value="Mumbai Traders">Mumbai Traders</option>
+                                <option value="Other">+ Add New Supplier</option>
+                            </select>
+                            <div class="help-text">Select supplier/vendor</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Plant <span class="required">*</span></label>
+                            <select class="form-select" id="plantName" required>
+                                <option value="">Select Plant</option>
+                                <option value="Plant A - XYZ">🏭 Plant A - XYZ</option>
+                                <option value="Plant B - ABC">🏭 Plant B - ABC</option>
+                                <option value="Plant C - PQR">🏭 Plant C - PQR</option>
+                                <option value="Plant D - DEF">🏭 Plant D - DEF</option>
+                            </select>
+                            <div class="help-text">Select destination plant</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Challan No <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="challanNo" placeholder="e.g., CH/2026/001" required>
+                            <div class="help-text">Supplier's delivery challan number</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vehicle No</label>
+                            <input type="text" class="form-input" id="vehicleNo" placeholder="e.g., MH43AB1234" style="text-transform: uppercase;">
+                            <div class="help-text">Vehicle number (optional)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Material Category <span class="required">*</span></label>
+                            <select class="form-select" id="materialCategory" onchange="updateSubCategory()" required>
+                                <option value="">Select Category</option>
+                                <option value="cement">Cement</option>
+                                <option value="aggregates">Aggregates</option>
+                                <option value="sand">Sand</option>
+                                <option value="chemical">Chemicals</option>
+                                <option value="fuel">Fuel</option>
+                                <option value="consumable">Consumables</option>
+                                <option value="other">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="subCategoryGroup" style="display: none;">
+                            <label class="form-label">Material Type <span class="required">*</span></label>
+                            <select class="form-select" id="materialSubCategory">
+                                <option value="">Select Type</option>
+                            </select>
+                            <div class="help-text" id="subCategoryHelp"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Quantity <span class="required">*</span></label>
+                            <input type="number" class="form-input" id="quantity" placeholder="0" step="0.01" required oninput="calculateAmount()">
+                            <div class="help-text">Material quantity received</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Unit <span class="required">*</span></label>
+                            <select class="form-select" id="materialUnit" required>
+                                <option value="">Select Unit</option>
+                                <option value="Kg">Kg (Kilogram)</option>
+                                <option value="Ton">Ton</option>
+                                <option value="MT">MT (Metric Ton)</option>
+                                <option value="Bags">Bags (50 Kg)</option>
+                                <option value="Ltr">Ltr (Litre)</option>
+                                <option value="Cu.M">Cu.M (Cubic Meter)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Rate (per unit)</label>
+                            <input type="number" class="form-input" id="rate" placeholder="0.00" step="0.01" oninput="calculateAmount()">
+                            <div class="help-text">Optional - can be updated later</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-input" id="amount" placeholder="0.00" step="0.01" readonly style="background: #1a2942; color: #90d090; font-weight: 600;">
+                            <div class="help-text">Auto-calculated (Qty × Rate)</div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-input" id="remarks" rows="2" placeholder="Additional notes or remarks..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeMaterialModal()">❌ CANCEL</button>
+                <button class="modal-btn save" onclick="saveMaterial()">💾 SAVE ENTRY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Results Modal -->
+    <div class="modal" id="filterResultsModal">
+        <div class="modal-content" style="max-width: 600px; background: #1a2942;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2c4564 0%, #1e3654 100%); border-bottom: 2px solid #00d9ff;">
+                <h2 class="modal-title" style="color: #00d9ff; font-weight: 700;">📊 FILTER RESULTS</h2>
+                <button class="modal-close" onclick="closeFilterResultsModal()" style="color: #c8d9f0;">✖</button>
+            </div>
+            <div class="modal-body" style="padding: 25px; background: #0f1e32;">
+                <div style="background: rgba(0, 217, 255, 0.08); border-left: 4px solid #00d9ff; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">FILTER CRITERIA</div>
+                    <div id="filterCriteriaContent" style="display: grid; gap: 8px;"></div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #1a2942 0%, #152238 100%); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2c4564;">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 13px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 1px;">FILTERED ENTRIES</div>
+                        <div id="totalEntriesDisplay" style="font-size: 36px; font-weight: 700; color: #00d9ff; text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);">0</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(11, 25, 41, 0.7); border-radius: 6px; border: 1px solid #2c4564;">
+                            <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">📊 TOTAL QUANTITY</div>
+                            <div id="totalQtyDisplay" style="font-size: 20px; font-weight: 700; color: #90d090;">0</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(11, 25, 41, 0.7); border-radius: 6px; border: 1px solid #2c4564;">
+                            <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">💰 TOTAL AMOUNT</div>
+                            <div id="totalAmtDisplay" style="font-size: 20px; font-weight: 700; color: #ffb74d;">₹0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #1a2942; border-top: 1px solid #2c4564;">
+                <button class="modal-btn save" onclick="closeFilterResultsModal()" style="background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; font-weight: 700; min-width: 120px;">
+                    ✅ OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inward Report Modal -->
+    <div class="modal" id="inwardReportModal">
+        <div class="modal-content" style="max-width: 90%; width: 1200px; background: #1a2942;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2c4564 0%, #1e3654 100%); border-bottom: 2px solid #00d9ff;">
+                <h2 class="modal-title" style="color: #00d9ff; font-weight: 700;">📊 MATERIAL INWARD REPORT</h2>
+                <button class="modal-close" onclick="closeInwardReportModal()" style="color: #c8d9f0;">✖</button>
+            </div>
+            <div class="modal-body" style="padding: 25px; background: #0f1e32; max-height: 70vh; overflow-y: auto;">
+                
+                <!-- Filter Section -->
+                <div style="background: rgba(0, 217, 255, 0.08); border-left: 4px solid #00d9ff; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">REPORT FILTERS</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div>
+                            <label style="font-size: 10px; color: #8aa4c4; display: block; margin-bottom: 5px;">FROM DATE</label>
+                            <input type="date" id="reportFromDate" style="width: 100%; padding: 8px; background: rgba(11, 25, 41, 0.6); border: 1px solid #4a6b8a; border-radius: 3px; color: #c8d9f0; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 10px; color: #8aa4c4; display: block; margin-bottom: 5px;">TO DATE</label>
+                            <input type="date" id="reportToDate" style="width: 100%; padding: 8px; background: rgba(11, 25, 41, 0.6); border: 1px solid #4a6b8a; border-radius: 3px; color: #c8d9f0; font-size: 12px;">
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button onclick="generateReport()" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; border: none; border-radius: 3px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                                🔍 GENERATE REPORT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #1a2942 0%, #152238 100%); padding: 15px; border-radius: 6px; border: 1px solid #2c4564; text-align: center;">
+                        <div style="font-size: 10px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">🏢 TOTAL PARTIES</div>
+                        <div id="reportTotalParties" style="font-size: 24px; font-weight: 700; color: #00d9ff;">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a2942 0%, #152238 100%); padding: 15px; border-radius: 6px; border: 1px solid #2c4564; text-align: center;">
+                        <div style="font-size: 10px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">📦 TOTAL MATERIALS</div>
+                        <div id="reportTotalMaterials" style="font-size: 24px; font-weight: 700; color: #00d9ff;">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a2942 0%, #152238 100%); padding: 15px; border-radius: 6px; border: 1px solid #2c4564; text-align: center;">
+                        <div style="font-size: 10px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">📊 TOTAL QUANTITY</div>
+                        <div id="reportTotalQuantity" style="font-size: 24px; font-weight: 700; color: #90d090;">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a2942 0%, #152238 100%); padding: 15px; border-radius: 6px; border: 1px solid #2c4564; text-align: center;">
+                        <div style="font-size: 10px; color: #8aa4c4; margin-bottom: 5px; letter-spacing: 0.5px;">💰 TOTAL AMOUNT</div>
+                        <div id="reportTotalAmount" style="font-size: 24px; font-weight: 700; color: #ffb74d;">₹0</div>
+                    </div>
+                </div>
+
+                <!-- Party-wise Breakdown -->
+                <div style="background: rgba(0, 217, 255, 0.05); border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 12px; color: #8aa4c4; margin-bottom: 15px; font-weight: 600; letter-spacing: 1px;">PARTY-WISE BREAKDOWN</div>
+                    <div id="reportPartyBreakdown">
+                        <!-- Party breakdown will be inserted here -->
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer" style="background: #1a2942; border-top: 1px solid #2c4564;">
+                <button class="modal-btn" onclick="exportReport()" style="background: rgba(0, 217, 255, 0.2); border: 1px solid #00d9ff; color: #00d9ff; font-weight: 600; min-width: 120px;">
+                    📥 EXPORT
+                </button>
+                <button class="modal-btn save" onclick="closeInwardReportModal()" style="background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; font-weight: 700; min-width: 120px;">
+                    ✅ CLOSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plant-wise Material Report Modal -->
+    <div class="modal" id="plantReportModal">
+        <div class="modal-content" style="max-width: 90%; width: 1200px; max-height: 90vh;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f1e32 100%);">
+                <h2 style="margin: 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                    🏭 PLANT-WISE MATERIAL REPORT
+                </h2>
+                <button class="modal-close" onclick="closePlantReportModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; max-height: calc(90vh - 140px); overflow-y: auto;">
+                
+                <!-- Date Filter -->
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; background: rgba(0, 217, 255, 0.1); padding: 15px; border-radius: 6px; border: 1px solid rgba(0, 217, 255, 0.3);">
+                    <div style="flex: 1;">
+                        <label style="font-size: 11px; color: #8aa4c4; margin-bottom: 5px; display: block;">📅 FROM DATE</label>
+                        <input type="date" id="plantReportFromDate" style="width: 100%; padding: 8px; background: #1a2942; border: 1px solid #2c4564; border-radius: 4px; color: #c8d9f0; font-size: 13px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 11px; color: #8aa4c4; margin-bottom: 5px; display: block;">📅 TO DATE</label>
+                        <input type="date" id="plantReportToDate" style="width: 100%; padding: 8px; background: #1a2942; border: 1px solid #2c4564; border-radius: 4px; color: #c8d9f0; font-size: 13px;">
+                    </div>
+                    <div style="padding-top: 18px;">
+                        <button onclick="generatePlantReport()" style="padding: 8px 20px; background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            🔍 GENERATE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Summary Cards -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="flex: 1; background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 6px; padding: 15px;">
+                        <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 8px;">🏭 TOTAL PLANTS</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #00d9ff;" id="totalPlantsDisplay">0</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 6px; padding: 15px;">
+                        <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 8px;">📦 TOTAL MATERIALS</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #00d9ff;" id="totalMaterialsDisplay">0</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(144, 208, 144, 0.1); border: 1px solid rgba(144, 208, 144, 0.3); border-radius: 6px; padding: 15px;">
+                        <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 8px;">📊 TOTAL QUANTITY</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #90d090;" id="totalPlantQtyDisplay">0</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 6px; padding: 15px;">
+                        <div style="font-size: 11px; color: #8aa4c4; margin-bottom: 8px;">💰 TOTAL AMOUNT</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #ffffff;" id="totalPlantAmtDisplay">₹0</div>
+                    </div>
+                </div>
+
+                <!-- Plant-wise Breakdown -->
+                <div style="background: rgba(0, 217, 255, 0.05); border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 12px; color: #8aa4c4; margin-bottom: 15px; font-weight: 600; letter-spacing: 1px;">🏭 PLANT-WISE BREAKDOWN</div>
+                    <div id="reportPlantBreakdown">
+                        <!-- Plant breakdown will be inserted here -->
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer" style="background: #1a2942; border-top: 1px solid #2c4564;">
+                <button class="modal-btn" onclick="exportPlantReport()" style="background: rgba(0, 217, 255, 0.2); border: 1px solid #00d9ff; color: #00d9ff; font-weight: 600; min-width: 120px;">
+                    📥 EXPORT
+                </button>
+                <button class="modal-btn save" onclick="closePlantReportModal()" style="background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: #0a1628; font-weight: 700; min-width: 120px;">
+                    ✅ CLOSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'add';
+        let editingMaterialId = null;
+
+        // Sample material database
+        const materialsDatabase = [
+            { id: 1, name: 'Cement (OPC 53 Grade)', category: 'raw', unit: 'Bags', hsn: '25231010', gst: 5, stock: 850, reorder: 100, rate: 350 },
+            { id: 2, name: 'Aggregates (20mm)', category: 'raw', unit: 'MT', hsn: '25171010', gst: 5, stock: 45, reorder: 50, rate: 1500 },
+            { id: 3, name: 'Diesel', category: 'fuel', unit: 'Ltr', hsn: '27101990', gst: 18, stock: 250, reorder: 500, rate: 95 },
+            { id: 4, name: 'Chemical Admixture', category: 'chemical', unit: 'Ltr', hsn: '38244090', gst: 18, stock: 180, reorder: 50, rate: 300 },
+            { id: 5, name: 'Grease', category: 'consumable', unit: 'Kg', hsn: '27101990', gst: 18, stock: 8, reorder: 15, rate: 300 }
+        ];
+
+        // Open material modal
+        function openMaterialModal(mode, materialId = null) {
+            currentMode = mode;
+            editingMaterialId = materialId;
+            
+            const modal = document.getElementById('materialModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            if (mode === 'add') {
+                modalTitle.textContent = '➕ ADD MATERIAL INWARD';
+                resetMaterialForm();
+                // Set today's date as default
+                document.getElementById('inwardDate').valueAsDate = new Date();
+            } else if (mode === 'edit' && materialId) {
+                modalTitle.textContent = '✏️ EDIT MATERIAL INWARD';
+                loadMaterialData(materialId);
+            }
+            
+            // Show modal
+            modal.classList.add('show');
+        }
+
+        // Close Material Modal
+        function closeMaterialModal() {
+            document.getElementById('materialModal').classList.remove('show');
+            resetMaterialForm();
+        }
+
+        // Reset Material Form
+        function resetMaterialForm() {
+            document.getElementById('materialForm').reset();
+            currentMode = 'add';
+            editingMaterialId = null;
+        }
+
+        // Load Material Data for Edit Mode
+        function loadMaterialData(rowIndex) {
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            let visibleCount = 0;
+            let targetRow = null;
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== 'none') {
+                    visibleCount++;
+                    if (visibleCount === rowIndex) {
+                        targetRow = rows[i];
+                        break;
+                    }
+                }
+            }
+            
+            if (!targetRow) return;
+            
+            const cells = targetRow.getElementsByTagName('td');
+            const date = cells[1].textContent;
+            const party = cells[2].textContent;
+            const plant = cells[3].textContent;
+            const challan = cells[4].textContent;
+            const material = cells[5].textContent;
+            const quantity = cells[7].textContent;
+            const rate = cells[8].textContent.replace('₹', '').trim();
+            
+            // Convert date DD-MM-YYYY to YYYY-MM-DD
+            let formattedDate = '';
+            if (date) {
+                const parts = date.split('-');
+                if (parts.length === 3) {
+                    formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+            }
+            
+            const qtyParts = quantity.split(' ');
+            const qtyValue = qtyParts[0] || '0';
+            const unit = qtyParts[1] || 'Ton';
+            
+            document.getElementById('inwardDate').value = formattedDate;
+            document.getElementById('challanNo').value = challan;
+            document.getElementById('quantity').value = qtyValue;
+            document.getElementById('unit').value = unit;
+            document.getElementById('rate').value = rate;
+            
+            const partySelect = document.getElementById('partyName');
+            for (let i = 0; i < partySelect.options.length; i++) {
+                if (partySelect.options[i].text === party) {
+                    partySelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            const plantSelect = document.getElementById('plantName');
+            for (let i = 0; i < plantSelect.options.length; i++) {
+                if (plantSelect.options[i].text.includes(plant.split(' - ')[0])) {
+                    plantSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            calculateAmount();
+        }
+
+        // Perform Search Function
+        function performSearch() {
+            const searchInput = document.getElementById('searchMaterial');
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const dropdown = document.getElementById('searchResults');
+            
+            if (searchTerm.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = allEntries.filter(entry => {
+                const term = searchTerm;
+                return entry.party.toLowerCase().includes(term) ||
+                       entry.material.toLowerCase().includes(term) ||
+                       entry.challan.toLowerCase().includes(term) ||
+                       entry.plant.toLowerCase().includes(term) ||
+                       entry.date.includes(term);
+            });
+
+            if (matches.length === 0) {
+                dropdown.innerHTML = '<div class="search-no-results">🔍 No results found for "' + searchTerm + '"<br><small style="color: #8aa4c4; margin-top: 8px; display: block;">Try searching by party name, material, or challan number</small></div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            // Build results HTML
+            let html = '';
+            matches.slice(0, 8).forEach((entry, index) => {
+                const highlightedParty = highlightText(entry.party, term);
+                const highlightedMaterial = highlightText(entry.material, term);
+                const highlightedChallan = highlightText(entry.challan, term);
+
+                html += `
+                    <div class="search-result-item" onclick="selectSearchResult(${entry.rowIndex})">
+                        <div class="search-result-left">
+                            <div class="search-result-title">${highlightedMaterial}</div>
+                            <div class="search-result-details">
+                                📅 ${entry.date} • 🏢 ${highlightedParty} • 📋 ${highlightedChallan}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="search-result-badge category-badge category-raw">${entry.category}</span>
+                            <div style="font-size: 12px; color: #90d090; margin-top: 4px; text-align: right;">
+                                ${entry.quantity} • ${entry.amount}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (matches.length > 8) {
+                html += `<div class="search-no-results" style="padding: 10px; color: #8aa4c4;">
+                    +${matches.length - 8} more results... Keep typing to refine search
+                </div>`;
+            }
+
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+
+        // Save Material (Add or Edit)
+        function saveMaterial() {
+            const date = document.getElementById('inwardDate').value;
+            const party = document.getElementById('partyName').value;
+            const plant = document.getElementById('plantName').value;
+            const challan = document.getElementById('challanNo').value;
+            const category = document.getElementById('category').value;
+            const subcategory = document.getElementById('subcategory').value;
+            const quantity = document.getElementById('quantity').value;
+            const unit = document.getElementById('unit').value;
+            const rate = document.getElementById('rate').value;
+            const vehicle = document.getElementById('vehicleNo').value || '';
+            
+            if (!date || !party || !plant || !challan || !category || !subcategory || !quantity || !rate) {
+                alert('⚠️ Please fill all required fields!');
+                return;
+            }
+            
+            const amount = parseFloat(quantity) * parseFloat(rate);
+            const formattedDate = new Date(date).toLocaleDateString('en-IN');
+            const materialName = subcategory;
+            const categoryBadge = getCategoryBadge(category);
+            
+            if (currentMode === 'add') {
+                const tbody = document.getElementById('materialsTableBody');
+                let rowCount = tbody.getElementsByTagName('tr').length + 1;
+                
+                const newRow = tbody.insertRow(0);
+                newRow.innerHTML = `
+                    <td style="font-weight: 600;">${rowCount}</td>
+                    <td style="font-weight: 600;">${formattedDate}</td>
+                    <td style="font-weight: 600;">${party}</td>
+                    <td style="color: #00d9ff; font-weight: 600;">${plant}</td>
+                    <td>${challan}</td>
+                    <td style="font-weight: 600;">${materialName}</td>
+                    ${categoryBadge}
+                    <td style="font-weight: 600; color: #90d090;">${quantity} ${unit}</td>
+                    <td>₹ ${parseFloat(rate).toFixed(2)}</td>
+                    <td style="font-weight: 600; color: #90d090;">₹ ${parseFloat(amount).toFixed(2)}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" onclick="openMaterialModal('edit', ${rowCount})">✏️ Edit</button>
+                            <button class="action-btn delete" onclick="deleteMaterial(${rowCount})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                alert(`✅ Material Inward Entry Added!\n\n📅 Date: ${formattedDate}\n🏢 Party: ${party}\n🏭 Plant: ${plant}\n📋 Challan: ${challan}\n📦 Material: ${materialName}\n📊 Quantity: ${quantity} ${unit}\n💰 Amount: ₹${parseFloat(amount).toFixed(2)}\n\n✅ Stock updated successfully!`);
+            } else {
+                const tbody = document.getElementById('materialsTableBody');
+                const rows = tbody.getElementsByTagName('tr');
+                
+                let targetRow = null;
+                let visibleCount = 0;
+                
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i].style.display !== 'none') {
+                        visibleCount++;
+                        if (visibleCount === editingMaterialId) {
+                            targetRow = rows[i];
+                            break;
+                        }
+                    }
+                }
+                
+                if (targetRow) {
+                    targetRow.cells[1].textContent = formattedDate;
+                    targetRow.cells[2].textContent = party;
+                    targetRow.cells[3].textContent = plant;
+                    targetRow.cells[3].style.color = '#00d9ff';
+                    targetRow.cells[4].textContent = challan;
+                    targetRow.cells[5].textContent = materialName;
+                    targetRow.cells[6].innerHTML = categoryBadge;
+                    targetRow.cells[7].textContent = `${quantity} ${unit}`;
+                    targetRow.cells[7].style.color = '#90d090';
+                    targetRow.cells[8].textContent = `₹ ${parseFloat(rate).toFixed(2)}`;
+                    targetRow.cells[9].textContent = `₹ ${parseFloat(amount).toFixed(2)}`;
+                    targetRow.cells[9].style.color = '#90d090';
+                    
+                    alert(`✅ Entry Updated!\n\n📅 Date: ${formattedDate}\n🏢 Party: ${party}\n🏭 Plant: ${plant}\n📦 Material: ${materialName}\n📊 Quantity: ${quantity} ${unit}\n💰 Amount: ₹${parseFloat(amount).toFixed(2)}`);
+                }
+            }
+
+            closeMaterialModal();
+            updateStats();
+            collectAllEntries();
+        }
+
+        // Get Category Badge
+        function getCategoryBadge(category) {
+            const badges = {
+                'cement': '<span class="category-badge category-raw">CEMENT</span>',
+                'aggregates': '<span class="category-badge category-raw">AGGREGATES</span>',
+                'sand': '<span class="category-badge category-raw">SAND</span>',
+                'chemical': '<span class="category-badge category-chemical">CHEMICAL</span>'
+            };
+            return `<td>${badges[category] || badges['cement']}</td>`;
+        }
+
+        // Calculate Amount
+        function calculateAmount() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            const amount = quantity * rate;
+            document.getElementById('amount').value = amount.toFixed(2);
+        }
+
+        // Update Subcategory based on Category
+        function updateSubCategory() {
+            const category = document.getElementById('category').value;
+            const subcatSelect = document.getElementById('subcategory');
+            
+            subcatSelect.innerHTML = '<option value="">Select Type</option>';
+            
+            const subCategories = {
+                'cement': ['Cement - OPC', 'Cement - PPC', 'Cement - PSC'],
+                'aggregates': ['Aggregates - 20mm', 'Aggregates - 12mm', 'Aggregates - 10mm', 'Aggregates - 6mm'],
+                'sand': ['Sand - Natural', 'Sand - M-Sand', 'Sand - P-Sand'],
+                'chemical': ['Admixture', 'Waterproofing', 'Retarder', 'Accelerator']
+            };
+            
+            const options = subCategories[category] || [];
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                subcatSelect.appendChild(option);
+            });
+        }
+
+        // Update Stats
+        function updateStats() {
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== 'none') {
+                    visibleCount++;
+                }
+            }
+            
+            document.getElementById('statTotal').textContent = visibleCount;
+        }
+
+        // Collect All Entries for Search
+        function collectAllEntries() {
+            allEntries = [];
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells.length === 0) continue;
+                
+                allEntries.push({
+                    rowIndex: i + 1,
+                    date: cells[1].textContent,
+                    party: cells[2].textContent,
+                    plant: cells[3].textContent,
+                    challan: cells[4].textContent,
+                    material: cells[5].textContent,
+                    category: cells[6].textContent,
+                    quantity: cells[7].textContent
+                });
+            }
+        }
+
+        // Highlight matching text
+        function highlightText(text, term) {
+            if (!term) return text;
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+
+        // Select search result
+        function selectSearchResult(rowIndex) {
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // Hide all rows
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = 'none';
+            }
+            
+            // Show selected row
+            if (rows[rowIndex]) {
+                rows[rowIndex].style.display = '';
+                rows[rowIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight effect
+                rows[rowIndex].style.background = 'rgba(0, 217, 255, 0.2)';
+                setTimeout(() => {
+                    rows[rowIndex].style.background = '';
+                }, 2000);
+            }
+            
+            hideSearchResults();
+            document.getElementById('statTotal').textContent = '1';
+        }
+
+        // Show search results dropdown
+        function showSearchResults() {
+            const searchTerm = document.getElementById('searchMaterial').value;
+            if (searchTerm.length > 0) {
+                showSearchSuggestions(searchTerm);
+            }
+        }
+
+        // Hide search results dropdown
+        function hideSearchResults() {
+            const dropdown = document.getElementById('searchResults');
+            setTimeout(() => {
+                dropdown.style.display = 'none';
+            }, 200);
+        }
+
+        // Update filter sub-type dropdown based on material category
+        function updateFilterSubType() {
+            const category = document.getElementById('filterMaterial').value;
+            const subTypeSelect = document.getElementById('filterSubType');
+            
+            // Clear existing options
+            subTypeSelect.innerHTML = '<option value="">All Types</option>';
+            
+            // Define sub-types for each category (same as add form)
+            const subTypes = {
+                'cement': [
+                    { value: 'OPC', label: 'OPC (Ordinary Portland Cement)' },
+                    { value: 'PPC', label: 'PPC (Portland Pozzolana Cement)' },
+                    { value: 'PSC', label: 'PSC (Portland Slag Cement)' },
+                    { value: 'Flyash', label: 'Flyash' },
+                    { value: 'GGBS', label: 'GGBS' }
+                ],
+                'aggregates': [
+                    { value: '10mm', label: '10mm' },
+                    { value: '20mm', label: '20mm' },
+                    { value: 'Crushed', label: 'Crushed Stone' },
+                    { value: 'Dust', label: 'Stone Dust' }
+                ],
+                'sand': [
+                    { value: 'M-Sand', label: 'M-Sand (Manufactured)' },
+                    { value: 'Natural', label: 'Natural River Sand' },
+                    { value: 'Robo', label: 'Robo Sand' },
+                    { value: 'P-Sand', label: 'P-Sand (Plastering)' }
+                ],
+                'chemical': [
+                    { value: 'Admixture', label: 'Admixture' },
+                    { value: 'Retarder', label: 'Retarder' },
+                    { value: 'Accelerator', label: 'Accelerator' }
+                ],
+                'fuel': [
+                    { value: 'Diesel', label: 'Diesel' },
+                    { value: 'Petrol', label: 'Petrol' }
+                ],
+                'consumable': [
+                    { value: 'Oil', label: 'Oil' },
+                    { value: 'Grease', label: 'Grease' }
+                ]
+            };
+            
+            // Populate sub-type options if category is selected
+            if (category && subTypes[category]) {
+                subTypes[category].forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.label;
+                    subTypeSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Apply all filters with SEARCH button
+        function applyFilters() {
+            const supplier = document.getElementById('filterSupplier').value.toLowerCase();
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+            const plant = document.getElementById('filterPlant').value.toLowerCase();
+            const material = document.getElementById('filterMaterial').value.toLowerCase();
+            const subType = document.getElementById('filterSubType').value.toLowerCase();
+
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+            let totalQuantity = 0;
+            let totalAmount = 0;
+
+            console.log('🔍 Applying Filters:', { supplier, fromDate, toDate, plant, material, subType });
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                
+                if (cells.length === 0) continue;
+
+                // Get cell values
+                const entryDate = cells[1] ? cells[1].textContent : '';
+                const party = cells[2] ? cells[2].textContent.toLowerCase() : '';
+                const plantName = cells[3] ? cells[3].textContent.toLowerCase() : '';
+                const materialName = cells[5] ? cells[5].textContent.toLowerCase() : '';
+                const categoryBadge = cells[6] ? cells[6].textContent.toLowerCase() : '';
+                const quantity = cells[7] ? cells[7].textContent : '';
+                const amount = cells[9] ? cells[9].textContent.replace(/[₹,]/g, '').trim() : '0';
+
+                // Parse date (DD-MM-YYYY format)
+                let entryDateObj = null;
+                if (entryDate) {
+                    const parts = entryDate.split('-');
+                    if (parts.length === 3) {
+                        entryDateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                    }
+                }
+
+                // Check each filter
+                const supplierMatch = !supplier || party.includes(supplier);
+                const plantMatch = !plant || plantName.includes(plant);
+                const materialMatch = !material || materialName.includes(material);
+                const subTypeMatch = !subType || materialName.includes(subType);
+
+                // Date range filter
+                let dateMatch = true;
+                if (fromDate && entryDateObj) {
+                    const fromDateObj = new Date(fromDate);
+                    if (entryDateObj < fromDateObj) dateMatch = false;
+                }
+                if (toDate && entryDateObj) {
+                    const toDateObj = new Date(toDate);
+                    if (entryDateObj > toDateObj) dateMatch = false;
+                }
+
+                // Show/hide row
+                if (supplierMatch && plantMatch && materialMatch && subTypeMatch && dateMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                    
+                    // Calculate totals
+                    const qtyValue = parseFloat(quantity.replace(/[^\d.]/g, '')) || 0;
+                    const amtValue = parseFloat(amount) || 0;
+                    totalQuantity += qtyValue;
+                    totalAmount += amtValue;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            // Update stats
+            document.getElementById('statTotal').textContent = visibleCount;
+
+            // Show beautiful modal instead of alert
+            showFilterResults(supplier, plant, material, subType, fromDate, toDate, visibleCount, totalQuantity, totalAmount);
+        }
+
+        // Show Filter Results in Beautiful Modal
+        function showFilterResults(supplier, plant, material, subType, fromDate, toDate, visibleCount, totalQuantity, totalAmount) {
+            // Get display names
+            const supplierName = supplier ? document.getElementById('filterSupplier').options[document.getElementById('filterSupplier').selectedIndex].text : 'All Suppliers';
+            const plantName = plant ? document.getElementById('filterPlant').options[document.getElementById('filterPlant').selectedIndex].text : 'All Plants';
+            const materialCat = material ? document.getElementById('filterMaterial').options[document.getElementById('filterMaterial').selectedIndex].text : 'All Materials';
+            const materialType = subType ? document.getElementById('filterSubType').options[document.getElementById('filterSubType').selectedIndex].text : 'All Types';
+            
+            let dateRange = 'All Dates';
+            if (fromDate && toDate) {
+                const fromParts = fromDate.split('-');
+                const toParts = toDate.split('-');
+                dateRange = `${fromParts[2]}-${fromParts[1]}-${fromParts[0]} to ${toParts[2]}-${toParts[1]}-${toParts[0]}`;
+            }
+
+            // Build filter criteria HTML
+            let criteriaHTML = '';
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px;"><span style="color: #6a8aaa;">🏢 Supplier:</span> <span style="color: #c8d9f0; font-weight: 600;">${supplierName}</span></div>`;
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px;"><span style="color: #6a8aaa;">🏭 Plant:</span> <span style="color: #c8d9f0; font-weight: 600;">${plantName}</span></div>`;
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px;"><span style="color: #6a8aaa;">📦 Material:</span> <span style="color: #c8d9f0; font-weight: 600;">${materialCat}</span></div>`;
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px;"><span style="color: #6a8aaa;">🔖 Type:</span> <span style="color: #c8d9f0; font-weight: 600;">${materialType}</span></div>`;
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px;"><span style="color: #6a8aaa;">📅 Period:</span> <span style="color: #c8d9f0; font-weight: 600;">${dateRange}</span></div>`;
+
+            // Update modal content
+            document.getElementById('filterCriteriaContent').innerHTML = criteriaHTML;
+            document.getElementById('totalEntriesDisplay').textContent = visibleCount;
+            document.getElementById('totalQtyDisplay').textContent = totalQuantity.toFixed(2) + ' units';
+            document.getElementById('totalAmtDisplay').textContent = '₹' + totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Show modal
+            document.getElementById('filterResultsModal').classList.add('show');
+        }
+
+        // Close Filter Results Modal
+        function closeFilterResultsModal() {
+            document.getElementById('filterResultsModal').classList.remove('show');
+        }
+
+        // Filter materials - UPDATED VERSION WITH WORKING SEARCH
+        function filterMaterials() {
+            const searchTerm = document.getElementById('searchMaterial').value.toLowerCase();
+            const categoryFilter = document.getElementById('filterCategory').value.toLowerCase();
+            const stockFilter = document.getElementById('filterStock').value;
+
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+
+            console.log('🔍 Filtering with:', searchTerm, categoryFilter); // Debug log
+
+            // Loop through all table rows
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                
+                if (cells.length === 0) continue;
+
+                // Get cell values
+                const date = cells[1] ? cells[1].textContent.toLowerCase() : '';
+                const party = cells[2] ? cells[2].textContent.toLowerCase() : '';
+                const challan = cells[3] ? cells[3].textContent.toLowerCase() : '';
+                const material = cells[4] ? cells[4].textContent.toLowerCase() : '';
+                const categoryBadge = cells[5] ? cells[5].textContent.toLowerCase() : '';
+                const quantity = cells[6] ? cells[6].textContent.toLowerCase() : '';
+
+                console.log('Row', i, 'Party:', party, 'Material:', material); // Debug each row
+
+                // Search filter - check if search term exists in any field
+                const matchesSearch = !searchTerm || 
+                    date.includes(searchTerm) ||
+                    party.includes(searchTerm) ||
+                    challan.includes(searchTerm) ||
+                    material.includes(searchTerm) ||
+                    quantity.includes(searchTerm);
+
+                // Category filter
+                const matchesCategory = !categoryFilter || 
+                    categoryFilter === '' ||
+                    categoryBadge.includes(categoryFilter);
+
+                // Show/hide row based on filters
+                if (matchesSearch && matchesCategory) {
+                    row.style.display = '';
+                    visibleCount++;
+                    console.log('✅ Showing row', i);
+                } else {
+                    row.style.display = 'none';
+                    console.log('❌ Hiding row', i);
+                }
+            }
+
+            console.log('Total visible:', visibleCount);
+            // Update total count
+            document.getElementById('statTotal').textContent = visibleCount;
+        }
+
+        // Reset filters
+        function resetFilters() {
+            // Clear all filter fields
+            document.getElementById('filterSupplier').value = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('filterPlant').value = '';
+            document.getElementById('filterMaterial').value = '';
+            document.getElementById('filterSubType').value = '';
+            
+            // Show all rows
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+            
+            // Reset count
+            const totalRows = rows.length;
+            document.getElementById('statTotal').textContent = totalRows;
+            
+            // Show reset confirmation modal
+            showResetConfirmation(totalRows);
+        }
+
+        // Show Reset Confirmation Modal
+        function showResetConfirmation(totalRows) {
+            // Build reset message HTML
+            let criteriaHTML = '';
+            criteriaHTML += `<div style="display: flex; align-items: center; gap: 10px; justify-content: center;"><span style="color: #90d090; font-size: 48px;">✅</span></div>`;
+            criteriaHTML += `<div style="text-align: center; margin-top: 15px; font-size: 16px; color: #c8d9f0; font-weight: 600;">All Filters Cleared!</div>`;
+            criteriaHTML += `<div style="text-align: center; margin-top: 8px; font-size: 13px; color: #8aa4c4;">Showing all entries in the list</div>`;
+
+            // Update modal content
+            document.getElementById('filterCriteriaContent').innerHTML = criteriaHTML;
+            document.getElementById('totalEntriesDisplay').textContent = totalRows;
+            document.getElementById('totalQtyDisplay').textContent = '- -';
+            document.getElementById('totalAmtDisplay').textContent = '- -';
+
+            // Show modal
+            document.getElementById('filterResultsModal').classList.add('show');
+        }
+
+        // When opening stock changes, update current stock
+        document.getElementById('openingStock').addEventListener('input', function() {
+            if (currentMode === 'add') {
+                document.getElementById('currentStock').value = this.value;
+            }
+        });
+
+        // Close modal on outside click
+        document.getElementById('materialModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMaterialModal();
+            }
+        });
+
+        // Hide search dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchBox = document.getElementById('searchMaterial');
+            const dropdown = document.getElementById('searchResults');
+            
+            if (!searchBox.contains(e.target) && !dropdown.contains(e.target)) {
+                hideSearchResults();
+            }
+        });
+
+        // Initialize: Collect all entries on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            collectAllEntries();
+            console.log('✅ Search initialized with', allEntries.length, 'entries');
+            
+            // Update card stats on page load
+            updateCardStats();
+        });
+
+        // Update card statistics
+        function updateCardStats() {
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // Count total visible rows
+            let visibleCount = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== 'none') {
+                    visibleCount++;
+                }
+            }
+            
+            // Update TOTAL MATERIALS card
+            document.getElementById('statTotal').textContent = visibleCount;
+            
+            console.log('📊 Card stats updated:', visibleCount, 'entries');
+        }
+
+        // ===== INWARD REPORT FUNCTIONS =====
+
+        // Open Inward Report Modal
+        function openInwardReportModal() {
+            // Set default dates (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+            
+            document.getElementById('reportToDate').valueAsDate = today;
+            document.getElementById('reportFromDate').valueAsDate = thirtyDaysAgo;
+            
+            // Generate initial report
+            generateReport();
+            
+            // Show modal
+            document.getElementById('inwardReportModal').classList.add('show');
+        }
+
+        // Close Inward Report Modal
+        function closeInwardReportModal() {
+            document.getElementById('inwardReportModal').classList.remove('show');
+        }
+
+        // ===== PLANT-WISE REPORT FUNCTIONS =====
+        
+        // Open Plant Report Modal
+        function openPlantReportModal() {
+            document.getElementById('plantReportModal').classList.add('show');
+            
+            // Set default date range (last 30 days)
+            const today = new Date();
+            const last30Days = new Date(today);
+            last30Days.setDate(today.getDate() - 30);
+            
+            document.getElementById('plantReportFromDate').valueAsDate = last30Days;
+            document.getElementById('plantReportToDate').valueAsDate = today;
+            
+            // Generate report immediately
+            generatePlantReport();
+        }
+
+        // Close Plant Report Modal
+        function closePlantReportModal() {
+            document.getElementById('plantReportModal').classList.remove('show');
+        }
+
+        // Generate Plant-wise Report
+        function generatePlantReport() {
+            const fromDate = document.getElementById('plantReportFromDate').value;
+            const toDate = document.getElementById('plantReportToDate').value;
+            
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // Plant-wise data structure
+            const plantData = {};
+            let grandTotalQty = 0;
+            let grandTotalAmt = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display === 'none') continue;
+                
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells.length === 0) continue;
+                
+                // Get data
+                const entryDate = cells[1] ? cells[1].textContent.trim() : '';
+                const plantName = cells[3] ? cells[3].textContent.trim() : 'Unknown Plant';
+                const materialName = cells[5] ? cells[5].textContent.trim() : '';
+                const quantity = cells[7] ? cells[7].textContent.trim() : '0';
+                const amount = cells[9] ? cells[9].textContent.replace(/[₹,]/g, '').trim() : '0';
+                
+                // Parse date
+                let entryDateObj = null;
+                if (entryDate) {
+                    const parts = entryDate.split('-');
+                    if (parts.length === 3) {
+                        entryDateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                    }
+                }
+                
+                // Filter by date range
+                let inDateRange = true;
+                if (fromDate && entryDateObj) {
+                    const fromDateObj = new Date(fromDate);
+                    if (entryDateObj < fromDateObj) inDateRange = false;
+                }
+                if (toDate && entryDateObj) {
+                    const toDateObj = new Date(toDate);
+                    if (entryDateObj > toDateObj) inDateRange = false;
+                }
+                
+                if (!inDateRange) continue;
+                
+                // Initialize plant if not exists
+                if (!plantData[plantName]) {
+                    plantData[plantName] = {
+                        materials: {},
+                        totalQty: 0,
+                        totalAmt: 0,
+                        entries: 0
+                    };
+                }
+                
+                // Initialize material if not exists
+                if (!plantData[plantName].materials[materialName]) {
+                    plantData[plantName].materials[materialName] = {
+                        qty: 0,
+                        amt: 0,
+                        count: 0
+                    };
+                }
+                
+                // Parse values
+                const qtyValue = parseFloat(quantity.replace(/[^\d.]/g, '')) || 0;
+                const amtValue = parseFloat(amount) || 0;
+                
+                // Update material data
+                plantData[plantName].materials[materialName].qty += qtyValue;
+                plantData[plantName].materials[materialName].amt += amtValue;
+                plantData[plantName].materials[materialName].count++;
+                
+                // Update plant totals
+                plantData[plantName].totalQty += qtyValue;
+                plantData[plantName].totalAmt += amtValue;
+                plantData[plantName].entries++;
+                
+                // Update grand totals
+                grandTotalQty += qtyValue;
+                grandTotalAmt += amtValue;
+            }
+            
+            // Update summary cards
+            document.getElementById('totalPlantsDisplay').textContent = Object.keys(plantData).length;
+            let totalMaterials = 0;
+            Object.values(plantData).forEach(plant => {
+                totalMaterials += Object.keys(plant.materials).length;
+            });
+            document.getElementById('totalMaterialsDisplay').textContent = totalMaterials;
+            document.getElementById('totalPlantQtyDisplay').textContent = grandTotalQty.toFixed(2);
+            document.getElementById('totalPlantAmtDisplay').textContent = '₹' + grandTotalAmt.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            
+            // Build plant breakdown HTML
+            let breakdownHTML = '';
+            const plantNames = Object.keys(plantData).sort();
+            
+            plantNames.forEach((plantName, index) => {
+                const plant = plantData[plantName];
+                const plantIcon = plantName.includes('Plant A') ? '🏭' : plantName.includes('Plant B') ? '🏭' : plantName.includes('Plant C') ? '🏭' : '🏭';
+                
+                breakdownHTML += `
+                    <div style="background: rgba(26, 41, 66, 0.6); border: 1px solid #2c4564; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="font-size: 24px;">${plantIcon}</div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700; color: #00d9ff;">${plantName}</div>
+                                    <div style="font-size: 11px; color: #6a8aaa; margin-top: 2px;">${plant.entries} entries • ${Object.keys(plant.materials).length} materials</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 700; color: #ffffff;">₹${plant.totalAmt.toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
+                                <div style="font-size: 11px; color: #90d090; margin-top: 2px;">Qty: ${plant.totalQty.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Material Details -->
+                        <div style="background: rgba(0, 217, 255, 0.05); border-radius: 4px; padding: 10px; margin-top: 10px;">
+                            <div style="font-size: 10px; color: #8aa4c4; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px;">MATERIAL BREAKDOWN</div>
+                            <div style="display: grid; gap: 8px;">
+                `;
+                
+                // Sort materials by amount (descending)
+                const materials = Object.entries(plant.materials).sort((a, b) => b[1].amt - a[1].amt);
+                
+                materials.forEach(([materialName, data]) => {
+                    breakdownHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: rgba(44, 69, 100, 0.4); border-radius: 3px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 12px; color: #c8d9f0; font-weight: 600;">${materialName}</div>
+                                <div style="font-size: 10px; color: #6a8aaa; margin-top: 2px;">${data.count} receipt(s)</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 13px; font-weight: 600; color: #ffffff;">₹${data.amt.toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
+                                <div style="font-size: 10px; color: #90d090; margin-top: 2px;">Qty: ${data.qty.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                breakdownHTML += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (plantNames.length === 0) {
+                breakdownHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6a8aaa;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🏭</div>
+                        <div style="font-size: 14px;">No plant data found for selected date range</div>
+                        <div style="font-size: 12px; margin-top: 8px;">Try selecting a different date range or add material inward entries</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('reportPlantBreakdown').innerHTML = breakdownHTML;
+        }
+
+        // Export Plant Report
+        function exportPlantReport() {
+            alert('🏭 Plant Report Export\n\nPlant-wise material report export functionality coming soon!\n\n✨ Will include:\n• Plant-wise breakdown\n• Material details per plant\n• Quantity & amount analysis\n• Professional Excel format');
+        }
+
+        // Generate Report (Party-wise - existing function)
+        function generateReport() {
+            const fromDate = document.getElementById('reportFromDate').value;
+            const toDate = document.getElementById('reportToDate').value;
+            
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            let partyData = {}; // To group by party
+            let totalQuantity = 0;
+            let totalAmount = 0;
+            let materialSet = new Set();
+            
+            // Process each row
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells.length === 0) continue;
+                
+                const entryDate = cells[1] ? cells[1].textContent : '';
+                const party = cells[2] ? cells[2].textContent : '';
+                const materialName = cells[4] ? cells[4].textContent : '';
+                const quantity = cells[6] ? cells[6].textContent : '';
+                const amount = cells[8] ? cells[8].textContent.replace(/[₹,]/g, '').trim() : '0';
+                
+                // Parse date
+                let entryDateObj = null;
+                if (entryDate) {
+                    const parts = entryDate.split('-');
+                    if (parts.length === 3) {
+                        entryDateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                    }
+                }
+                
+                // Check date range
+                let dateMatch = true;
+                if (fromDate && entryDateObj) {
+                    const fromDateObj = new Date(fromDate);
+                    if (entryDateObj < fromDateObj) dateMatch = false;
+                }
+                if (toDate && entryDateObj) {
+                    const toDateObj = new Date(toDate);
+                    if (entryDateObj > toDateObj) dateMatch = false;
+                }
+                
+                if (!dateMatch) continue;
+                
+                // Add to party data
+                if (!partyData[party]) {
+                    partyData[party] = {
+                        materials: [],
+                        total: 0
+                    };
+                }
+                
+                const qtyValue = parseFloat(quantity.replace(/[^\d.]/g, '')) || 0;
+                const amtValue = parseFloat(amount) || 0;
+                
+                partyData[party].materials.push({
+                    name: materialName,
+                    quantity: quantity,
+                    amount: amtValue
+                });
+                partyData[party].total += amtValue;
+                
+                totalQuantity += qtyValue;
+                totalAmount += amtValue;
+                materialSet.add(materialName);
+            }
+            
+            // Update summary cards
+            document.getElementById('reportTotalParties').textContent = Object.keys(partyData).length;
+            document.getElementById('reportTotalMaterials').textContent = materialSet.size;
+            document.getElementById('reportTotalQuantity').textContent = totalQuantity.toFixed(2) + ' units';
+            document.getElementById('reportTotalAmount').textContent = '₹' + totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Build party breakdown HTML
+            let breakdownHTML = '';
+            for (let party in partyData) {
+                breakdownHTML += `
+                    <div style="background: rgba(11, 25, 41, 0.7); border: 1px solid #2c4564; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-size: 14px; color: #c8d9f0; font-weight: 600;">🏢 ${party}</div>
+                            <div style="font-size: 16px; color: #ffb74d; font-weight: 700;">₹${partyData[party].total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        </div>
+                        <div style="border-left: 2px solid #00d9ff; padding-left: 15px; margin-left: 10px;">
+                `;
+                
+                partyData[party].materials.forEach(material => {
+                    breakdownHTML += `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2c4564;">
+                            <div style="color: #8aa4c4; font-size: 12px;">📦 ${material.name}</div>
+                            <div style="display: flex; gap: 15px;">
+                                <span style="color: #90d090; font-size: 12px;">${material.quantity}</span>
+                                <span style="color: #ffb74d; font-size: 12px; min-width: 100px; text-align: right;">₹${material.amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                breakdownHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (breakdownHTML === '') {
+                breakdownHTML = '<div style="text-align: center; padding: 40px; color: #8aa4c4;">No data found for selected date range</div>';
+            }
+            
+            document.getElementById('reportPartyBreakdown').innerHTML = breakdownHTML;
+        }
+
+        // Export Report (from modal)
+        function exportReport() {
+            alert('📥 Export functionality will be implemented with backend integration.\n\nOptions:\n• PDF Export\n• Excel Export\n• Print');
+        }
+
+        // Export to Excel (Main table) - Professional Format
+        function exportToExcel() {
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // Check if there are visible rows
+            let visibleRows = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== 'none') {
+                    visibleRows++;
+                }
+            }
+            
+            if (visibleRows === 0) {
+                alert('⚠️ No data to export!\n\nPlease add some material inward entries first.');
+                return;
+            }
+            
+            // Get current date for header
+            const today = new Date();
+            const dateStr = today.getDate().toString().padStart(2, '0') + '-' + 
+                           (today.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                           today.getFullYear();
+            
+            // Build professional CSV content with company header
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM for proper Excel encoding
+            
+            // ===== COMPANY HEADER =====
+            csvContent += "RMC PLANT ERP\n";
+            csvContent += "MATERIAL INWARD REGISTER\n";
+            csvContent += `Report Date: ${dateStr}\n`;
+            csvContent += `Plant: Plant A - XYZ\n`;
+            csvContent += "\n"; // Blank line
+            
+            // ===== COLUMN HEADERS (Bold in Excel) =====
+            csvContent += "Sr No,Date,Party Name,Plant,Challan No,Vehicle No,Material Description,Category,Quantity,Unit,Rate per Unit,Amount,Remarks\n";
+            
+            // ===== DATA ROWS =====
+            let srNo = 1;
+            let totalQuantity = 0;
+            let totalAmount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display === 'none') continue;
+                
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells.length === 0) continue;
+                
+                // Extract data
+                const date = cells[1] ? cells[1].textContent.trim() : '';
+                const party = cells[2] ? cells[2].textContent.trim() : '';
+                const plant = cells[3] ? cells[3].textContent.trim() : '';
+                const challan = cells[4] ? cells[4].textContent.trim() : '';
+                const material = cells[5] ? cells[5].textContent.trim() : '';
+                const category = cells[6] ? cells[6].textContent.trim() : '';
+                const quantity = cells[7] ? cells[7].textContent.trim() : '';
+                const rate = cells[8] ? cells[8].textContent.trim().replace('₹', '').replace(/,/g, '') : '0';
+                const amount = cells[9] ? cells[9].textContent.trim().replace('₹', '').replace(/,/g, '') : '0';
+                
+                // Parse quantity and unit
+                const qtyParts = quantity.split(' ');
+                const qtyValue = qtyParts[0] || '0';
+                const unit = qtyParts[1] || 'Unit';
+                
+                // Vehicle No (from challan if format is CH/2026/101)
+                const vehicleNo = '-'; // Can be extracted if stored separately
+                const remarks = '-';
+                
+                // Add row
+                csvContent += `${srNo},"${date}","${party}","${plant}","${challan}","${vehicleNo}","${material}","${category}",${qtyValue},"${unit}",${rate},${amount},"${remarks}"\n`;
+                
+                // Calculate totals
+                totalQuantity += parseFloat(qtyValue) || 0;
+                totalAmount += parseFloat(amount) || 0;
+                
+                srNo++;
+            }
+            
+            // ===== FOOTER WITH TOTALS =====
+            csvContent += "\n"; // Blank line before totals
+            csvContent += `,,,,,,,TOTAL,${totalQuantity.toFixed(2)},,,"${totalAmount.toFixed(2)}",\n`;
+            csvContent += "\n"; // Blank line
+            csvContent += `Total Entries: ${visibleRows}\n`;
+            csvContent += `Generated By: Gunvant Admin\n`;
+            csvContent += `Generated On: ${new Date().toLocaleString('en-IN')}\n`;
+            csvContent += "\n";
+            csvContent += "Note: This is a system generated report from RMC Plant ERP\n";
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Material_Inward_Register_${dateStr}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show professional success message
+            alert(`✅ Export Successful!\n\n📄 File: Material_Inward_Register_${dateStr}.csv\n📊 Entries Exported: ${visibleRows}\n� Total Amount: ₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}\n\n📥 Downloaded to: Downloads folder\n💡 Open in Microsoft Excel for best viewing\n\n✨ Features:\n• Company header included\n• Auto-totals calculated\n• Professional formatting\n• Print-ready layout`);
+        }
+
+        // Toggle Export Dropdown
+        function toggleExportDropdown() {
+            const dropdown = document.querySelector('.export-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.export-dropdown');
+            const exportBtn = event.target.closest('.export-dropdown-container');
+            
+            if (!exportBtn && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Export to PDF (Professional Format)
+        function exportToPDF() {
+            // Close dropdown
+            document.querySelector('.export-dropdown').classList.remove('show');
+            
+            const tbody = document.getElementById('materialsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // Check if there are visible rows
+            let visibleRows = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== 'none') {
+                    visibleRows++;
+                }
+            }
+            
+            if (visibleRows === 0) {
+                alert('⚠️ No data to export!\n\nPlease add some material inward entries first.');
+                return;
+            }
+            
+            // Collect data and generate PDF via print
+            const today = new Date();
+            const dateStr = today.getDate().toString().padStart(2, '0') + '-' + 
+                           (today.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                           today.getFullYear();
+            
+            let htmlContent = '<html><head><meta charset="UTF-8"><title>Material Inward Register</title>';
+            htmlContent += '<style>@page {size: A4 landscape; margin: 15mm;} body {font-family: Calibri, Arial; margin: 20px;} ';
+            htmlContent += '.header {text-align: center; margin-bottom: 20px; border-bottom: 3px solid #00d9ff; padding-bottom: 15px;} ';
+            htmlContent += '.header h1 {margin: 0; font-size: 24px; color: #1a2942; font-weight: bold;} .header h2 {margin: 5px 0; font-size: 18px; color: #00d9ff;} ';
+            htmlContent += '.header p {margin: 5px 0; font-size: 12px; color: #555;} ';
+            htmlContent += 'table {width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px;} ';
+            htmlContent += 'th {background: #1a2942; color: white; padding: 10px 8px; text-align: left; border: 1px solid #666; font-weight: bold;} ';
+            htmlContent += 'td {padding: 8px; border: 1px solid #ccc;} tr:nth-child(even) {background: #f5f5f5;} ';
+            htmlContent += '.total-row {background: #e8f4f8 !important; font-weight: bold; border-top: 2px solid #1a2942;} ';
+            htmlContent += '.footer {margin-top: 30px; padding-top: 15px; border-top: 2px solid #00d9ff; font-size: 10px; color: #666;}</style></head><body>';
+            
+            htmlContent += `<div class="header"><h1>RMC PLANT ERP</h1><h2>MATERIAL INWARD REGISTER</h2><p>Report Date: ${dateStr} | Plant: Plant A - XYZ | Generated By: Gunvant Admin</p></div>`;
+            htmlContent += '<table><thead><tr><th>Sr</th><th>Date</th><th>Party</th><th>Plant</th><th>Challan</th><th>Material</th><th>Category</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>';
+            
+            let srNo = 1, totalAmt = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display === 'none') continue;
+                const cells = rows[i].getElementsByTagName('td');
+                if (cells.length === 0) continue;
+                
+                htmlContent += `<tr><td>${srNo}</td><td>${cells[1].textContent}</td><td>${cells[2].textContent}</td><td>${cells[3].textContent}</td><td>${cells[4].textContent}</td><td>${cells[5].textContent}</td><td>${cells[6].textContent}</td><td>${cells[7].textContent}</td><td>${cells[8].textContent}</td><td>${cells[9].textContent}</td></tr>`;
+                totalAmt += parseFloat(cells[9].textContent.replace(/[₹,]/g, '')) || 0;
+                srNo++;
+            }
+            
+            htmlContent += `<tr class="total-row"><td colspan="9" style="text-align:right"><strong>TOTAL:</strong></td><td><strong>₹${totalAmt.toLocaleString('en-IN', {minimumFractionDigits: 2})}</strong></td></tr></tbody></table>`;
+            htmlContent += `<div class="footer"><p><strong>Total Entries:</strong> ${visibleRows} | <strong>Generated:</strong> ${new Date().toLocaleString('en-IN')}</p><p style="text-align:right">RMC Plant ERP - Computer Generated Document</p></div></body></html>`;
+            
+            const printWindow = window.open('', '', 'width=1200,height=800');
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                alert(`📄 PDF Print Dialog Opened!\n\n📊 Entries: ${visibleRows}\n💰 Total: ₹${totalAmt.toLocaleString('en-IN', {minimumFractionDigits: 2})}\n\n💡 In print dialog:\n• Select "Save as PDF"\n• Filename: Material_Inward_${dateStr}.pdf\n\n✨ Professional landscape A4 format`);
+            }, 500);
+        }
+    </script>
+</body>
+</html>

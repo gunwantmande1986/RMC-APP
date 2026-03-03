@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Production Register - RMC Plant ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a1628;
+            color: #c8d9f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .report-header {
+            background: linear-gradient(135deg, #1a2942 0%, #0f1e32 100%);
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 2px solid #4a6b8a;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-title {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .report-title h1 {
+            font-size: 24px;
+            color: #00FF88;
+            font-weight: 600;
+        }
+
+        .report-title .subtitle {
+            font-size: 13px;
+            color: #8aa4c4;
+        }
+
+        .report-info {
+            text-align: right;
+        }
+
+        .report-info .plant-name {
+            font-size: 15px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        .report-info .report-date {
+            font-size: 13px;
+            color: #8aa4c4;
+            margin-top: 5px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #1a2942;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #4a6b8a;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            color: #8aa4c4;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: #8aa4c4;
+            white-space: nowrap;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            background: #0f1e32;
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            min-width: 150px;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #00FF88;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            min-width: auto;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #00FF88;
+            color: #0a1628;
+        }
+
+        .btn-primary:hover {
+            background: #00dd77;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #4a6b8a;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #5a7b9a;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #1a2942;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #4a6b8a;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .summary-card .label {
+            font-size: 12px;
+            color: #8aa4c4;
+            font-weight: 500;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            color: #00FF88;
+            font-weight: 700;
+        }
+
+        .summary-card .sub-value {
+            font-size: 13px;
+            color: #c8d9f0;
+        }
+
+        /* Data Table */
+        .table-container {
+            background: #1a2942;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #4a6b8a;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-header h3 {
+            font-size: 16px;
+            color: #c8d9f0;
+        }
+
+        .table-header .record-count {
+            font-size: 13px;
+            color: #8aa4c4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #0f1e32;
+            position: sticky;
+            top: 0;
+        }
+
+        thead th {
+            padding: 12px 10px;
+            text-align: left;
+            color: #00FF88;
+            font-weight: 600;
+            border-bottom: 2px solid #4a6b8a;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #2a3a52;
+            transition: background 0.2s;
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(15, 30, 50, 0.3);
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        tbody td {
+            padding: 12px 10px;
+            color: #c8d9f0;
+        }
+
+        tbody td.number {
+            font-family: 'Courier New', monospace;
+            text-align: right;
+        }
+
+        tbody td.highlight {
+            color: #00FF88;
+            font-weight: 600;
+        }
+
+        tbody td.difference {
+            font-weight: 600;
+        }
+
+        tbody td.difference.zero {
+            color: #8aa4c4;
+        }
+
+        tbody td.difference.positive {
+            color: #ff6b6b;
+        }
+
+        tbody td.difference.negative {
+            color: #ffd93d;
+        }
+
+        tfoot {
+            background: #0f1e32;
+            border-top: 2px solid #4a6b8a;
+        }
+
+        tfoot td {
+            padding: 12px 10px;
+            font-weight: 700;
+            color: #00FF88;
+        }
+
+        /* Custom Select with Search */
+        .custom-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .custom-select-input {
+            width: 100%;
+            background: #0f1e32;
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            padding: 8px 30px 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .custom-select-input:focus {
+            outline: none;
+            border-color: #00FF88;
+        }
+
+        .custom-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0f1e32;
+            border: 1px solid #4a6b8a;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .custom-select-dropdown.show {
+            display: block;
+        }
+
+        .custom-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #c8d9f0;
+            font-size: 13px;
+        }
+
+        .custom-select-option:hover {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00FF88;
+        }
+
+        .custom-select-option.selected {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00FF88;
+            font-weight: 600;
+        }
+
+        .custom-select-option.no-results {
+            padding: 8px 12px;
+            color: #8aa4c4;
+            font-style: italic;
+            cursor: default;
+        }
+
+        .custom-select-arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #8aa4c4;
+        }
+
+        /* Scrollbar for dropdown */
+        .custom-select-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-track {
+            background: #0a1628;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-thumb {
+            background: #4a6b8a;
+            border-radius: 3px;
+        }
+
+        /* Custom Select Styling */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a6b8a;
+            pointer-events: none;
+            font-size: 10px;
+        }
+
+        .custom-select-input {
+            width: 100%;
+            padding: 10px 30px 10px 12px;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            background: #1a2942;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .custom-select-input:focus {
+            outline: none;
+            border-color: #00FF88;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1);
+        }
+
+        .custom-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: #1a2942;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-select-dropdown.show {
+            display: block;
+        }
+
+        .custom-select-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+        }
+
+        .custom-select-option:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .custom-select-option.selected {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00FF88;
+            font-weight: 600;
+        }
+
+        .custom-select-option.hidden {
+            display: none;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-track {
+            background: #0a1628;
+            border-radius: 4px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-thumb {
+            background: #4a6b8a;
+            border-radius: 4px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+            background: #5a7b9a;
+        }
+
+        .no-results {
+            padding: 10px 12px;
+            color: #999;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        /* Grade Breakdown */
+        .breakdown-section {
+            background: #1a2942;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #4a6b8a;
+        }
+
+        .breakdown-title {
+            font-size: 15px;
+            color: #c8d9f0;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #0f1e32;
+            border-radius: 5px;
+            border-left: 4px solid #00FF88;
+        }
+
+        .breakdown-item .grade {
+            font-size: 14px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        .breakdown-item .details {
+            text-align: right;
+        }
+
+        .breakdown-item .quantity {
+            font-size: 15px;
+            color: #00FF88;
+            font-weight: 700;
+        }
+
+        .breakdown-item .percentage {
+            font-size: 12px;
+            color: #8aa4c4;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .report-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .report-info {
+                text-align: center;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .summary-section {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            thead th,
+            tbody td {
+                padding: 8px 5px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .filter-section,
+            .action-buttons {
+                display: none;
+            }
+
+            .report-header,
+            .summary-card,
+            .table-container,
+            .breakdown-section {
+                border: 1px solid #000;
+                background: white;
+                color: black;
+            }
+
+            table {
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Report Header -->
+    <div class="report-header">
+        <div class="report-title">
+            <h1>📊 DAILY PRODUCTION REGISTER</h1>
+            <div class="subtitle">Complete day-wise production with time, party, grade, quantity, and vehicle details</div>
+        </div>
+        <div class="report-info">
+            <div class="plant-name">Plant A - XYZ</div>
+            <div class="report-date">Date: 19-01-2026 | Generated: 19-01-2026 15:21</div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-title">FILTERS & CONTROLS</div>
+        
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Date From:</label>
+                <input type="date" value="2026-01-19">
+            </div>
+            <div class="filter-group">
+                <label>Date To:</label>
+                <input type="date" value="2026-01-19">
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Party:</label>
+                <div class="custom-select-wrapper">
+                    <input type="text" class="custom-select-input" id="partyFilter" placeholder="Search or select party..." autocomplete="off">
+                    <span class="custom-select-arrow">▼</span>
+                    <div class="custom-select-dropdown" id="partyDropdown">
+                        <div class="custom-select-option selected" data-value="All Parties">All Parties</div>
+                        <div class="custom-select-option" data-value="XYZ Infra">XYZ Infra</div>
+                        <div class="custom-select-option" data-value="ABC Constructions">ABC Constructions</div>
+                        <div class="custom-select-option" data-value="PQR Builders">PQR Builders</div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Sub Party:</label>
+                <div class="custom-select-wrapper">
+                    <input type="text" class="custom-select-input" id="subPartyFilter" placeholder="Search or select sub party..." autocomplete="off">
+                    <span class="custom-select-arrow">▼</span>
+                    <div class="custom-select-dropdown" id="subPartyDropdown">
+                        <div class="custom-select-option selected" data-value="All Sub Parties">All Sub Parties</div>
+                        <div class="custom-select-option" data-value="Anil Kumar">Anil Kumar</div>
+                        <div class="custom-select-option" data-value="Rajesh Sharma">Rajesh Sharma</div>
+                        <div class="custom-select-option" data-value="Vijay Patil">Vijay Patil</div>
+                        <div class="custom-select-option" data-value="Suresh Yadav">Suresh Yadav</div>
+                        <div class="custom-select-option" data-value="Ramesh Kumar">Ramesh Kumar</div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Grade:</label>
+                <div class="custom-select-wrapper">
+                    <input type="text" class="custom-select-input" id="gradeFilter" placeholder="Search or select grade..." autocomplete="off">
+                    <span class="custom-select-arrow">▼</span>
+                    <div class="custom-select-dropdown" id="gradeDropdown">
+                        <div class="custom-select-option selected" data-value="All Grades">All Grades</div>
+                        <div class="custom-select-option" data-value="M20">M20</div>
+                        <div class="custom-select-option" data-value="M25">M25</div>
+                        <div class="custom-select-option" data-value="M30">M30</div>
+                        <div class="custom-select-option" data-value="M40">M40</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Vehicle:</label>
+                <div class="custom-select-wrapper">
+                    <input type="text" class="custom-select-input" id="vehicleFilter" placeholder="Search or select vehicle..." autocomplete="off">
+                    <span class="custom-select-arrow">▼</span>
+                    <div class="custom-select-dropdown" id="vehicleDropdown">
+                        <div class="custom-select-option selected" data-value="All Vehicles">All Vehicles</div>
+                        <div class="custom-select-option" data-value="MH12CD5678">MH12CD5678</div>
+                        <div class="custom-select-option" data-value="MH12IJ7890">MH12IJ7890</div>
+                        <div class="custom-select-option" data-value="MH12MN4567">MH12MN4567</div>
+                        <div class="custom-select-option" data-value="MH12QP8901">MH12QP8901</div>
+                        <div class="custom-select-option" data-value="MH12QR2345">MH12QR2345</div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Site:</label>
+                <div class="custom-select-wrapper">
+                    <input type="text" class="custom-select-input" id="siteFilter" placeholder="Search or select site..." autocomplete="off">
+                    <span class="custom-select-arrow">▼</span>
+                    <div class="custom-select-dropdown" id="siteDropdown">
+                        <div class="custom-select-option selected" data-value="All Sites">All Sites</div>
+                        <div class="custom-select-option" data-value="Site Alpha">Site Alpha</div>
+                        <div class="custom-select-option" data-value="Site Beta">Site Beta</div>
+                        <div class="custom-select-option" data-value="Site Gamma">Site Gamma</div>
+                        <div class="custom-select-option" data-value="Site Delta">Site Delta</div>
+                        <div class="custom-select-option" data-value="Site Epsilon">Site Epsilon</div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group" style="flex: 1;">
+                <label>Quick Search:</label>
+                <input type="text" id="quickSearch" placeholder="Search party, sub party, vehicle, challan..." style="min-width: 250px;">
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="applyFilters()">
+                <span>🔍</span> Apply Filters
+            </button>
+            <button class="btn btn-secondary" onclick="clearFilters()">
+                <span>🔄</span> Clear Filters
+            </button>
+            <button class="btn btn-secondary" onclick="refreshReport()">
+                <span>🔄</span> Refresh
+            </button>
+            <button class="btn btn-secondary" onclick="exportExcel()">
+                <span>📊</span> Export Excel
+            </button>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <span>🖨️</span> Print
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-section">
+        <div class="summary-card">
+            <div class="label">TOTAL PRODUCTION</div>
+            <div class="value">45.50 CUM</div>
+            <div class="sub-value">12 Trips</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">TOTAL AMOUNT</div>
+            <div class="value">₹2,04,750</div>
+            <div class="sub-value">Average: ₹17,062/trip</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">AVERAGE PER TRIP</div>
+            <div class="value">3.79 CUM</div>
+            <div class="sub-value">Efficiency: 94%</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">VARIANCE</div>
+            <div class="value">-0.20 CUM</div>
+            <div class="sub-value">1 short supply</div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h3>PRODUCTION DETAILS</h3>
+            <div class="record-count">Showing 1-12 of 12 entries</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>TIME</th>
+                    <th>PARTY</th>
+                    <th>SUB PARTY</th>
+                    <th>CH.GRADE</th>
+                    <th>ACT.GRADE</th>
+                    <th>CH.QTY</th>
+                    <th>ACT.QTY</th>
+                    <th>DIFF QTY</th>
+                    <th>RATE</th>
+                    <th>AMOUNT</th>
+                    <th>VEHICLE</th>
+                    <th>SITE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>14:30</td>
+                    <td>XYZ Infra</td>
+                    <td>Anil Kumar</td>
+                    <td>M25</td>
+                    <td>M25</td>
+                    <td class="number">4.50</td>
+                    <td class="number">4.50</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹20,250</td>
+                    <td>MH12CD5678</td>
+                    <td>Site Alpha</td>
+                </tr>
+                <tr>
+                    <td>11:15</td>
+                    <td>XYZ Infra</td>
+                    <td>Rajesh Sharma</td>
+                    <td>M20</td>
+                    <td>M20</td>
+                    <td class="number">3.50</td>
+                    <td class="number">3.50</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,000</td>
+                    <td class="number highlight">₹14,000</td>
+                    <td>MH12IJ7890</td>
+                    <td>Site Gamma</td>
+                </tr>
+                <tr>
+                    <td>09:45</td>
+                    <td>ABC Constructions</td>
+                    <td>Vijay Patil</td>
+                    <td>M30</td>
+                    <td>M30</td>
+                    <td class="number">5.00</td>
+                    <td class="number">5.00</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹22,500</td>
+                    <td>MH12MN4567</td>
+                    <td>Site Delta</td>
+                </tr>
+                <tr>
+                    <td>16:20</td>
+                    <td>PQR Builders</td>
+                    <td>Suresh Yadav</td>
+                    <td>M30</td>
+                    <td>M30</td>
+                    <td class="number">4.00</td>
+                    <td class="number">4.00</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹18,000</td>
+                    <td>MH12QP8901</td>
+                    <td>Site Epsilon</td>
+                </tr>
+                <tr>
+                    <td>13:00</td>
+                    <td>ABC Constructions</td>
+                    <td>Ramesh Kumar</td>
+                    <td>M40</td>
+                    <td>M40</td>
+                    <td class="number">5.80</td>
+                    <td class="number">6.00</td>
+                    <td class="number difference negative">-0.20</td>
+                    <td class="number">₹5,000</td>
+                    <td class="number highlight">₹29,000</td>
+                    <td>MH12QR2345</td>
+                    <td>Site Beta</td>
+                </tr>
+                <tr>
+                    <td>10:30</td>
+                    <td>XYZ Infra</td>
+                    <td>Prakash Singh</td>
+                    <td>M25</td>
+                    <td>M25</td>
+                    <td class="number">5.00</td>
+                    <td class="number">5.00</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹22,500</td>
+                    <td>MH12ST6789</td>
+                    <td>Site Alpha</td>
+                </tr>
+                <tr>
+                    <td>15:45</td>
+                    <td>PQR Builders</td>
+                    <td>Deepak Mehta</td>
+                    <td>M20</td>
+                    <td>M25</td>
+                    <td class="number">3.00</td>
+                    <td class="number">3.00</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,000</td>
+                    <td class="number highlight">₹12,000</td>
+                    <td>MH12UV1234</td>
+                    <td>Site Zeta</td>
+                </tr>
+                <tr>
+                    <td>08:30</td>
+                    <td>ABC Constructions</td>
+                    <td>Ashok Gupta</td>
+                    <td>M30</td>
+                    <td>M30</td>
+                    <td class="number">4.50</td>
+                    <td class="number">4.50</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹20,250</td>
+                    <td>MH12WX5678</td>
+                    <td>Site Delta</td>
+                </tr>
+                <tr>
+                    <td>12:15</td>
+                    <td>XYZ Infra</td>
+                    <td>Manoj Verma</td>
+                    <td>M40</td>
+                    <td>M40</td>
+                    <td class="number">4.00</td>
+                    <td class="number">4.00</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹5,000</td>
+                    <td class="number highlight">₹20,000</td>
+                    <td>MH12YZ9012</td>
+                    <td>Site Gamma</td>
+                </tr>
+                <tr>
+                    <td>14:00</td>
+                    <td>PQR Builders</td>
+                    <td>Ravi Desai</td>
+                    <td>M25</td>
+                    <td>M20</td>
+                    <td class="number">3.50</td>
+                    <td class="number">3.50</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹15,750</td>
+                    <td>MH12AB3456</td>
+                    <td>Site Epsilon</td>
+                </tr>
+                <tr>
+                    <td>11:45</td>
+                    <td>ABC Constructions</td>
+                    <td>Santosh More</td>
+                    <td>M20</td>
+                    <td>M20</td>
+                    <td class="number">2.50</td>
+                    <td class="number">2.50</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,000</td>
+                    <td class="number highlight">₹10,000</td>
+                    <td>MH12CD7890</td>
+                    <td>Site Beta</td>
+                </tr>
+                <tr>
+                    <td>09:00</td>
+                    <td>XYZ Infra</td>
+                    <td>Kiran Shah</td>
+                    <td>M30</td>
+                    <td>M30</td>
+                    <td class="number">3.20</td>
+                    <td class="number">3.20</td>
+                    <td class="number difference zero">0.00</td>
+                    <td class="number">₹4,500</td>
+                    <td class="number highlight">₹14,400</td>
+                    <td>MH12EF1234</td>
+                    <td>Site Zeta</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right;"><strong>TOTAL:</strong></td>
+                    <td class="number"><strong>48.50</strong></td>
+                    <td class="number"><strong>48.70</strong></td>
+                    <td class="number"><strong>-0.20</strong></td>
+                    <td></td>
+                    <td class="number"><strong>₹2,18,650</strong></td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Grade Breakdown -->
+    <div class="breakdown-section">
+        <div class="breakdown-title">GRADE-WISE BREAKDOWN</div>
+        <div class="breakdown-grid" id="gradeBreakdownGrid">
+            <!-- Will be populated dynamically by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        function applyFilters() {
+            const party = document.getElementById('partyFilter').value;
+            const subParty = document.getElementById('subPartyFilter').value;
+            const grade = document.getElementById('gradeFilter').value;
+            const vehicle = document.getElementById('vehicleFilter').value;
+            const site = document.getElementById('siteFilter').value;
+            const search = document.getElementById('quickSearch').value.toLowerCase();
+
+            const rows = document.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const cells = row.cells;
+                const rowParty = cells[1].textContent;
+                const rowSubParty = cells[2].textContent;
+                const rowChGrade = cells[3].textContent;
+                const rowActGrade = cells[4].textContent;
+                const rowVehicle = cells[10].textContent;
+                const rowSite = cells[11].textContent;
+
+                let show = true;
+
+                // Party filter
+                if (party !== 'All Parties' && rowParty !== party) {
+                    show = false;
+                }
+
+                // Sub Party filter
+                if (subParty !== 'All Sub Parties' && rowSubParty !== subParty) {
+                    show = false;
+                }
+
+                // Grade filter
+                if (grade !== 'All Grades' && rowChGrade !== grade && rowActGrade !== grade) {
+                    show = false;
+                }
+
+                // Vehicle filter
+                if (vehicle !== 'All Vehicles' && rowVehicle !== vehicle) {
+                    show = false;
+                }
+
+                // Site filter
+                if (site !== 'All Sites' && rowSite !== site) {
+                    show = false;
+                }
+
+                // Quick search filter
+                if (search && !row.textContent.toLowerCase().includes(search)) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            // Update record count
+            document.querySelector('.record-count').textContent = 
+                `Showing 1-${visibleCount} of ${rows.length} entries`;
+
+            // Recalculate totals
+            recalculateTotals();
+        }
+
+        function clearFilters() {
+            // Reset custom select inputs to first option
+            const customSelects = [
+                { inputId: 'partyFilter', dropdownId: 'partyDropdown' },
+                { inputId: 'subPartyFilter', dropdownId: 'subPartyDropdown' },
+                { inputId: 'gradeFilter', dropdownId: 'gradeDropdown' },
+                { inputId: 'vehicleFilter', dropdownId: 'vehicleDropdown' },
+                { inputId: 'siteFilter', dropdownId: 'siteDropdown' }
+            ];
+
+            customSelects.forEach(select => {
+                const input = document.getElementById(select.inputId);
+                const dropdown = document.getElementById(select.dropdownId);
+                const options = dropdown.querySelectorAll('.custom-select-option');
+                
+                // Reset to first option
+                options.forEach(opt => opt.classList.remove('selected'));
+                options[0].classList.add('selected');
+                input.value = options[0].getAttribute('data-value');
+            });
+
+            document.getElementById('quickSearch').value = '';
+            
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => row.style.display = '');
+            
+            document.querySelector('.record-count').textContent = 
+                `Showing 1-${rows.length} of ${rows.length} entries`;
+            
+            recalculateTotals();
+        }
+
+        function recalculateTotals() {
+            const rows = document.querySelectorAll('tbody tr');
+            let totalChQty = 0;
+            let totalActQty = 0;
+            let totalAmount = 0;
+            let visibleRows = 0;
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const chQty = parseFloat(row.cells[5].textContent);
+                    const actQty = parseFloat(row.cells[6].textContent);
+                    const amount = parseFloat(row.cells[9].textContent.replace(/[₹,]/g, ''));
+
+                    totalChQty += chQty;
+                    totalActQty += actQty;
+                    totalAmount += amount;
+                    visibleRows++;
+                }
+            });
+
+            // Update footer
+            const footer = document.querySelector('tfoot tr');
+            footer.cells[1].innerHTML = `<strong>${totalChQty.toFixed(2)}</strong>`;
+            footer.cells[2].innerHTML = `<strong>${totalActQty.toFixed(2)}</strong>`;
+            footer.cells[3].innerHTML = `<strong>${(totalChQty - totalActQty).toFixed(2)}</strong>`;
+            footer.cells[5].innerHTML = `<strong>₹${totalAmount.toLocaleString('en-IN')}</strong>`;
+
+            // Update summary cards
+            document.querySelector('.summary-section .summary-card:nth-child(1) .value').textContent = 
+                `${totalActQty.toFixed(2)} CUM`;
+            document.querySelector('.summary-section .summary-card:nth-child(1) .sub-value').textContent = 
+                `${visibleRows} Trips`;
+            document.querySelector('.summary-section .summary-card:nth-child(2) .value').textContent = 
+                `₹${totalAmount.toLocaleString('en-IN')}`;
+            document.querySelector('.summary-section .summary-card:nth-child(2) .sub-value').textContent = 
+                `Average: ₹${visibleRows > 0 ? Math.round(totalAmount / visibleRows).toLocaleString('en-IN') : 0}/trip`;
+            document.querySelector('.summary-section .summary-card:nth-child(3) .value').textContent = 
+                `${visibleRows > 0 ? (totalActQty / visibleRows).toFixed(2) : 0} CUM`;
+            document.querySelector('.summary-section .summary-card:nth-child(4) .value').textContent = 
+                `${(totalChQty - totalActQty).toFixed(2)} CUM`;
+            
+            // Update grade breakdown dynamically
+            updateGradeBreakdown(rows, totalActQty);
+        }
+
+        function updateGradeBreakdown(rows, totalQty) {
+            const gradeData = {};
+            
+            // Collect grade-wise quantities from visible rows
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const actGrade = row.cells[4].textContent.trim(); // ACT.GRADE column
+                    const actQty = parseFloat(row.cells[6].textContent); // ACT.QTY column
+                    
+                    if (gradeData[actGrade]) {
+                        gradeData[actGrade] += actQty;
+                    } else {
+                        gradeData[actGrade] = actQty;
+                    }
+                }
+            });
+            
+            // Sort grades by quantity (descending)
+            const sortedGrades = Object.entries(gradeData).sort((a, b) => b[1] - a[1]);
+            
+            // Update breakdown grid
+            const breakdownGrid = document.getElementById('gradeBreakdownGrid');
+            breakdownGrid.innerHTML = '';
+            
+            sortedGrades.forEach(([grade, qty]) => {
+                const percentage = totalQty > 0 ? Math.round((qty / totalQty) * 100) : 0;
+                
+                const breakdownItem = document.createElement('div');
+                breakdownItem.className = 'breakdown-item';
+                breakdownItem.innerHTML = `
+                    <div class="grade">${grade}</div>
+                    <div class="details">
+                        <div class="quantity">${qty.toFixed(2)} CUM</div>
+                        <div class="percentage">${percentage}%</div>
+                    </div>
+                `;
+                breakdownGrid.appendChild(breakdownItem);
+            });
+        }
+
+        function refreshReport() {
+            clearFilters();
+            alert('Report refreshed!');
+        }
+
+        function exportExcel() {
+            alert('Exporting to Excel... (Backend integration pending)');
+            // TODO: Generate Excel file
+        }
+
+        // Real-time search on typing
+        document.addEventListener('DOMContentLoaded', function() {
+            const quickSearch = document.getElementById('quickSearch');
+            quickSearch.addEventListener('input', applyFilters);
+
+            // Initialize all custom selects
+            initializeCustomSelect('partyFilter', 'partyDropdown');
+            initializeCustomSelect('subPartyFilter', 'subPartyDropdown');
+            initializeCustomSelect('gradeFilter', 'gradeDropdown');
+            initializeCustomSelect('vehicleFilter', 'vehicleDropdown');
+            initializeCustomSelect('siteFilter', 'siteDropdown');
+            
+            // Calculate initial totals and grade breakdown
+            recalculateTotals();
+        });
+
+        // Initialize custom searchable select
+        function initializeCustomSelect(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const options = dropdown.querySelectorAll('.custom-select-option');
+            
+            let selectedValue = options[0].getAttribute('data-value'); // Default to first option
+            input.value = selectedValue;
+
+            // Show dropdown on input click/focus
+            input.addEventListener('click', function() {
+                closeAllDropdowns();
+                dropdown.classList.add('show');
+                input.select(); // Select all text for easy typing
+            });
+
+            input.addEventListener('focus', function() {
+                closeAllDropdowns();
+                dropdown.classList.add('show');
+            });
+
+            // Filter options as user types
+            input.addEventListener('input', function() {
+                const searchTerm = input.value.toLowerCase().trim();
+                let hasVisibleOptions = false;
+
+                options.forEach(option => {
+                    const optionText = option.getAttribute('data-value').toLowerCase();
+                    
+                    // Match from start of string OR start of any word OR contains (for numbers/codes)
+                    const startsWithSearch = optionText.startsWith(searchTerm);
+                    const wordStartsWithSearch = optionText.split(' ').some(word => word.startsWith(searchTerm));
+                    const containsSearch = optionText.includes(searchTerm); // For vehicle numbers like "5678" matching "MH12CD5678"
+                    
+                    if (searchTerm === '' || startsWithSearch || wordStartsWithSearch || containsSearch) {
+                        option.classList.remove('hidden');
+                        hasVisibleOptions = true;
+                    } else {
+                        option.classList.add('hidden');
+                    }
+                });
+
+                // Show "No results" message if no matches
+                let noResultsMsg = dropdown.querySelector('.no-results');
+                if (!hasVisibleOptions) {
+                    if (!noResultsMsg) {
+                        noResultsMsg = document.createElement('div');
+                        noResultsMsg.className = 'no-results';
+                        noResultsMsg.textContent = 'No results found';
+                        dropdown.appendChild(noResultsMsg);
+                    }
+                    noResultsMsg.style.display = 'block';
+                } else {
+                    if (noResultsMsg) {
+                        noResultsMsg.style.display = 'none';
+                    }
+                }
+            });
+
+            // Select option on click
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    
+                    // Update input value
+                    selectedValue = option.getAttribute('data-value');
+                    input.value = selectedValue;
+                    
+                    // Hide dropdown
+                    dropdown.classList.remove('show');
+                    
+                    // Trigger filter update
+                    applyFilters();
+                });
+            });
+
+            // Keyboard navigation
+            input.addEventListener('keydown', function(e) {
+                const visibleOptions = Array.from(options).filter(opt => !opt.classList.contains('hidden'));
+                const currentIndex = visibleOptions.findIndex(opt => opt.classList.contains('selected'));
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!dropdown.classList.contains('show')) {
+                        dropdown.classList.add('show');
+                    } else {
+                        const nextIndex = Math.min(currentIndex + 1, visibleOptions.length - 1);
+                        if (nextIndex >= 0) {
+                            visibleOptions.forEach(opt => opt.classList.remove('selected'));
+                            visibleOptions[nextIndex].classList.add('selected');
+                            visibleOptions[nextIndex].scrollIntoView({ block: 'nearest' });
+                        }
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIndex = Math.max(currentIndex - 1, 0);
+                    if (prevIndex >= 0) {
+                        visibleOptions.forEach(opt => opt.classList.remove('selected'));
+                        visibleOptions[prevIndex].classList.add('selected');
+                        visibleOptions[prevIndex].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (dropdown.classList.contains('show')) {
+                        const selectedOption = visibleOptions[currentIndex >= 0 ? currentIndex : 0];
+                        if (selectedOption) {
+                            selectedOption.click();
+                        }
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('show');
+                    input.blur();
+                }
+            });
+        }
+
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-select-wrapper')) {
+                closeAllDropdowns();
+            }
+        });
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+
+        // Auto-refresh every 5 minutes (optional)
+        // setInterval(refreshReport, 300000);
+    </script>
+
+</body>
+</html>

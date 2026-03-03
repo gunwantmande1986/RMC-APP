@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Pump Service - Daily Entry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            overflow-x: hidden;
+        }
+
+        .page-container {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a6b8a;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: #8aa4c4;
+            margin-top: 5px;
+        }
+
+        .header-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            background: rgba(144, 208, 144, 0.2);
+            color: #90d090;
+            border: 1px solid #90d090;
+        }
+
+        .header-btn:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-section, .summary-section {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #4a6b8a;
+            border-radius: 4px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #00d9ff;
+            background: rgba(11, 25, 41, 0.8);
+        }
+
+        .pricing-card {
+            background: rgba(26, 41, 66, 0.5);
+            border: 1px solid #5a7b9a;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #4a6b8a;
+        }
+
+        .pricing-row:last-child {
+            border-bottom: none;
+            padding-top: 12px;
+            margin-top: 5px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #90d090;
+        }
+
+        .pricing-label {
+            font-size: 12px;
+            color: #8aa4c4;
+        }
+
+        .pricing-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #c8d9f0;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #4a6b8a;
+            margin-top: 20px;
+        }
+
+        .recent-table th {
+            background: rgba(11, 25, 41, 0.9);
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            border: 1px solid #5a7b9a;
+        }
+
+        .recent-table td {
+            padding: 10px 8px;
+            border: 1px solid #3a5b7a;
+            font-size: 12px;
+        }
+
+        .recent-table tbody tr:hover {
+            background: rgba(26, 41, 66, 0.6);
+        }
+
+        .badge-cash {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1>💵 CASH PUMP SERVICE</h1>
+                <div class="page-subtitle">Daily service entry with instant payment</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="alert('View Today Summary')">📊 TODAY'S SUMMARY</button>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Entry Form -->
+            <div class="form-section">
+                <div class="section-title">📝 SERVICE ENTRY FORM</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-input" id="serviceDate" value="2026-01-22">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Pump ID</label>
+                    <select class="form-select" id="pumpId" onchange="calculateCharges()">
+                        <option value="">-- Select Pump --</option>
+                        <option value="PUMP-001">PUMP-001 - Schwing S60 (60m³/hr)</option>
+                        <option value="PUMP-002">PUMP-002 - Putzmeister L50 (50m³/hr)</option>
+                        <option value="PUMP-003">PUMP-003 - Schwing S90 (90m³/hr)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Operator Name</label>
+                    <input type="text" class="form-input" id="operatorName" placeholder="Enter operator name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Party Name (Cash Customer)</label>
+                    <input type="text" class="form-input" id="partyName" placeholder="Enter customer name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Site Location</label>
+                    <input type="text" class="form-input" id="siteLocation" placeholder="Enter site address">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fixed Quantity (m³)</label>
+                    <input type="number" class="form-input" id="fixedQtyInput" placeholder="50.00" value="50" step="0.01" onchange="calculateCharges()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fixed Amount (₹)</label>
+                    <input type="number" class="form-input" id="fixedAmtInput" placeholder="16000.00" value="16000" step="0.01" onchange="calculateCharges()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Extra Rate (per m³)</label>
+                    <input type="number" class="form-input" id="extraRateInput" placeholder="250.00" value="250" step="0.01" onchange="calculateCharges()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Total Quantity Pumped (m³)</label>
+                    <input type="number" class="form-input" id="quantity" placeholder="0.00" step="0.01" onchange="calculateCharges()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Service Type</label>
+                    <select class="form-select" id="serviceType">
+                        <option value="daily">Daily Service (Single Day)</option>
+                        <option value="hourly">Hourly Basis</option>
+                        <option value="half-day">Half Day Service</option>
+                        <option value="full-day">Full Day Service</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Working Hours</label>
+                    <input type="number" class="form-input" id="workingHours" placeholder="8" step="0.5" value="8">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rate per m³</label>
+                    <input type="number" class="form-input" id="ratePerUnit" placeholder="250.00" step="0.01" onchange="calculateCharges()">
+                </div>
+
+                <div class="form-group" style="padding: 12px; background: rgba(144, 208, 144, 0.1); border: 1px solid #90d090; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; font-weight: 600; color: #90d090;">💰 PAYMENT RECEIVED</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #90d090;" id="paymentDisplay">₹ 0</span>
+                    </div>
+                    <select class="form-select" id="paymentMode" style="border-color: #90d090;">
+                        <option value="cash">💵 Cash Payment</option>
+                        <option value="upi">📱 UPI/PhonePe</option>
+                        <option value="cheque">🏦 Cheque</option>
+                        <option value="bank">💳 Bank Transfer</option>
+                    </select>
+                </div>
+
+                <button class="btn-save" onclick="saveService()">💾 SAVE & RECEIVE CASH</button>
+            </div>
+
+            <!-- Pricing Summary -->
+            <div class="summary-section">
+                <div class="section-title">💰 PRICING CALCULATION</div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-row">
+                        <span class="pricing-label">Fixed Quantity:</span>
+                        <span class="pricing-value" id="fixedQty">50 m³</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="pricing-label">Fixed Amount:</span>
+                        <span class="pricing-value" id="fixedAmt">₹ 16,000</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="pricing-label">Extra Quantity:</span>
+                        <span class="pricing-value" id="extraQty">0 m³</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="pricing-label">Extra Rate (per m³):</span>
+                        <span class="pricing-value" id="extraRate">₹ 250</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="pricing-label">Extra Amount:</span>
+                        <span class="pricing-value" id="extraAmt">₹ 0</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="pricing-label">TOTAL AMOUNT:</span>
+                        <span class="pricing-value" id="totalAmt">₹ 16,000</span>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 25px;">📋 TODAY'S CASH SERVICES</div>
+                <table class="recent-table">
+                    <thead>
+                        <tr>
+                            <th>TIME</th>
+                            <th>PUMP</th>
+                            <th>PARTY</th>
+                            <th>SITE</th>
+                            <th>QTY</th>
+                            <th>AMOUNT</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:30 AM</td>
+                            <td style="font-weight: 600; color: #00d9ff;">PUMP-001</td>
+                            <td>ABC Builders</td>
+                            <td style="font-size: 11px; color: #8aa4c4;">Andheri Site</td>
+                            <td style="font-weight: 600;">45 m³</td>
+                            <td style="font-weight: 600; color: #90d090;">₹ 11,250</td>
+                            <td><span class="badge-cash">✓ PAID</span></td>
+                        </tr>
+                        <tr>
+                            <td>11:15 AM</td>
+                            <td style="font-weight: 600; color: #00d9ff;">PUMP-002</td>
+                            <td>XYZ Construction</td>
+                            <td style="font-size: 11px; color: #8aa4c4;">Bandra Project</td>
+                            <td style="font-weight: 600;">60 m³</td>
+                            <td style="font-weight: 600; color: #90d090;">₹ 18,500</td>
+                            <td><span class="badge-cash">✓ PAID</span></td>
+                        </tr>
+                        <tr>
+                            <td>02:45 PM</td>
+                            <td style="font-weight: 600; color: #00d9ff;">PUMP-001</td>
+                            <td>PQR Developers</td>
+                            <td style="font-size: 11px; color: #8aa4c4;">Goregaon Mall</td>
+                            <td style="font-weight: 600;">55 m³</td>
+                            <td style="font-weight: 600; color: #90d090;">₹ 17,250</td>
+                            <td><span class="badge-cash">✓ PAID</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 15px; padding: 12px; background: rgba(144, 208, 144, 0.1); border: 1px solid #90d090; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; font-weight: 600; color: #90d090;">💰 Today's Total Cash Collection:</span>
+                        <span style="font-size: 16px; font-weight: 700; color: #90d090;">₹ 47,000</span>
+                    </div>
+                </div>
+            </div>
+        function calculateCharges() {
+            // Get values from input fields
+            const totalQty = parseFloat(document.getElementById('quantity').value) || 0;
+            const fixedQty = parseFloat(document.getElementById('fixedQtyInput').value) || 50;
+            const fixedAmt = parseFloat(document.getElementById('fixedAmtInput').value) || 16000;
+            const extraRateValue = parseFloat(document.getElementById('extraRateInput').value) || 250;
+            
+            let extraQtyValue = 0;
+            let extraAmtValue = 0;
+            let totalAmount = 0;
+            
+            if (totalQty <= fixedQty) {
+                // Only fixed amount if qty is less than or equal to fixed qty
+                totalAmount = fixedAmt;
+            } else {
+                // Calculate extra charges
+                extraQtyValue = totalQty - fixedQty;
+                extraAmtValue = extraQtyValue * extraRateValue;
+                totalAmount = fixedAmt + extraAmtValue;
+            }
+            
+            // Update right side display
+            document.getElementById('fixedQty').textContent = fixedQty.toFixed(2) + ' m³';
+            document.getElementById('fixedAmt').textContent = '₹ ' + fixedAmt.toLocaleString('en-IN');
+            document.getElementById('extraQty').textContent = extraQtyValue.toFixed(2) + ' m³';
+            document.getElementById('extraRate').textContent = '₹ ' + extraRateValue.toFixed(2);
+            document.getElementById('extraAmt').textContent = '₹ ' + extraAmtValue.toLocaleString('en-IN');
+            document.getElementById('totalAmt').textContent = '₹ ' + totalAmount.toLocaleString('en-IN');
+            
+            // Update payment display
+            document.getElementById('paymentDisplay').textContent = '₹ ' + totalAmount.toLocaleString('en-IN');
+        }
+
+        function saveService() {
+            const pumpId = document.getElementById('pumpId').value;
+            const partyName = document.getElementById('partyName').value;
+            const qty = document.getElementById('quantity').value;
+            const serviceType = document.getElementById('serviceType').value;
+            const workingHours = document.getElementById('workingHours').value;
+            const paymentMode = document.getElementById('paymentMode').options[document.getElementById('paymentMode').selectedIndex].text;
+            const totalAmt = document.getElementById('totalAmt').textContent;
+            
+            if (!pumpId || !partyName || !qty) {
+                alert('⚠️ Please fill all required fields!');
+                return;
+            }
+            
+            alert(`✅ Service saved successfully!\n💰 Payment: ${totalAmt}\n💳 Mode: ${paymentMode}\n⏱️ Hours: ${workingHours} hrs\n📋 Cash received and recorded.`);
+            
+            // Reset form
+            document.getElementById('partyName').value = '';
+            document.getElementById('siteLocation').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('ratePerUnit').value = '';
+            calculateCharges();
+        }
+    </script>
+</body>
+</html>

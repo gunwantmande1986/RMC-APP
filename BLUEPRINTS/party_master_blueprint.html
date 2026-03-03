@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Master - SKCON RMC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blueprint-bg: #0B1929;
+            --blueprint-secondary: #152238;
+            --blueprint-card: #1A2942;
+            --blueprint-border: #2C3E56;
+            --cyan-bright: #00D9FF;
+            --green-tech: #00FF88;
+            --red-tech: #FF3366;
+            --yellow-tech: #FFD700;
+            --orange-tech: #FF8C00;
+            --text-white: #E8F1F5;
+            --text-muted: #7A9CB5;
+            --grid-fine: rgba(0, 217, 255, 0.03);
+            --grid-major: rgba(0, 217, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--blueprint-bg);
+            background-image: 
+                linear-gradient(var(--grid-fine) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px),
+                linear-gradient(var(--grid-major) 2px, transparent 2px),
+                linear-gradient(90deg, var(--grid-major) 2px, transparent 2px);
+            background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-white);
+            padding: 8px;
+            min-height: 100vh;
+        }
+
+        .master-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .page-header {
+            background: linear-gradient(135deg, var(--blueprint-secondary) 0%, var(--blueprint-card) 100%);
+            border: 2px solid var(--cyan-bright);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 14px;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .header-left p {
+            font-size: 9px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--cyan-bright);
+            line-height: 1.2;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--blueprint-card);
+            border: 1px solid var(--blueprint-border);
+            border-radius: 4px;
+            padding: 6px 10px 6px 30px;
+            color: var(--text-white);
+            font-size: 11px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan-bright), #00A8CC);
+            color: var(--blueprint-bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--green-tech), #00CC66);
+            color: var(--blueprint-bg);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red-tech), #CC0044);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--blueprint-card);
+            color: var(--cyan-bright);
+            border: 1px solid var(--blueprint-border);
+        }
+
+        /* Party Table */
+        .table-container {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--blueprint-border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .table-header {
+            background: var(--blueprint-card);
+            padding: 6px 10px;
+            border-bottom: 2px solid var(--cyan-bright);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .table-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            background: var(--blueprint-secondary);
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--blueprint-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            text-align: left;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--blueprint-border);
+        }
+
+        th:nth-child(7),
+        th:nth-child(8) {
+            text-align: right;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--blueprint-border);
+            transition: all 0.2s;
+            height: 32px;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        tbody tr.selected {
+            background: rgba(0, 217, 255, 0.15);
+            border-left: 3px solid var(--cyan-bright);
+        }
+
+        td {
+            padding: 4px 10px;
+            font-size: 11px;
+            color: var(--text-white);
+        }
+
+        .party-name {
+            font-weight: 600;
+            color: var(--cyan-bright);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-customer {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-tech);
+            border: 1px solid var(--green-tech);
+        }
+
+        .badge-supplier {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--cyan-bright);
+            border: 1px solid var(--cyan-bright);
+        }
+
+        .badge-both {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--yellow-tech);
+            border: 1px solid var(--yellow-tech);
+        }
+
+        .amount-positive {
+            color: var(--green-tech);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .amount-negative {
+            color: var(--red-tech);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .amount-zero {
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .amount-neutral {
+            color: #7A9CB5;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .icon-btn {
+            width: 20px;
+            height: 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .icon-btn.edit {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--cyan-bright);
+        }
+
+        .icon-btn.delete {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--red-tech);
+        }
+
+        .icon-btn.view {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--green-tech);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Add/Edit Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--blueprint-secondary);
+            border: 2px solid var(--cyan-bright);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .modal-header {
+            background: var(--blueprint-card);
+            padding: 10px 15px;
+            border-bottom: 2px solid var(--cyan-bright);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .close-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--red-tech);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--red-tech);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label .required {
+            color: var(--red-tech);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            background: var(--blueprint-card);
+            border: 1px solid var(--blueprint-border);
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: var(--text-white);
+            font-size: 11px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .modal-footer {
+            padding: 10px 15px;
+            border-top: 1px solid var(--blueprint-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--blueprint-card);
+            border: 2px solid var(--cyan-bright);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 6px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--blueprint-border);
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: rgba(0, 217, 255, 0.15);
+        }
+
+        .autocomplete-item-name {
+            font-weight: 600;
+            color: var(--cyan-bright);
+        }
+
+        .autocomplete-item-details {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--blueprint-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--blueprint-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan-bright);
+        }
+
+        /* Filter Tags */
+        .filter-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            padding: 3px 8px;
+            background: var(--blueprint-card);
+            border: 1px solid var(--blueprint-border);
+            border-radius: 10px;
+            font-size: 9px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tag.active {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: var(--cyan-bright);
+            color: var(--cyan-bright);
+        }
+
+        /* Export Options */
+        .export-dropdown {
+            position: relative;
+        }
+
+        .export-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: var(--blueprint-card);
+            border: 2px solid var(--cyan-bright);
+            border-radius: 4px;
+            min-width: 150px;
+            display: none;
+            z-index: 50;
+        }
+
+        .export-menu.active {
+            display: block;
+        }
+
+        .export-option {
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--blueprint-border);
+            transition: all 0.2s;
+        }
+
+        .export-option:last-child {
+            border-bottom: none;
+        }
+
+        .export-option:hover {
+            background: rgba(0, 217, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="master-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <h1>🏢 PARTY MASTER</h1>
+                <p>Client & Supplier Management System</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value">45</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-value" style="color: var(--green-tech);">32</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Suppliers</div>
+                    <div class="stat-value" style="color: var(--cyan-bright);">18</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" 
+                       class="search-input" 
+                       id="partySearch" 
+                       placeholder="Search by name, mobile, GST, or city..."
+                       autocomplete="off">
+                <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+            </div>
+            
+            <div class="filter-tags">
+                <div class="filter-tag active" data-filter="all">All</div>
+                <div class="filter-tag" data-filter="customer">Customers</div>
+                <div class="filter-tag" data-filter="supplier">Suppliers</div>
+                <div class="filter-tag" data-filter="both">Both</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="openAddModal()">
+                    ➕ Add Party
+                </button>
+                <div class="export-dropdown">
+                    <button class="btn btn-secondary" onclick="toggleExportMenu()">
+                        📊 Export
+                    </button>
+                    <div class="export-menu" id="exportMenu">
+                        <div class="export-option" onclick="exportToExcel()">📗 Excel</div>
+                        <div class="export-option" onclick="exportToPDF()">📕 PDF</div>
+                        <div class="export-option" onclick="exportToCSV()">📄 CSV</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Party Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">📋 Party List</div>
+                <div class="table-count">Showing <span id="rowCount">45</span> parties</div>
+            </div>
+            <table id="partyTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th style="width: 250px;">Party Name</th>
+                        <th style="width: 100px;">Type</th>
+                        <th style="width: 120px;">Mobile</th>
+                        <th style="width: 150px;">GST No</th>
+                        <th style="width: 120px;">City</th>
+                        <th style="width: 120px;">Opening Bal</th>
+                        <th style="width: 120px;">Current Bal</th>
+                        <th style="width: 100px;" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Sample Data Rows -->
+                    <tr>
+                        <td>1</td>
+                        <td class="party-name">AEPL INFRASTRUCTURE PVT LTD</td>
+                        <td><span class="badge badge-customer">Customer</span></td>
+                        <td>9876543210</td>
+                        <td>27AAACA1234A1Z5</td>
+                        <td>Mumbai</td>
+                        <td class="amount-neutral">₹ 0.00</td>
+                        <td class="amount-negative">₹ 2,45,600.00 Dr</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn view" title="View Ledger">👁️</button>
+                                <button class="icon-btn edit" title="Edit">✏️</button>
+                                <button class="icon-btn delete" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="party-name">ADARSH PETROLIUM</td>
+                        <td><span class="badge badge-supplier">Supplier</span></td>
+                        <td>9123456789</td>
+                        <td>27BBBCA5678B2Z6</td>
+                        <td>Pune</td>
+                        <td class="amount-neutral">₹ 50,000.00 Cr</td>
+                        <td class="amount-positive">₹ 1,25,000.00 Cr</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn view" title="View Ledger">👁️</button>
+                                <button class="icon-btn edit" title="Edit">✏️</button>
+                                <button class="icon-btn delete" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="party-name">OM SHIV ENGINEERING</td>
+                        <td><span class="badge badge-both">Both</span></td>
+                        <td>9988776655</td>
+                        <td>27CCCCA9012C3Z7</td>
+                        <td>Nashik</td>
+                        <td class="amount-neutral">₹ 0.00</td>
+                        <td class="amount-negative">₹ 75,000.00 Dr</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn view" title="View Ledger">👁️</button>
+                                <button class="icon-btn edit" title="Edit">✏️</button>
+                                <button class="icon-btn delete" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td class="party-name">SHREE CEMENT SUPPLIERS</td>
+                        <td><span class="badge badge-supplier">Supplier</span></td>
+                        <td>9765432198</td>
+                        <td>27DDDCA3456D4Z8</td>
+                        <td>Mumbai</td>
+                        <td class="amount-neutral">₹ 1,00,000.00 Cr</td>
+                        <td class="amount-positive">₹ 3,45,000.00 Cr</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn view" title="View Ledger">👁️</button>
+                                <button class="icon-btn edit" title="Edit">✏️</button>
+                                <button class="icon-btn delete" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td class="party-name">RELIANCE CONSTRUCTION LTD</td>
+                        <td><span class="badge badge-customer">Customer</span></td>
+                        <td>9112233445</td>
+                        <td>27EEECA7890E5Z9</td>
+                        <td>Thane</td>
+                        <td class="amount-neutral">₹ 0.00</td>
+                        <td class="amount-negative">₹ 5,67,800.00 Dr</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn view" title="View Ledger">👁️</button>
+                                <button class="icon-btn edit" title="Edit">✏️</button>
+                                <button class="icon-btn delete" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Party Modal -->
+    <div class="modal" id="partyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">➕ Add New Party</div>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="partyForm">
+                    <div class="form-grid">
+                        <!-- Party Type -->
+                        <div class="form-group">
+                            <label class="form-label">Party Type <span class="required">*</span></label>
+                            <select class="form-select" name="partyType" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="customer">Customer</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="both">Both (Customer & Supplier)</option>
+                            </select>
+                        </div>
+
+                        <!-- Party Code -->
+                        <div class="form-group">
+                            <label class="form-label">Party Code</label>
+                            <input type="text" class="form-input" name="partyCode" placeholder="Auto-generated">
+                        </div>
+
+                        <!-- Party Name -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Party Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="partyName" placeholder="Enter party name" required>
+                        </div>
+
+                        <!-- Contact Person -->
+                        <div class="form-group">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-input" name="contactPerson" placeholder="Contact person name">
+                        </div>
+
+                        <!-- Mobile -->
+                        <div class="form-group">
+                            <label class="form-label">Mobile Number <span class="required">*</span></label>
+                            <input type="tel" class="form-input" name="mobile" placeholder="10-digit mobile" maxlength="10" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" name="email" placeholder="email@example.com">
+                        </div>
+
+                        <!-- GST Number -->
+                        <div class="form-group">
+                            <label class="form-label">GST Number</label>
+                            <input type="text" class="form-input" name="gstNumber" placeholder="27AAAAA0000A1Z5" maxlength="15">
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-textarea" name="address" placeholder="Enter full address"></textarea>
+                        </div>
+
+                        <!-- City -->
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-input" name="city" placeholder="City name">
+                        </div>
+
+                        <!-- State -->
+                        <div class="form-group">
+                            <label class="form-label">State</label>
+                            <select class="form-select" name="state">
+                                <option value="">-- Select State --</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Delhi">Delhi</option>
+                                <!-- Add more states -->
+                            </select>
+                        </div>
+
+                        <!-- PIN Code -->
+                        <div class="form-group">
+                            <label class="form-label">PIN Code</label>
+                            <input type="text" class="form-input" name="pincode" placeholder="6-digit PIN" maxlength="6">
+                        </div>
+
+                        <!-- PAN Number -->
+                        <div class="form-group">
+                            <label class="form-label">PAN Number</label>
+                            <input type="text" class="form-input" name="panNumber" placeholder="AAAAA0000A" maxlength="10">
+                        </div>
+
+                        <!-- Opening Balance -->
+                        <div class="form-group">
+                            <label class="form-label">Opening Balance</label>
+                            <input type="number" class="form-input" name="openingBalance" placeholder="0.00" step="0.01">
+                        </div>
+
+                        <!-- Balance Type -->
+                        <div class="form-group">
+                            <label class="form-label">Balance Type</label>
+                            <select class="form-select" name="balanceType">
+                                <option value="debit">Debit (Dr) - Receivable</option>
+                                <option value="credit">Credit (Cr) - Payable</option>
+                            </select>
+                        </div>
+
+                        <!-- Credit Limit -->
+                        <div class="form-group">
+                            <label class="form-label">Credit Limit</label>
+                            <input type="number" class="form-input" name="creditLimit" placeholder="0.00" step="0.01">
+                        </div>
+
+                        <!-- Credit Days -->
+                        <div class="form-group">
+                            <label class="form-label">Credit Days</label>
+                            <input type="number" class="form-input" name="creditDays" placeholder="0">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Notes / Remarks</label>
+                            <textarea class="form-textarea" name="notes" placeholder="Any additional information"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveParty()">💾 Save Party</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample party data
+        let parties = [];
+
+        // Search and Autocomplete
+        const searchInput = document.getElementById('partySearch');
+        const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            if (searchTerm.length < 2) {
+                autocompleteDropdown.classList.remove('active');
+                return;
+            }
+
+            // Filter parties (simulated)
+            const filtered = [
+                { name: 'AEPL INFRASTRUCTURE PVT LTD', mobile: '9876543210', city: 'Mumbai', type: 'Customer' },
+                { name: 'ADARSH PETROLIUM', mobile: '9123456789', city: 'Pune', type: 'Supplier' },
+                { name: 'OM SHIV ENGINEERING', mobile: '9988776655', city: 'Nashik', type: 'Both' }
+            ].filter(party => 
+                party.name.toLowerCase().includes(searchTerm) ||
+                party.mobile.includes(searchTerm) ||
+                party.city.toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length > 0) {
+                autocompleteDropdown.innerHTML = filtered.map(party => `
+                    <div class="autocomplete-item" onclick="selectParty('${party.name}')">
+                        <div class="autocomplete-item-name">${party.name}</div>
+                        <div class="autocomplete-item-details">${party.mobile} • ${party.city} • ${party.type}</div>
+                    </div>
+                `).join('');
+                autocompleteDropdown.classList.add('active');
+            } else {
+                autocompleteDropdown.classList.remove('active');
+            }
+        });
+
+        // Close autocomplete on outside click
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target)) {
+                autocompleteDropdown.classList.remove('active');
+            }
+        });
+
+        function selectParty(name) {
+            searchInput.value = name;
+            autocompleteDropdown.classList.remove('active');
+            // Filter table or show party details
+            console.log('Selected party:', name);
+        }
+
+        // Filter Tags
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                console.log('Filter by:', filter);
+                // Apply filter to table
+            });
+        });
+
+        // Modal Functions
+        function openAddModal() {
+            document.getElementById('partyModal').classList.add('active');
+            document.getElementById('modalTitle').textContent = '➕ Add New Party';
+            document.getElementById('partyForm').reset();
+        }
+
+        function closeModal() {
+            document.getElementById('partyModal').classList.remove('active');
+        }
+
+        function saveParty() {
+            const form = document.getElementById('partyForm');
+            if (form.checkValidity()) {
+                alert('Party saved successfully!');
+                closeModal();
+                // Add save logic here
+            } else {
+                alert('Please fill all required fields!');
+            }
+        }
+
+        // Export Functions
+        function toggleExportMenu() {
+            document.getElementById('exportMenu').classList.toggle('active');
+        }
+
+        function exportToExcel() {
+            alert('Exporting to Excel...');
+            toggleExportMenu();
+        }
+
+        function exportToPDF() {
+            alert('Exporting to PDF...');
+            toggleExportMenu();
+        }
+
+        function exportToCSV() {
+            alert('Exporting to CSV...');
+            toggleExportMenu();
+        }
+
+        // Close export menu on outside click
+        document.addEventListener('click', function(e) {
+            const exportDropdown = document.querySelector('.export-dropdown');
+            if (!exportDropdown.contains(e.target)) {
+                document.getElementById('exportMenu').classList.remove('active');
+            }
+        });
+
+        // Row selection
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (!e.target.closest('.icon-btn')) {
+                    document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
+                    this.classList.add('selected');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

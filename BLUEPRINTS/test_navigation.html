@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #0a1628;
+            color: #fff;
+        }
+        .test-section {
+            background: #1a2942;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #4a6b8a;
+            border-radius: 8px;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #4a6b8a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #5a7b9a;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #0f1e32;
+            border-left: 4px solid #90d090;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #d09090;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #4a6b8a;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 RMC Navigation Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Check Files Exist</h2>
+        <button onclick="testFilesExist()">Test File Paths</button>
+        <div id="fileTest" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Test Parent-Child Communication</h2>
+        <p>This simulates the layout → form → view entries flow</p>
+        <button onclick="loadInFrame('rmc_billing_entry_blueprint.html')">Load Billing Form</button>
+        <button onclick="loadInFrame('rmc_cash_entries_view.html')">Load Cash View</button>
+        <button onclick="loadInFrame('rmc_billing_entries_view.html')">Load Billing View</button>
+        <div id="frameTest" class="result" style="display:none;"></div>
+        
+        <iframe id="testFrame"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Open Full Layout</h2>
+        <button onclick="window.open('rmc_erp_full_layout.html', '_blank')">Open Layout in New Tab</button>
+    </div>
+
+    <script>
+        function testFilesExist() {
+            const files = [
+                'rmc_erp_full_layout.html',
+                'rmc_billing_entry_blueprint.html',
+                'rmc_blueprint_exact.html',
+                'rmc_cash_entries_view.html',
+                'rmc_billing_entries_view.html'
+            ];
+            
+            let result = '<h3>File Test Results:</h3>';
+            let allGood = true;
+            
+            files.forEach(file => {
+                // Try to load as image to check existence
+                const img = new Image();
+                img.onerror = function() {
+                    result += `❓ ${file} - Cannot verify (CORS restriction)<br>`;
+                };
+                
+                result += `📄 ${file}<br>`;
+            });
+            
+            result += '<br><strong>Note:</strong> All files should be in BLUEPRINTS folder. If VIEW ENTRIES button doesn\'t work, check console for errors.';
+            
+            document.getElementById('fileTest').style.display = 'block';
+            document.getElementById('fileTest').innerHTML = result;
+        }
+
+        function loadInFrame(file) {
+            const frame = document.getElementById('testFrame');
+            frame.src = file;
+            
+            document.getElementById('frameTest').style.display = 'block';
+            document.getElementById('frameTest').innerHTML = `
+                ✅ Loading: <strong>${file}</strong><br>
+                Check if page loads below. If blank, file path is wrong.
+            `;
+        }
+
+        // Make loadModule available globally for iframe to call
+        window.loadModule = function(module) {
+            console.log('🎯 loadModule called from iframe:', module);
+            alert('✅ SUCCESS! loadModule called with: ' + module);
+            
+            const frame = document.getElementById('testFrame');
+            const files = {
+                'cash-view-entries': 'rmc_cash_entries_view.html',
+                'billing-view-entries': 'rmc_billing_entries_view.html'
+            };
+            
+            if (files[module]) {
+                frame.src = files[module];
+                document.getElementById('frameTest').innerHTML = `
+                    ✅ Module: <strong>${module}</strong><br>
+                    Loading: <strong>${files[module]}</strong>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>

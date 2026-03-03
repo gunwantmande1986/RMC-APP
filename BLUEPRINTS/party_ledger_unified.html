@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Ledger - Unified View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a1628;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #c8d9f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .ledger-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #1a2942;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .ledger-header {
+            background: linear-gradient(135deg, #2a4365 0%, #1a2942 100%);
+            padding: 20px 30px;
+            border-bottom: 2px solid #4a6b8a;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .party-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .party-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #90d0d0;
+        }
+
+        .party-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: rgba(100, 150, 200, 0.2);
+            border: 1px solid #4a6b8a;
+            color: #90c0d0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(100, 150, 200, 0.3);
+            border-color: #6a8aaa;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 0 30px;
+            background: #1a2942;
+        }
+
+        .filter-tab {
+            padding: 12px 24px;
+            background: rgba(42, 67, 101, 0.3);
+            border: none;
+            border-top: 3px solid transparent;
+            color: #8aa4c4;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-tab:hover {
+            background: rgba(42, 67, 101, 0.5);
+            color: #a0c4e4;
+        }
+
+        .filter-tab.active {
+            background: rgba(100, 150, 200, 0.15);
+            border-top-color: #6a8aaa;
+            color: #c8d9f0;
+        }
+
+        .tab-amount {
+            font-size: 12px;
+            color: #90d090;
+            font-weight: bold;
+        }
+
+        /* Ledger Table */
+        .ledger-content {
+            padding: 0;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ledger-table thead {
+            background: rgba(42, 67, 101, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .ledger-table th {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #90c0d0;
+            border-bottom: 2px solid #4a6b8a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ledger-table th:last-child {
+            text-align: right;
+        }
+
+        .ledger-table td {
+            padding: 12px 15px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+        }
+
+        .ledger-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .ledger-table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .ledger-table tbody tr:hover {
+            background: rgba(100, 150, 200, 0.08);
+        }
+
+        /* Row Type Colors */
+        .cash-row {
+            background: rgba(144, 238, 144, 0.05);
+            border-left: 3px solid rgba(144, 238, 144, 0.5);
+        }
+
+        .billing-row {
+            background: rgba(135, 206, 250, 0.05);
+            border-left: 3px solid rgba(135, 206, 250, 0.5);
+        }
+
+        .payment-row {
+            background: rgba(200, 200, 200, 0.03);
+            border-left: 3px solid rgba(200, 200, 200, 0.3);
+        }
+
+        /* Service & Mode Badges */
+        .service-badge, .mode-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .service-rmc {
+            background: rgba(144, 208, 144, 0.15);
+            color: #90d090;
+            border: 1px solid rgba(144, 208, 144, 0.3);
+        }
+
+        .service-pump {
+            background: rgba(208, 144, 208, 0.15);
+            color: #d090d0;
+            border: 1px solid rgba(208, 144, 208, 0.3);
+        }
+
+        .service-payment {
+            background: rgba(200, 200, 200, 0.1);
+            color: #c0c0c0;
+            border: 1px solid rgba(200, 200, 200, 0.2);
+        }
+
+        .mode-cash {
+            background: rgba(144, 238, 144, 0.15);
+            color: #90ee90;
+            border: 1px solid rgba(144, 238, 144, 0.3);
+        }
+
+        .mode-billing {
+            background: rgba(135, 206, 250, 0.15);
+            color: #87cefa;
+            border: 1px solid rgba(135, 206, 250, 0.3);
+        }
+
+        .mode-payment {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Amount Columns */
+        .debit-amount {
+            color: #d08090;
+            font-weight: 600;
+        }
+
+        .credit-amount {
+            color: #90d090;
+            font-weight: 600;
+        }
+
+        .balance-amount {
+            color: #90c0d0;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Footer Totals */
+        .ledger-footer {
+            background: rgba(42, 67, 101, 0.5);
+            padding: 20px 30px;
+            border-top: 2px solid #4a6b8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .totals-section {
+            display: flex;
+            gap: 40px;
+        }
+
+        .total-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .total-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .total-debit { color: #d08090; }
+        .total-credit { color: #90d090; }
+        .total-balance { color: #90c0d0; font-size: 22px; }
+
+        /* Hidden rows */
+        .ledger-row {
+            display: table-row;
+        }
+
+        .ledger-row.hidden {
+            display: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6a8aaa;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Date Range Filter */
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 6px 10px;
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid #4a6b8a;
+            color: #c8d9f0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #6a8aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="ledger-container">
+        <!-- Header -->
+        <div class="ledger-header">
+            <div class="party-info">
+                <div>
+                    <div class="party-name">📊 ABC Constructions</div>
+                    <div style="font-size: 12px; color: #8aa4c4; margin-top: 5px;">
+                        Party Code: P001 | GST: 27AABCU9603R1ZM
+                    </div>
+                </div>
+                <div class="party-actions">
+                    <div class="date-filter">
+                        <input type="date" class="date-input" id="dateFrom" value="2024-04-01">
+                        <span style="color: #8aa4c4;">to</span>
+                        <input type="date" class="date-input" id="dateTo" value="2024-04-30">
+                    </div>
+                    <button class="action-btn" onclick="refreshLedger()">🔄 Refresh</button>
+                    <button class="action-btn" onclick="exportLedger()">📥 Export</button>
+                    <button class="action-btn" onclick="printLedger()">🖨️ Print</button>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterLedger('all')" data-filter="all">
+                    📊 All Transactions
+                    <span class="tab-amount">(₹78,000)</span>
+                </button>
+                <button class="filter-tab" onclick="filterLedger('cash')" data-filter="cash">
+                    💵 Cash
+                    <span class="tab-amount">(₹30,000)</span>
+                </button>
+                <button class="filter-tab" onclick="filterLedger('billing')" data-filter="billing">
+                    💳 Billing
+                    <span class="tab-amount">(₹48,000)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="ledger-content">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th style="width: 100px;">Date</th>
+                        <th style="width: 80px;">Service</th>
+                        <th style="width: 80px;">Mode</th>
+                        <th>Description</th>
+                        <th style="width: 120px; text-align: right;">Debit</th>
+                        <th style="width: 120px; text-align: right;">Credit</th>
+                        <th style="width: 120px;">Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerBody">
+                    <!-- Opening Balance -->
+                    <tr class="ledger-row payment-row" data-mode="all">
+                        <td>01-04-2024</td>
+                        <td><span class="service-badge service-payment">-</span></td>
+                        <td><span class="mode-badge mode-payment">Opening</span></td>
+                        <td>Opening Balance</td>
+                        <td style="text-align: right;">-</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹0</td>
+                    </tr>
+
+                    <!-- Cash Production -->
+                    <tr class="ledger-row cash-row" data-mode="cash">
+                        <td>24-04-2024</td>
+                        <td><span class="service-badge service-rmc">RMC</span></td>
+                        <td><span class="mode-badge mode-cash">Cash</span></td>
+                        <td>Production Entry - CH002547 | M25 | 5.00 CUM | Site: Bandra West</td>
+                        <td class="debit-amount" style="text-align: right;">₹25,000</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹25,000</td>
+                    </tr>
+
+                    <!-- Cash Pump Service -->
+                    <tr class="ledger-row cash-row" data-mode="cash">
+                        <td>25-04-2024</td>
+                        <td><span class="service-badge service-pump">Pump</span></td>
+                        <td><span class="mode-badge mode-cash">Cash</span></td>
+                        <td>Cash Pump Service - 8 Hours | MH12 AB 1234</td>
+                        <td class="debit-amount" style="text-align: right;">₹5,000</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹30,000</td>
+                    </tr>
+
+                    <!-- Billing Production -->
+                    <tr class="ledger-row billing-row" data-mode="billing">
+                        <td>26-04-2024</td>
+                        <td><span class="service-badge service-rmc">RMC</span></td>
+                        <td><span class="mode-badge mode-billing">Billing</span></td>
+                        <td>Billing Production - BL001 | M30 | 8.00 CUM | Site: Andheri East</td>
+                        <td class="debit-amount" style="text-align: right;">₹40,000</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹70,000</td>
+                    </tr>
+
+                    <!-- Billing Pump Service -->
+                    <tr class="ledger-row billing-row" data-mode="billing">
+                        <td>27-04-2024</td>
+                        <td><span class="service-badge service-pump">Pump</span></td>
+                        <td><span class="mode-badge mode-billing">Billing</span></td>
+                        <td>Billing Pump Rental - 10 Hours | MH12 CD 5678</td>
+                        <td class="debit-amount" style="text-align: right;">₹8,000</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹78,000</td>
+                    </tr>
+
+                    <!-- Payment Received -->
+                    <tr class="ledger-row payment-row" data-mode="all">
+                        <td>28-04-2024</td>
+                        <td><span class="service-badge service-payment">-</span></td>
+                        <td><span class="mode-badge mode-payment">Payment</span></td>
+                        <td>Payment Received - NEFT/RTGS | Ref: TXN123456</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="credit-amount" style="text-align: right;">₹50,000</td>
+                        <td class="balance-amount">₹28,000</td>
+                    </tr>
+
+                    <!-- More sample entries -->
+                    <tr class="ledger-row cash-row" data-mode="cash">
+                        <td>29-04-2024</td>
+                        <td><span class="service-badge service-rmc">RMC</span></td>
+                        <td><span class="mode-badge mode-cash">Cash</span></td>
+                        <td>Cash Production - CH002548 | M20 | 6.50 CUM | Site: Powai</td>
+                        <td class="debit-amount" style="text-align: right;">₹29,250</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹57,250</td>
+                    </tr>
+
+                    <tr class="ledger-row billing-row" data-mode="billing">
+                        <td>30-04-2024</td>
+                        <td><span class="service-badge service-pump">Pump</span></td>
+                        <td><span class="mode-badge mode-billing">Billing</span></td>
+                        <td>Billing Pump Service - 12 Hours | MH12 EF 9012</td>
+                        <td class="debit-amount" style="text-align: right;">₹9,600</td>
+                        <td style="text-align: right;">-</td>
+                        <td class="balance-amount">₹66,850</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Totals -->
+        <div class="ledger-footer">
+            <div class="totals-section">
+                <div class="total-item">
+                    <div class="total-label">Total Debit</div>
+                    <div class="total-value total-debit" id="totalDebit">₹1,17,850</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Total Credit</div>
+                    <div class="total-value total-credit" id="totalCredit">₹50,000</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Outstanding Balance</div>
+                    <div class="total-value total-balance" id="totalBalance">₹67,850</div>
+                </div>
+            </div>
+            <div style="font-size: 11px; color: #8aa4c4;">
+                Last Updated: 23-01-2026 07:50:00 | 8 Transactions
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // FILTER LEDGER BY MODE (Cash/Billing/All)
+        // ==========================================
+        function filterLedger(mode) {
+            const rows = document.querySelectorAll('.ledger-row');
+            const tabs = document.querySelectorAll('.filter-tab');
+            
+            // Update active tab
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-filter') === mode) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Filter rows
+            let totalDebit = 0;
+            let totalCredit = 0;
+            
+            rows.forEach(row => {
+                const rowMode = row.getAttribute('data-mode');
+                
+                if (mode === 'all' || rowMode === mode || rowMode === 'all') {
+                    row.classList.remove('hidden');
+                    
+                    // Calculate totals
+                    const debitText = row.cells[4].textContent.replace(/[₹,\s-]/g, '');
+                    const creditText = row.cells[5].textContent.replace(/[₹,\s-]/g, '');
+                    
+                    if (debitText) totalDebit += parseFloat(debitText);
+                    if (creditText) totalCredit += parseFloat(creditText);
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            
+            // Update footer totals
+            const balance = totalDebit - totalCredit;
+            document.getElementById('totalDebit').textContent = `₹${totalDebit.toLocaleString()}`;
+            document.getElementById('totalCredit').textContent = `₹${totalCredit.toLocaleString()}`;
+            document.getElementById('totalBalance').textContent = `₹${balance.toLocaleString()}`;
+        }
+
+        // ==========================================
+        // REFRESH LEDGER
+        // ==========================================
+        function refreshLedger() {
+            alert('🔄 Refreshing ledger data...\n\nThis will fetch latest transactions from database.');
+            // In real app: fetch from API and rebuild table
+        }
+
+        // ==========================================
+        // EXPORT LEDGER
+        // ==========================================
+        function exportLedger() {
+            alert('📥 Export Options:\n\n1. Excel (XLSX)\n2. PDF Report\n3. CSV Format\n\nThis will be implemented in backend phase.');
+        }
+
+        // ==========================================
+        // PRINT LEDGER
+        // ==========================================
+        function printLedger() {
+            window.print();
+        }
+
+        // ==========================================
+        // INITIALIZE
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Party Ledger - Unified View Loaded');
+            console.log('📊 Single ledger per party');
+            console.log('🔁 Tabs = Filters (not separate ledgers)');
+            console.log('✨ Professional polish applied');
+        });
+    </script>
+</body>
+</html>

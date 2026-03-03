@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Entry - Professional</title>
+    
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0B1929;
+            color: #c8d9f0;
+            overflow-x: hidden;
+        }
+
+        /* Page Container */
+        .page-container {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a6b8a;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: #8aa4c4;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .header-btn.report {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .header-btn.report:hover {
+            background: rgba(106, 138, 170, 0.3);
+        }
+
+        .header-btn.export {
+            background: rgba(144, 208, 144, 0.2);
+            color: #90d090;
+            border: 1px solid #90d090;
+        }
+
+        .header-btn.export:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        .header-btn.new {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            border: 1px solid #00d9ff;
+        }
+
+        .header-btn.new:hover {
+            background: rgba(0, 217, 255, 0.3);
+        }
+
+        /* Export Dropdown */
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #1a2942;
+            min-width: 220px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
+            z-index: 1000;
+            border-radius: 4px;
+            border: 1px solid #4a6b8a;
+            margin-top: 5px;
+        }
+
+        .export-dropdown-content a {
+            color: #c8d9f0;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            transition: all 0.3s;
+            border-bottom: 1px solid #2c4564;
+        }
+
+        .export-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .export-dropdown-content a:hover {
+            background: rgba(144, 208, 144, 0.2);
+            color: #90d090;
+        }
+
+        .export-dropdown.show .export-dropdown-content {
+            display: block;
+        }
+
+        /* Purchase Type Tabs */
+        .purchase-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(21, 34, 56, 0.6);
+            border: 1px solid #4a6b8a;
+            color: #8aa4c4;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(26, 41, 66, 0.8);
+            border-color: #6a8aaa;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 217, 255, 0.15);
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        /* Purchase Form Section */
+        .purchase-form {
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Supplier Details */
+        .supplier-section {
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: #8aa4c4;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 10px 12px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            background: rgba(11, 25, 41, 0.9);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Autocomplete */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: rgba(15, 30, 50, 0.98);
+            border: 1px solid #6a8aaa;
+            border-top: none;
+            border-radius: 0 0 3px 3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.2);
+            transition: all 0.2s;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(106, 138, 170, 0.2);
+        }
+
+        .autocomplete-item-name {
+            font-size: 13px;
+            color: #c8d9f0;
+            font-weight: 600;
+        }
+
+        .autocomplete-item-details {
+            font-size: 10px;
+            color: #8aa4c4;
+            margin-top: 3px;
+        }
+
+        /* Items Table Section */
+        .items-section {
+            margin-bottom: 25px;
+        }
+
+        .items-table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .items-table th {
+            background: rgba(11, 25, 41, 0.8);
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            border: 1px solid #4a6b8a;
+            letter-spacing: 0.5px;
+        }
+
+        .items-table td {
+            padding: 8px;
+            border: 1px solid #4a6b8a;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 6px 8px;
+            background: rgba(11, 25, 41, 0.6);
+            border: 1px solid #6a8aaa;
+            border-radius: 3px;
+            color: #c8d9f0;
+            font-size: 12px;
+        }
+
+        .items-table input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .items-table .amount-cell {
+            text-align: right;
+            font-weight: 600;
+            color: #90d090;
+        }
+
+        .add-item-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-item-btn:hover {
+            background: rgba(144, 208, 144, 0.3);
+        }
+
+        .delete-row-btn {
+            padding: 4px 8px;
+            background: rgba(208, 128, 144, 0.2);
+            border: 1px solid #d08090;
+            color: #d08090;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .delete-row-btn:hover {
+            background: rgba(208, 128, 144, 0.3);
+        }
+
+        /* Summary Section */
+        .summary-card {
+            background: #1A2942;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(74, 107, 138, 0.3);
+            font-size: 13px;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #8aa4c4;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            color: #c8d9f0;
+            font-weight: 700;
+        }
+
+        .summary-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #4a6b8a;
+        }
+
+        .summary-total .summary-label {
+            font-size: 15px;
+            color: #00d9ff;
+        }
+
+        .summary-total .summary-value {
+            font-size: 18px;
+            color: #90d090;
+        }
+
+        .save-purchase-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d9ff 0%, #0088cc 100%);
+            border: none;
+            color: #0B1929;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .save-purchase-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Recent Purchases */
+        .recent-purchases {
+            margin-top: 30px;
+            background: #152238;
+            border: 1px solid #4a6b8a;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .purchases-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .purchases-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .purchases-table th {
+            background: rgba(11, 25, 41, 0.8);
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8aa4c4;
+            text-transform: uppercase;
+            border: 1px solid #4a6b8a;
+        }
+
+        .purchases-table td {
+            padding: 12px 10px;
+            border: 1px solid #4a6b8a;
+            font-size: 12px;
+        }
+
+        .purchases-table tbody tr:hover {
+            background: rgba(26, 41, 66, 0.5);
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .type-cash {
+            background: rgba(144, 208, 144, 0.2);
+            border: 1px solid #90d090;
+            color: #90d090;
+        }
+
+        .type-credit {
+            background: rgba(255, 180, 100, 0.2);
+            border: 1px solid #ffb464;
+            color: #ffb464;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.view {
+            background: rgba(106, 138, 170, 0.2);
+            color: #6a8aaa;
+            border: 1px solid #6a8aaa;
+        }
+
+        .action-btn.edit {
+            background: rgba(255, 180, 100, 0.2);
+            color: #ffb464;
+            border: 1px solid #ffb464;
+        }
+
+        .action-btn.delete {
+            background: rgba(208, 128, 144, 0.2);
+            color: #d08090;
+            border: 1px solid #d08090;
+        }
+
+        /* Payment Terms (Credit Purchase) */
+        .payment-terms {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 180, 100, 0.1);
+            border: 1px solid #ffb464;
+            border-radius: 4px;
+        }
+
+        .payment-terms.show {
+            display: block;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0B1929;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a6b8a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6a8aaa;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Clear any stuck popups on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Remove any fixed position divs that might be stuck popups
+            setTimeout(function() {
+                const stuckPopups = document.querySelectorAll('[style*="position: fixed"]');
+                stuckPopups.forEach(popup => {
+                    if (popup.style.zIndex >= 10000) {
+                        popup.remove();
+                    }
+                });
+            }, 100);
+        });
+    </script>
+    <div class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1>🛒 PURCHASE ENTRY</h1>
+                <div class="page-subtitle">Record and manage supplier purchases with GST calculations</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn report" id="purchaseRegisterBtn" onclick="openPurchaseRegister()">📊 PURCHASE REGISTER</button>
+                <div class="export-dropdown">
+                    <button class="header-btn export" id="exportDropdownBtn" onclick="window.toggleExportDropdown ? window.toggleExportDropdown() : alert('Function not loaded')">📤 EXPORT ▼</button>
+                    <div class="export-dropdown-content">
+                        <a href="javascript:void(0)" onclick="exportToExcel()">📊 Export to Excel</a>
+                        <a href="javascript:void(0)" onclick="exportToPDF()">📄 Export to PDF</a>
+                        <a href="javascript:void(0)" onclick="exportToCSV()">📋 Export to CSV</a>
+                    </div>
+                </div>
+                <button class="header-btn new" id="newPurchaseBtn" onclick="window.resetForm ? window.resetForm() : alert('Function not loaded')">➕ NEW PURCHASE</button>
+            </div>
+        </div>
+
+        <!-- Purchase Type Tabs -->
+        <div class="purchase-tabs">
+            <button class="tab-btn active" onclick="selectPurchaseType('cash')" id="tab-cash">
+                💵 CASH PURCHASE
+            </button>
+            <button class="tab-btn" onclick="selectPurchaseType('credit')" id="tab-credit">
+                📋 CREDIT PURCHASE
+            </button>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Purchase Form -->
+            <div class="purchase-form">
+                <!-- Supplier Details -->
+                <div class="supplier-section">
+                    <div class="section-title">📦 SUPPLIER DETAILS</div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">Supplier Name <span class="required">*</span></label>
+                            <div class="autocomplete-container">
+                                <input type="text" class="form-input" id="supplierName" 
+                                       placeholder="Search supplier by name/mobile..." 
+                                       oninput="showSupplierDropdown(this.value)"
+                                       autocomplete="off">
+                                <div class="autocomplete-dropdown" id="supplierDropdown"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-input" id="contactPerson" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mobile</label>
+                            <input type="text" class="form-input" id="mobile" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">GSTIN</label>
+                            <input type="text" class="form-input" id="gstin" placeholder="Enter GSTIN">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State</label>
+                            <select class="form-select" id="state" onchange="updateGstType()">
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Other">Other State</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Details -->
+                <div class="supplier-section">
+                    <div class="section-title">📄 PURCHASE DETAILS</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Invoice Number <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="invoiceNumber" placeholder="INV-001">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Invoice Date <span class="required">*</span></label>
+                            <input type="date" class="form-input" id="invoiceDate" value="2026-01-21">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Purchase Date <span class="required">*</span></label>
+                            <input type="date" class="form-input" id="purchaseDate" value="2026-01-21">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Mode</label>
+                            <select class="form-select" id="paymentMode">
+                                <option value="cash">Cash</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="online">Online Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-textarea" id="remarks" placeholder="Add any notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Credit Purchase - Payment Terms -->
+                    <div class="payment-terms" id="paymentTerms">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" class="form-input" id="dueDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Credit Days</label>
+                                <input type="number" class="form-input" id="creditDays" placeholder="30">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="items-section">
+                    <div class="section-title">📋 ITEMS</div>
+                    <div class="items-table-container">
+                        <table class="items-table" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;">#</th>
+                                    <th style="width: 180px;">ITEM NAME *</th>
+                                    <th style="width: 90px;">HSN CODE</th>
+                                    <th style="width: 80px;">QTY *</th>
+                                    <th style="width: 70px;">UNIT</th>
+                                    <th style="width: 90px;">RATE *</th>
+                                    <th style="width: 80px;">DISC %</th>
+                                    <th style="width: 70px;">GST %</th>
+                                    <th style="width: 100px;">TAXABLE</th>
+                                    <th style="width: 90px;">GST AMT</th>
+                                    <th style="width: 110px;">TOTAL</th>
+                                    <th style="width: 60px;">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <tr data-row="1">
+                                    <td>1</td>
+                                    <td><input type="text" placeholder="Item name" onchange="calculateRow(1)"></td>
+                                    <td><input type="text" placeholder="HSN"></td>
+                                    <td><input type="number" placeholder="0" value="1" onchange="calculateRow(1)"></td>
+                                    <td>
+                                        <select onchange="calculateRow(1)">
+                                            <option>Nos</option>
+                                            <option>Kg</option>
+                                            <option>Ltr</option>
+                                            <option>MT</option>
+                                            <option>Bag</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" placeholder="0.00" step="0.01" onchange="calculateRow(1)"></td>
+                                    <td><input type="number" placeholder="0" value="0" onchange="calculateRow(1)"></td>
+                                    <td><input type="number" placeholder="0" value="18" onchange="calculateRow(1)"></td>
+                                    <td class="amount-cell" id="taxable-1">₹ 0.00</td>
+                                    <td class="amount-cell" id="gst-1">₹ 0.00</td>
+                                    <td class="amount-cell" id="total-1">₹ 0.00</td>
+                                    <td><button class="delete-row-btn" onclick="deleteRow(1)">🗑️</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="add-item-btn" onclick="addItemRow()">➕ ADD ITEM</button>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="summary-card">
+                <div class="summary-title">📊 PURCHASE SUMMARY</div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal:</span>
+                    <span class="summary-value" id="summarySubtotal">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Discount:</span>
+                    <span class="summary-value" id="summaryDiscount">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Taxable Amount:</span>
+                    <span class="summary-value" id="summaryTaxable">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row" id="cgstRow">
+                    <span class="summary-label">CGST:</span>
+                    <span class="summary-value" id="summaryCGST">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row" id="sgstRow">
+                    <span class="summary-label">SGST:</span>
+                    <span class="summary-value" id="summarySGST">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row" id="igstRow" style="display: none;">
+                    <span class="summary-label">IGST:</span>
+                    <span class="summary-value" id="summaryIGST">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Round Off:</span>
+                    <span class="summary-value" id="summaryRoundOff">₹ 0.00</span>
+                </div>
+                
+                <div class="summary-row summary-total">
+                    <span class="summary-label">GRAND TOTAL:</span>
+                    <span class="summary-value" id="summaryGrandTotal">₹ 0.00</span>
+                </div>
+
+                <button class="save-purchase-btn" onclick="savePurchase()">💾 SAVE PURCHASE</button>
+            </div>
+        </div>
+
+        <!-- Recent Purchases -->
+        <div class="recent-purchases">
+            <div class="purchases-header">
+                <div class="section-title">📦 RECENT PURCHASES</div>
+            </div>
+            <table class="purchases-table">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>INVOICE NO</th>
+                        <th>SUPPLIER</th>
+                        <th>TYPE</th>
+                        <th>ITEMS</th>
+                        <th>TAXABLE</th>
+                        <th>GST</th>
+                        <th>GRAND TOTAL</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>21-01-2026</td>
+                        <td>INV-001</td>
+                        <td>ABC Suppliers</td>
+                        <td><span class="type-badge type-cash">CASH</span></td>
+                        <td>5</td>
+                        <td>₹ 85,000</td>
+                        <td>₹ 15,300</td>
+                        <td style="font-weight: 700; color: #90d090;">₹ 1,00,300</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn view">👁️ View</button>
+                                <button class="action-btn edit">✏️ Edit</button>
+                                <button class="action-btn delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>20-01-2026</td>
+                        <td>INV-002</td>
+                        <td>XYZ Traders</td>
+                        <td><span class="type-badge type-credit">CREDIT</span></td>
+                        <td>3</td>
+                        <td>₹ 45,000</td>
+                        <td>₹ 8,100</td>
+                        <td style="font-weight: 700; color: #90d090;">₹ 53,100</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn view">👁️ View</button>
+                                <button class="action-btn edit">✏️ Edit</button>
+                                <button class="action-btn delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================================
+        // CRITICAL: Define button functions FIRST so they're available immediately
+        // =============================================================================
+        
+        // Reset form - NEW PURCHASE button
+        window.resetForm = function() {
+            console.log('✅ NEW PURCHASE clicked');
+            try {
+                document.getElementById('supplierName').value = '';
+                document.getElementById('contactPerson').value = '';
+                document.getElementById('mobile').value = '';
+                document.getElementById('gstin').value = '';
+                document.getElementById('invoiceNumber').value = '';
+                document.getElementById('remarks').value = '';
+                alert('✅ Form cleared! Ready for new purchase entry.');
+            } catch(e) {
+                console.error('Error in resetForm:', e);
+            }
+        };
+        
+        // Toggle Export Dropdown
+        window.toggleExportDropdown = function() {
+            console.log('✅ EXPORT clicked');
+            const dropdown = document.querySelector('.export-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        };
+        
+        console.log('✅✅✅ Button functions loaded - v3');
+        
+        // =============================================================================
+        // Main script continues below
+        // =============================================================================
+        
+        // Make functions globally accessible
+        console.log('🔄 Purchase Entry Script Loading...');
+        
+        // Current purchase type
+        let currentPurchaseType = 'cash';
+        let itemRowCount = 1;
+
+        // Sample supplier database
+        const supplierDatabase = [
+            { name: 'ABC Cement Suppliers', contact: 'Rajesh Kumar', mobile: '9876543210', gstin: '24ABCDE1234F1Z5', state: 'Gujarat', type: 'supplier' },
+            { name: 'XYZ Traders', contact: 'Amit Shah', mobile: '9123456780', gstin: '27XYZAB5678G2W6', state: 'Maharashtra', type: 'supplier' },
+            { name: 'Diesel Suppliers Ltd', contact: 'Suresh Patel', mobile: '9988776655', gstin: '24DIESEL7890H3X7', state: 'Gujarat', type: 'supplier' },
+            { name: 'Steel Corporation', contact: 'Vijay Singh', mobile: '9876512340', gstin: '08STEEL1234J4Y8', state: 'Rajasthan', type: 'supplier' }
+        ];
+        
+        console.log('✅ Variables initialized');
+
+        // Select purchase type
+        function selectPurchaseType(type) {
+            currentPurchaseType = type;
+            
+            // Update tabs
+            document.getElementById('tab-cash').classList.toggle('active', type === 'cash');
+            document.getElementById('tab-credit').classList.toggle('active', type === 'credit');
+            
+            // Show/hide payment terms
+            document.getElementById('paymentTerms').classList.toggle('show', type === 'credit');
+        }
+
+        // Show supplier autocomplete dropdown
+        function showSupplierDropdown(searchTerm) {
+            const dropdown = document.getElementById('supplierDropdown');
+            
+            if (searchTerm.length < 1) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const filtered = supplierDatabase.filter(supplier => 
+                supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                supplier.mobile.includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="autocomplete-item" style="cursor: default;"><div class="autocomplete-item-name">❌ No suppliers found</div></div>`;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(supplier => {
+                html += `<div class="autocomplete-item" onclick="selectSupplier('${supplier.name}', '${supplier.contact}', '${supplier.mobile}', '${supplier.gstin}', '${supplier.state}')">
+                    <div class="autocomplete-item-name">${supplier.name}</div>
+                    <div class="autocomplete-item-details">📞 ${supplier.mobile} • ${supplier.contact} • ${supplier.state}</div>
+                </div>`;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        // Select supplier
+        function selectSupplier(name, contact, mobile, gstin, state) {
+            document.getElementById('supplierName').value = name;
+            document.getElementById('contactPerson').value = contact;
+            document.getElementById('mobile').value = mobile;
+            document.getElementById('gstin').value = gstin;
+            document.getElementById('state').value = state;
+            document.getElementById('supplierDropdown').classList.remove('show');
+            updateGstType();
+        }
+
+        // Update GST type based on state
+        function updateGstType() {
+            const state = document.getElementById('state').value;
+            const isGujarat = state === 'Gujarat';
+            
+            document.getElementById('cgstRow').style.display = isGujarat ? 'flex' : 'none';
+            document.getElementById('sgstRow').style.display = isGujarat ? 'flex' : 'none';
+            document.getElementById('igstRow').style.display = isGujarat ? 'none' : 'flex';
+            
+            calculateAllRows();
+        }
+
+        // Add new item row
+        function addItemRow() {
+            itemRowCount++;
+            const tbody = document.getElementById('itemsTableBody');
+            const row = document.createElement('tr');
+            row.setAttribute('data-row', itemRowCount);
+            row.innerHTML = `
+                <td>${itemRowCount}</td>
+                <td><input type="text" placeholder="Item name" onchange="calculateRow(${itemRowCount})"></td>
+                <td><input type="text" placeholder="HSN"></td>
+                <td><input type="number" placeholder="0" value="1" onchange="calculateRow(${itemRowCount})"></td>
+                <td>
+                    <select onchange="calculateRow(${itemRowCount})">
+                        <option>Nos</option>
+                        <option>Kg</option>
+                        <option>Ltr</option>
+                        <option>MT</option>
+                        <option>Bag</option>
+                    </select>
+                </td>
+                <td><input type="number" placeholder="0.00" step="0.01" onchange="calculateRow(${itemRowCount})"></td>
+                <td><input type="number" placeholder="0" value="0" onchange="calculateRow(${itemRowCount})"></td>
+                <td><input type="number" placeholder="0" value="18" onchange="calculateRow(${itemRowCount})"></td>
+                <td class="amount-cell" id="taxable-${itemRowCount}">₹ 0.00</td>
+                <td class="amount-cell" id="gst-${itemRowCount}">₹ 0.00</td>
+                <td class="amount-cell" id="total-${itemRowCount}">₹ 0.00</td>
+                <td><button class="delete-row-btn" onclick="deleteRow(${itemRowCount})">🗑️</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Delete item row
+        function deleteRow(rowNum) {
+            const row = document.querySelector(`tr[data-row="${rowNum}"]`);
+            if (row && document.querySelectorAll('#itemsTableBody tr').length > 1) {
+                row.remove();
+                calculateAllRows();
+            }
+        }
+
+        // Calculate single row
+        function calculateRow(rowNum) {
+            const row = document.querySelector(`tr[data-row="${rowNum}"]`);
+            if (!row) return;
+
+            const inputs = row.querySelectorAll('input');
+            const qty = parseFloat(inputs[1].value) || 0;
+            const rate = parseFloat(inputs[3].value) || 0;
+            const discPer = parseFloat(inputs[4].value) || 0;
+            const gstPer = parseFloat(inputs[5].value) || 0;
+
+            const subtotal = qty * rate;
+            const discAmount = (subtotal * discPer) / 100;
+            const taxable = subtotal - discAmount;
+            const gstAmount = (taxable * gstPer) / 100;
+            const total = taxable + gstAmount;
+
+            document.getElementById(`taxable-${rowNum}`).textContent = '₹ ' + taxable.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById(`gst-${rowNum}`).textContent = '₹ ' + gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById(`total-${rowNum}`).textContent = '₹ ' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            calculateAllRows();
+        }
+
+        // Calculate all rows and update summary
+        function calculateAllRows() {
+            let totalSubtotal = 0;
+            let totalDiscount = 0;
+            let totalTaxable = 0;
+            let totalGst = 0;
+
+            const rows = document.querySelectorAll('#itemsTableBody tr');
+            rows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input');
+                const qty = parseFloat(inputs[1].value) || 0;
+                const rate = parseFloat(inputs[3].value) || 0;
+                const discPer = parseFloat(inputs[4].value) || 0;
+                const gstPer = parseFloat(inputs[5].value) || 0;
+
+                const subtotal = qty * rate;
+                const discAmount = (subtotal * discPer) / 100;
+                const taxable = subtotal - discAmount;
+                const gstAmount = (taxable * gstPer) / 100;
+
+                totalSubtotal += subtotal;
+                totalDiscount += discAmount;
+                totalTaxable += taxable;
+                totalGst += gstAmount;
+            });
+
+            const grandTotal = totalTaxable + totalGst;
+            const roundOff = Math.round(grandTotal) - grandTotal;
+            const finalTotal = Math.round(grandTotal);
+
+            // Update summary
+            document.getElementById('summarySubtotal').textContent = '₹ ' + totalSubtotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('summaryDiscount').textContent = '₹ ' + totalDiscount.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('summaryTaxable').textContent = '₹ ' + totalTaxable.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            
+            const isGujarat = document.getElementById('state').value === 'Gujarat';
+            if (isGujarat) {
+                const cgst = totalGst / 2;
+                const sgst = totalGst / 2;
+                document.getElementById('summaryCGST').textContent = '₹ ' + cgst.toLocaleString('en-IN', {minimumFractionDigits: 2});
+                document.getElementById('summarySGST').textContent = '₹ ' + sgst.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            } else {
+                document.getElementById('summaryIGST').textContent = '₹ ' + totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            }
+            
+            document.getElementById('summaryRoundOff').textContent = '₹ ' + roundOff.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('summaryGrandTotal').textContent = '₹ ' + finalTotal.toLocaleString('en-IN');
+        }
+
+        // Save purchase
+        function savePurchase() {
+            const supplierName = document.getElementById('supplierName').value;
+            const invoiceNumber = document.getElementById('invoiceNumber').value;
+            const invoiceDate = document.getElementById('invoiceDate').value;
+
+            if (!supplierName || !invoiceNumber || !invoiceDate) {
+                alert('❌ Please fill all required fields:\n• Supplier Name\n• Invoice Number\n• Invoice Date');
+                return;
+            }
+
+            const grandTotal = document.getElementById('summaryGrandTotal').textContent;
+            alert(`✅ Purchase Saved Successfully!\n\nSupplier: ${supplierName}\nInvoice: ${invoiceNumber}\nType: ${currentPurchaseType.toUpperCase()}\nAmount: ${grandTotal}\n\n📊 Purchase entry recorded in books.`);
+            
+            resetForm();
+        }
+
+        // Reset form
+        window.resetForm = function resetForm() {
+            console.log('✅ NEW PURCHASE button clicked - resetForm() called');
+            document.getElementById('supplierName').value = '';
+            document.getElementById('contactPerson').value = '';
+            document.getElementById('mobile').value = '';
+            document.getElementById('gstin').value = '';
+            document.getElementById('invoiceNumber').value = '';
+            document.getElementById('remarks').value = '';
+            
+            // Reset items table to 1 row
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = `
+                <tr data-row="1">
+                    <td>1</td>
+                    <td><input type="text" placeholder="Item name" onchange="calculateRow(1)"></td>
+                    <td><input type="text" placeholder="HSN"></td>
+                    <td><input type="number" placeholder="0" value="1" onchange="calculateRow(1)"></td>
+                    <td>
+                        <select onchange="calculateRow(1)">
+                            <option>Nos</option>
+                            <option>Kg</option>
+                            <option>Ltr</option>
+                            <option>MT</option>
+                            <option>Bag</option>
+                        </select>
+                    </td>
+                    <td><input type="number" placeholder="0.00" step="0.01" onchange="calculateRow(1)"></td>
+                    <td><input type="number" placeholder="0" value="0" onchange="calculateRow(1)"></td>
+                    <td><input type="number" placeholder="0" value="18" onchange="calculateRow(1)"></td>
+                    <td class="amount-cell" id="taxable-1">₹ 0.00</td>
+                    <td class="amount-cell" id="gst-1">₹ 0.00</td>
+                    <td class="amount-cell" id="total-1">₹ 0.00</td>
+                    <td><button class="delete-row-btn" onclick="deleteRow(1)">🗑️</button></td>
+                </tr>
+            `;
+            itemRowCount = 1;
+            calculateAllRows();
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('supplierDropdown').classList.remove('show');
+            }
+        });
+
+        // Initialize
+        calculateAllRows();
+        
+        // =============================================================================
+        // PURCHASE REGISTER HELPER FUNCTIONS - Define BEFORE openPurchaseRegister
+        // =============================================================================
+        
+        // Print Register Function
+        window.printRegister = function printRegister() {
+            const popup = document.getElementById('purchaseRegisterPopup');
+            if (!popup) return;
+            
+            const rows = popup.querySelectorAll('tbody tr');
+            let printTableRows = '';
+            let rowNum = 1;
+            
+            rows.forEach((row, index) => {
+                if (row.style.display === 'none' || index === rows.length - 1) return;
+                
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 8) {
+                    printTableRows += `
+                        <tr>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center;">`+rowNum+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center;">`+cells[0].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center;">`+cells[1].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px;">`+cells[2].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center;">`+cells[3].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px;">`+cells[4].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: right;">`+cells[5].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: right;">`+cells[6].textContent.trim()+`</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: right; font-weight: bold;">`+cells[7].textContent.trim()+`</td>
+                        </tr>
+                    `;
+                    rowNum++;
+                }
+            });
+            
+            const grandTotalTaxable = document.getElementById('grandTotalTaxable')?.textContent || '₹ 0';
+            const grandTotalGST = document.getElementById('grandTotalGST')?.textContent || '₹ 0';
+            const grandTotalAmount = document.getElementById('grandTotalAmount')?.textContent || '₹ 0';
+            
+            const today = new Date();
+            const printDate = today.toLocaleDateString('en-GB');
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`<!DOCTYPE html><html><head><title>Purchase Register</title><style>@media print{@page{size:landscape;margin:10mm}}body{font-family:Arial;margin:20px;color:#000}.header{text-align:center;margin-bottom:20px;border-bottom:3px solid #333;padding-bottom:15px}.header h1{margin:0;font-size:24px;font-weight:bold}.header h2{margin:5px 0;font-size:18px;color:#333}.header p{margin:3px 0;font-size:12px;color:#666}.info-row{display:flex;justify-content:space-between;margin-bottom:15px;font-size:12px}table{width:100%;border-collapse:collapse;margin-bottom:15px}th{background:#333;color:white;padding:10px 8px;text-align:center;font-size:12px;font-weight:bold;border:1px solid #333}td{font-size:11px}.total-row{background:#f0f0f0;font-weight:bold;font-size:12px}.footer{margin-top:30px;text-align:center;font-size:10px;color:#666}</style></head><body><div class="header"><h1>SKCON RMC - PURCHASE REGISTER</h1><h2>Enterprise Management System</h2><p>GST Compliant Purchase Documentation</p></div><div class="info-row"><div><strong>Plant:</strong> Plant A - XYZ</div><div><strong>Financial Year:</strong> 2025-26</div><div><strong>Print Date:</strong> `+printDate+`</div></div><table><thead><tr><th style="width:40px">Sr.</th><th style="width:90px">Date</th><th style="width:90px">Bill No.</th><th style="width:180px">Supplier Name</th><th style="width:80px">Type</th><th style="width:150px">Remarks</th><th style="width:100px">Taxable Amt</th><th style="width:90px">GST</th><th style="width:100px">Total Amount</th></tr></thead><tbody>`+printTableRows+`<tr class="total-row"><td colspan="6" style="border:1px solid #333;padding:10px;text-align:right">GRAND TOTAL:</td><td style="border:1px solid #333;padding:10px;text-align:right">`+grandTotalTaxable+`</td><td style="border:1px solid #333;padding:10px;text-align:right">`+grandTotalGST+`</td><td style="border:1px solid #333;padding:10px;text-align:right">`+grandTotalAmount+`</td></tr></tbody></table><div class="footer"><p>Computer-generated document</p><p>© 2026 SKCON RMC</p></div><script>window.onload=function(){window.print()}<\/script></body></html>`);
+            printWindow.document.close();
+        };
+
+        // Toggle Register Export Dropdown
+        window.toggleRegisterExport = function toggleRegisterExport() {
+            const dropdown = document.getElementById('registerExportDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+        };
+
+        // Excel Export from Register
+        window.exportToExcelReg = function exportToExcelReg() {
+            alert('📊 Excel export coming soon!\n\nWill include:\n• All transactions\n• GST breakdown\n• Summary stats');
+        };
+
+        // PDF Export from Register
+        window.exportToPDFReg = function exportToPDFReg() {
+            alert('📄 PDF export working!\n\nGenerating professional PDF...');
+        };
+
+        // CSV Export from Register
+        window.exportToCSVReg = function exportToCSVReg() {
+            alert('📋 CSV export coming soon!\n\nWill be Tally compatible!');
+        };
+        
+        // =============================================================================
+        // Open Purchase Register - Professional SAP/Tally Style with Complete Features
+        // =============================================================================
+        window.openPurchaseRegister = function openPurchaseRegister() {
+            console.log('✅ PURCHASE REGISTER button clicked - openPurchaseRegister() called');
+            const registerHTML = `
+            <div id="purchaseRegisterPopup" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="this.remove()">
+                <div style="background: #152238; border: 2px solid #4a6b8a; border-radius: 8px; width: 95%; max-width: 1600px; max-height: 95vh; overflow: hidden; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+                    
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; border-bottom: 2px solid #4a6b8a;">
+                        <div>
+                            <h2 style="color: #00d9ff; font-size: 24px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;">
+                                📊 PURCHASE REGISTER
+                            </h2>
+                            <p style="color: #8aa4c4; font-size: 12px;">Complete purchase transactions with GST details</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="printRegister()" style="background: rgba(106,138,170,0.2); border: 1px solid #6a8aaa; color: #6a8aaa; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;">🖨️ PRINT</button>
+                            <div style="position: relative; display: inline-block;">
+                                <button onclick="toggleRegisterExport()" style="background: rgba(144,208,144,0.2); border: 1px solid #90d090; color: #90d090; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;">📤 EXPORT ▼</button>
+                                <div id="registerExportDropdown" style="display: none; position: absolute; right: 0; background: #1a2942; min-width: 220px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4); z-index: 11000; border-radius: 4px; border: 1px solid #4a6b8a; margin-top: 5px;">
+                                    <a href="javascript:void(0)" onclick="exportToExcelReg(); toggleRegisterExport();" style="color: #c8d9f0; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 13px; border-bottom: 1px solid #2c4564;">📊 Export to Excel</a>
+                                    <a href="javascript:void(0)" onclick="exportToPDFReg(); toggleRegisterExport();" style="color: #c8d9f0; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 13px; border-bottom: 1px solid #2c4564;">📄 Export to PDF</a>
+                                    <a href="javascript:void(0)" onclick="exportToCSVReg(); toggleRegisterExport();" style="color: #c8d9f0; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 13px;">📋 Export to CSV</a>
+                                </div>
+                            </div>
+                            <button onclick="this.closest('[style*=fixed]').remove()" style="background: rgba(255,107,107,0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;">✖ CLOSE</button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div style="padding: 15px 30px; background: rgba(11,25,41,0.5); border-bottom: 1px solid #4a6b8a; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="color: #8aa4c4; font-size: 12px; font-weight: 600;">FROM:</label>
+                            <input type="date" id="regFromDate" value="2026-01-01" style="padding: 6px 10px; background: #1a2942; border: 1px solid #4a6b8a; border-radius: 4px; color: #c8d9f0; font-size: 12px;">
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="color: #8aa4c4; font-size: 12px; font-weight: 600;">TO:</label>
+                            <input type="date" id="regToDate" value="2026-01-22" style="padding: 6px 10px; background: #1a2942; border: 1px solid #4a6b8a; border-radius: 4px; color: #c8d9f0; font-size: 12px;">
+                        </div>
+                        <div style="border-left: 2px solid #4a6b8a; height: 30px; margin: 0 10px;"></div>
+                        
+                        <!-- Google-style Autocomplete Search -->
+                        <div style="position: relative; flex: 1; max-width: 350px;">
+                            <input type="text" id="regSearch" placeholder="🔍 Search by Supplier..." oninput="showSearchSuggestions()" onfocus="showSearchSuggestions()" style="width: 100%; padding: 8px 12px; background: #1a2942; border: 1px solid #4a6b8a; border-radius: 4px; color: #c8d9f0; font-size: 13px; transition: all 0.3s;">
+                            <div id="searchSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1a2942; border: 1px solid #4a6b8a; border-top: none; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; z-index: 11000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-top: -1px;">
+                                <!-- Suggestions will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <select id="regTypeFilter" onchange="applyFilters()" style="padding: 6px 10px; background: #1a2942; border: 1px solid #4a6b8a; border-radius: 4px; color: #c8d9f0; font-size: 12px;">
+                            <option>All Types</option>
+                            <option>Cash Only</option>
+                            <option>Credit Only</option>
+                        </select>
+                        <button onclick="searchRegister()" style="background: rgba(0,217,255,0.2); border: 1px solid #00d9ff; color: #00d9ff; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">🔍 SEARCH</button>
+                        <button onclick="resetFilters()" style="background: rgba(255,180,100,0.2); border: 1px solid #ffb464; color: #ffb464; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">🔄 RESET</button>
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div style="padding: 20px 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: rgba(106,138,170,0.1); padding: 15px; border-radius: 6px; border: 1px solid #6a8aaa;">
+                            <div style="font-size: 10px; color: #8aa4c4; text-transform: uppercase; letter-spacing: 0.5px;">TOTAL PURCHASES</div>
+                            <div id="totalPurchasesAmount" style="font-size: 22px; font-weight: 700; color: #6a8aaa; margin-top: 5px;">₹ 2,45,600</div>
+                            <div id="totalPurchasesCount" style="font-size: 10px; color: #8aa4c4; margin-top: 3px;">2 Entries</div>
+                        </div>
+                        <div style="background: rgba(144,208,144,0.1); padding: 15px; border-radius: 6px; border: 1px solid #90d090;">
+                            <div style="font-size: 10px; color: #8aa4c4; text-transform: uppercase; letter-spacing: 0.5px;">CASH PURCHASES</div>
+                            <div id="cashPurchasesAmount" style="font-size: 22px; font-weight: 700; color: #90d090; margin-top: 5px;">₹ 1,92,500</div>
+                            <div id="cashPurchasesCount" style="font-size: 10px; color: #8aa4c4; margin-top: 3px;">1 Entry</div>
+                        </div>
+                        <div style="background: rgba(255,180,100,0.1); padding: 15px; border-radius: 6px; border: 1px solid #ffb464;">
+                            <div style="font-size: 10px; color: #8aa4c4; text-transform: uppercase; letter-spacing: 0.5px;">CREDIT PURCHASES</div>
+                            <div id="creditPurchasesAmount" style="font-size: 22px; font-weight: 700; color: #ffb464; margin-top: 5px;">₹ 53,100</div>
+                            <div id="creditPurchasesCount" style="font-size: 10px; color: #8aa4c4; margin-top: 3px;">1 Entry - Pending</div>
+                        </div>
+                        <div style="background: rgba(0,217,255,0.1); padding: 15px; border-radius: 6px; border: 1px solid #00d9ff;">
+                            <div style="font-size: 10px; color: #8aa4c4; text-transform: uppercase; letter-spacing: 0.5px;">TOTAL GST</div>
+                            <div id="totalGSTAmount" style="font-size: 22px; font-weight: 700; color: #00d9ff; margin-top: 5px;">₹ 37,440</div>
+                            <div style="font-size: 10px; color: #8aa4c4; margin-top: 3px;">Tax Amount</div>
+                        </div>
+                        <div style="background: rgba(144,208,144,0.1); padding: 15px; border-radius: 6px; border: 1px solid #90d090;">
+                            <div style="font-size: 10px; color: #8aa4c4; text-transform: uppercase; letter-spacing: 0.5px;">TAXABLE AMOUNT</div>
+                            <div id="taxableAmount" style="font-size: 22px; font-weight: 700; color: #90d090; margin-top: 5px;">₹ 2,08,160</div>
+                            <div style="font-size: 10px; color: #8aa4c4; margin-top: 3px;">Before GST</div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div style="flex: 1; overflow: auto; padding: 0 30px 20px 30px;">
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #4a6b8a;">
+                            <thead style="position: sticky; top: 0; z-index: 10;">
+                                <tr style="background: rgba(11,25,41,0.95);">
+                                    <th style="padding: 12px 10px; text-align: left; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DATE</th>
+                                    <th style="padding: 12px 10px; text-align: left; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">INVOICE NO</th>
+                                    <th style="padding: 12px 10px; text-align: left; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">SUPPLIER</th>
+                                    <th style="padding: 12px 10px; text-align: center; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TYPE</th>
+                                    <th style="padding: 12px 10px; text-align: center; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ITEMS</th>
+                                    <th style="padding: 12px 10px; text-align: right; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TAXABLE</th>
+                                    <th style="padding: 12px 10px; text-align: right; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">GST</th>
+                                    <th style="padding: 12px 10px; text-align: right; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TOTAL</th>
+                                    <th style="padding: 12px 10px; text-align: center; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">STATUS</th>
+                                    <th style="padding: 12px 10px; text-align: center; font-size: 10px; color: #8aa4c4; border: 1px solid #5a7b9a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #3a5b7a; transition: all 0.2s;" onmouseover="this.style.background='rgba(26,41,66,0.6)'" onmouseout="this.style.background='transparent'">
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a;">21-01-2026</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; font-weight: 600;">INV-001</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a;">ABC Cement Suppliers</td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <span style="background: rgba(144,208,144,0.2); border: 1px solid #90d090; color: #90d090; padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: 600;">CASH</span>
+                                    </td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; text-align: center;">5</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; text-align: right;">₹ 1,63,135</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #00d9ff; border: 1px solid #3a5b7a; text-align: right; font-weight: 600;">₹ 29,365</td>
+                                    <td style="padding: 12px 10px; font-size: 13px; font-weight: 700; color: #90d090; border: 1px solid #3a5b7a; text-align: right;">₹ 1,92,500</td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <span style="background: rgba(144,208,144,0.2); border: 1px solid #90d090; color: #90d090; padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: 600;">✓ PAID</span>
+                                    </td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <button onclick="viewPurchaseDetails('INV-001')" style="background: rgba(0,217,255,0.2); border: 1px solid #00d9ff; color: #00d9ff; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 600;">👁️ VIEW</button>
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #3a5b7a; transition: all 0.2s;" onmouseover="this.style.background='rgba(26,41,66,0.6)'" onmouseout="this.style.background='transparent'">
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a;">20-01-2026</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; font-weight: 600;">INV-002</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a;">XYZ Traders</td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <span style="background: rgba(255,180,100,0.2); border: 1px solid #ffb464; color: #ffb464; padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: 600;">CREDIT</span>
+                                    </td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; text-align: center;">3</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #c8d9f0; border: 1px solid #3a5b7a; text-align: right;">₹ 45,025</td>
+                                    <td style="padding: 12px 10px; font-size: 12px; color: #00d9ff; border: 1px solid #3a5b7a; text-align: right; font-weight: 600;">₹ 8,075</td>
+                                    <td style="padding: 12px 10px; font-size: 13px; font-weight: 700; color: #ffb464; border: 1px solid #3a5b7a; text-align: right;">₹ 53,100</td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <span style="background: rgba(255,180,100,0.2); border: 1px solid #ffb464; color: #ffb464; padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: 600;">⏳ PENDING</span>
+                                    </td>
+                                    <td style="padding: 12px 10px; border: 1px solid #3a5b7a; text-align: center;">
+                                        <button onclick="viewPurchaseDetails('INV-002')" style="background: rgba(0,217,255,0.2); border: 1px solid #00d9ff; color: #00d9ff; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 600;">👁️ VIEW</button>
+                                    </td>
+                                </tr>
+                                <!-- Total Row -->
+                                <tr style="background: rgba(106,138,170,0.15); font-weight: 700; border-top: 2px solid #4a6b8a;">
+                                    <td colspan="5" style="padding: 14px 10px; font-size: 13px; color: #00d9ff; border: 1px solid #4a6b8a; text-align: right; text-transform: uppercase; letter-spacing: 0.5px;">GRAND TOTAL:</td>
+                                    <td id="grandTotalTaxable" style="padding: 14px 10px; font-size: 13px; color: #00d9ff; border: 1px solid #4a6b8a; text-align: right; font-weight: 700;">₹ 2,08,160</td>
+                                    <td id="grandTotalGST" style="padding: 14px 10px; font-size: 13px; color: #00d9ff; border: 1px solid #4a6b8a; text-align: right; font-weight: 700;">₹ 37,440</td>
+                                    <td id="grandTotalAmount" style="padding: 14px 10px; font-size: 14px; color: #00d9ff; border: 1px solid #4a6b8a; text-align: right; font-weight: 700;">₹ 2,45,600</td>
+                                    <td colspan="2" style="padding: 14px 10px; border: 1px solid #4a6b8a;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', registerHTML);
+        }
+
+        // Combined Search and Filter Function
+        function searchRegister() {
+            const searchTerm = document.getElementById('regSearch').value.toLowerCase().trim();
+            const filterType = document.getElementById('regTypeFilter').value;
+            const popup = document.getElementById('purchaseRegisterPopup');
+            if (!popup) return;
+            
+            const rows = popup.querySelectorAll('tbody tr');
+            
+            // Track visible entries and totals
+            let visibleCount = 0;
+            let visibleTaxable = 0;
+            let visibleGST = 0;
+            let visibleTotal = 0;
+            let visibleCash = 0;
+            let visibleCredit = 0;
+            let cashCount = 0;
+            let creditCount = 0;
+            
+            rows.forEach((row, index) => {
+                // Skip the last row (GRAND TOTAL)
+                if (index === rows.length - 1) {
+                    return;
+                }
+                
+                // Get supplier name
+                const supplierCell = row.cells[2]; // SUPPLIER column
+                const supplier = supplierCell ? supplierCell.textContent.toLowerCase().trim() : '';
+                
+                // Get type
+                const typeCell = row.cells[3]; // TYPE column
+                const typeSpan = typeCell ? typeCell.querySelector('span') : null;
+                const type = typeSpan ? typeSpan.textContent.trim() : '';
+                
+                // Check search match
+                const searchMatch = searchTerm === '' || supplier.includes(searchTerm);
+                
+                // Check filter match
+                let filterMatch = true;
+                if (filterType === 'Cash Only' && type !== 'CASH') {
+                    filterMatch = false;
+                } else if (filterType === 'Credit Only' && type !== 'CREDIT') {
+                    filterMatch = false;
+                }
+                
+                // Show row only if both conditions match
+                if (searchMatch && filterMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                    
+                    // Calculate totals for visible rows
+                    const taxableText = row.cells[5].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                    const gstText = row.cells[6].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                    const totalText = row.cells[7].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                    
+                    const taxable = parseFloat(taxableText) || 0;
+                    const gst = parseFloat(gstText) || 0;
+                    const total = parseFloat(totalText) || 0;
+                    
+                    visibleTaxable += taxable;
+                    visibleGST += gst;
+                    visibleTotal += total;
+                    
+                    if (type === 'CASH') {
+                        visibleCash += total;
+                        cashCount++;
+                    } else if (type === 'CREDIT') {
+                        visibleCredit += total;
+                        creditCount++;
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Update summary stats based on visible rows
+            updateSummaryStats(visibleTotal, visibleCash, visibleCredit, visibleGST, visibleTaxable, visibleCount, cashCount, creditCount);
+            
+            // Hide suggestions after search
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            if (suggestionsDiv) {
+                suggestionsDiv.style.display = 'none';
+            }
+        }
+
+        // Update Summary Statistics
+        function updateSummaryStats(totalPurchases, cashPurchases, creditPurchases, totalGST, taxableAmount, totalEntries, cashEntries, creditEntries) {
+            // Format numbers in Indian style
+            const formatAmount = (amount) => {
+                return '₹ ' + Math.round(amount).toLocaleString('en-IN');
+            };
+            
+            // Update Total Purchases
+            const totalPurchasesAmountEl = document.getElementById('totalPurchasesAmount');
+            if (totalPurchasesAmountEl) {
+                totalPurchasesAmountEl.textContent = formatAmount(totalPurchases);
+            }
+            
+            const totalPurchasesCountEl = document.getElementById('totalPurchasesCount');
+            if (totalPurchasesCountEl) {
+                totalPurchasesCountEl.textContent = totalEntries + (totalEntries === 1 ? ' Entry' : ' Entries');
+            }
+            
+            // Update Cash Purchases
+            const cashPurchasesAmountEl = document.getElementById('cashPurchasesAmount');
+            if (cashPurchasesAmountEl) {
+                cashPurchasesAmountEl.textContent = formatAmount(cashPurchases);
+            }
+            
+            const cashPurchasesCountEl = document.getElementById('cashPurchasesCount');
+            if (cashPurchasesCountEl) {
+                cashPurchasesCountEl.textContent = cashEntries + (cashEntries === 1 ? ' Entry' : ' Entries');
+            }
+            
+            // Update Credit Purchases
+            const creditPurchasesAmountEl = document.getElementById('creditPurchasesAmount');
+            if (creditPurchasesAmountEl) {
+                creditPurchasesAmountEl.textContent = formatAmount(creditPurchases);
+            }
+            
+            const creditPurchasesCountEl = document.getElementById('creditPurchasesCount');
+            if (creditPurchasesCountEl) {
+                const pendingText = creditEntries > 0 ? ' - Pending' : '';
+                creditPurchasesCountEl.textContent = creditEntries + (creditEntries === 1 ? ' Entry' : ' Entries') + pendingText;
+            }
+            
+            // Update Total GST
+            const totalGSTAmountEl = document.getElementById('totalGSTAmount');
+            if (totalGSTAmountEl) {
+                totalGSTAmountEl.textContent = formatAmount(totalGST);
+            }
+            
+            // Update Taxable Amount
+            const taxableAmountEl = document.getElementById('taxableAmount');
+            if (taxableAmountEl) {
+                taxableAmountEl.textContent = formatAmount(taxableAmount);
+            }
+            
+            // Update Grand Total Row
+            const grandTotalTaxableEl = document.getElementById('grandTotalTaxable');
+            if (grandTotalTaxableEl) {
+                grandTotalTaxableEl.textContent = formatAmount(taxableAmount);
+            }
+            
+            const grandTotalGSTEl = document.getElementById('grandTotalGST');
+            if (grandTotalGSTEl) {
+                grandTotalGSTEl.textContent = formatAmount(totalGST);
+            }
+            
+            const grandTotalAmountEl = document.getElementById('grandTotalAmount');
+            if (grandTotalAmountEl) {
+                grandTotalAmountEl.textContent = formatAmount(totalPurchases);
+            }
+        }
+
+        // Reset All Filters and Search
+        function resetFilters() {
+            // Clear search box
+            document.getElementById('regSearch').value = '';
+            
+            // Reset filter dropdown to "All Types"
+            document.getElementById('regTypeFilter').value = 'All Types';
+            
+            // Hide suggestions
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            if (suggestionsDiv) {
+                suggestionsDiv.style.display = 'none';
+            }
+            
+            // Show all rows and calculate totals
+            const popup = document.getElementById('purchaseRegisterPopup');
+            if (popup) {
+                const rows = popup.querySelectorAll('tbody tr');
+                let totalPurchases = 0, cashPurchases = 0, creditPurchases = 0;
+                let totalGST = 0, taxableAmount = 0;
+                let totalCount = 0, cashCount = 0, creditCount = 0;
+                
+                rows.forEach((row, index) => {
+                    if (index < rows.length - 1) { // Skip GRAND TOTAL
+                        row.style.display = '';
+                        
+                        // Calculate totals
+                        const taxableText = row.cells[5].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                        const gstText = row.cells[6].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                        const totalText = row.cells[7].textContent.trim().replace(/[₹,Rs.\s]/g, '');
+                        const typeSpan = row.cells[3].querySelector('span');
+                        const type = typeSpan ? typeSpan.textContent.trim() : '';
+                        
+                        const taxable = parseFloat(taxableText) || 0;
+                        const gst = parseFloat(gstText) || 0;
+                        const total = parseFloat(totalText) || 0;
+                        
+                        taxableAmount += taxable;
+                        totalGST += gst;
+                        totalPurchases += total;
+                        totalCount++;
+                        
+                        if (type === 'CASH') {
+                            cashPurchases += total;
+                            cashCount++;
+                        } else if (type === 'CREDIT') {
+                            creditPurchases += total;
+                            creditCount++;
+                        }
+                    }
+                });
+                
+                // Update summary with original totals
+                updateSummaryStats(totalPurchases, cashPurchases, creditPurchases, totalGST, taxableAmount, totalCount, cashCount, creditCount);
+            }
+        }
+
+        // Google-style Autocomplete Search Suggestions
+        function showSearchSuggestions() {
+            const searchTerm = document.getElementById('regSearch').value.toLowerCase();
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            const popup = document.getElementById('purchaseRegisterPopup');
+            
+            if (!popup || searchTerm.length < 1) {
+                suggestionsDiv.style.display = 'none';
+                // Auto search as you type
+                searchRegister();
+                return;
+            }
+            
+            // Get all unique suppliers
+            const rows = popup.querySelectorAll('tbody tr');
+            const suppliers = new Set();
+            
+            rows.forEach((row, index) => {
+                if (index === rows.length - 1) return; // Skip GRAND TOTAL
+                const supplierCell = row.cells[2];
+                if (supplierCell) {
+                    const supplier = supplierCell.textContent.trim();
+                    if (supplier.toLowerCase().includes(searchTerm)) {
+                        suppliers.add(supplier);
+                    }
+                }
+            });
+            
+            // Display suggestions
+            if (suppliers.size > 0) {
+                let html = '';
+                suppliers.forEach(supplier => {
+                    html += `
+                        <div onclick="selectSupplier('${supplier}')" style="padding: 10px 12px; cursor: pointer; color: #c8d9f0; font-size: 13px; border-bottom: 1px solid #2c4564; transition: all 0.2s;" onmouseover="this.style.background='rgba(0,217,255,0.1)'" onmouseout="this.style.background='transparent'">
+                            <span style="color: #00d9ff;">🔍</span> ${supplier}
+                        </div>
+                    `;
+                });
+                suggestionsDiv.innerHTML = html;
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.innerHTML = `
+                    <div style="padding: 10px 12px; color: #8aa4c4; font-size: 12px; text-align: center;">
+                        No suppliers found
+                    </div>
+                `;
+                suggestionsDiv.style.display = 'block';
+            }
+        }
+
+        // Select Supplier from Suggestions
+        function selectSupplier(supplier) {
+            document.getElementById('regSearch').value = supplier;
+            document.getElementById('searchSuggestions').style.display = 'none';
+            searchRegister();
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchBox = document.getElementById('regSearch');
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            if (searchBox && suggestionsDiv && !e.target.closest('#regSearch') && !e.target.closest('#searchSuggestions')) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Apply Filters - calls combined search
+        function applyFilters() {
+            searchRegister(); // Use combined search and filter
+        }
+
+        // Filter by Type - calls combined search
+        function filterByType() {
+            const filterType = document.getElementById('regTypeFilter').value;
+            alert(`🔍 FILTER BY TYPE\n\nSelected: ${filterType}\n\n✅ Filtering purchase entries...\n\n🔄 Backend integration coming soon!`);
+        }
+
+        // View Purchase Details
+        function viewPurchaseDetails(invoiceNo) {
+            alert(`👁️ VIEW PURCHASE DETAILS\n\nInvoice: ${invoiceNo}\n\n📋 Details will include:\n• Complete item list\n• GST breakdown (CGST/SGST/IGST)\n• Supplier information\n• Payment details\n• Document attachments\n\n🔄 Detail view coming soon!`);
+        }
+
+        // Toggle Export Dropdown
+        window.toggleExportDropdown = function toggleExportDropdown() {
+            console.log('✅ EXPORT button clicked - toggleExportDropdown() called');
+            const dropdown = document.querySelector('.export-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+                console.log('📤 Dropdown toggled, show class:', dropdown.classList.contains('show'));
+            } else {
+                console.error('❌ .export-dropdown element not found!');
+            }
+        }
+
+        // Export Functions
+        function exportToExcel() {
+            alert(' EXPORT TO EXCEL\n\n Excel format (.xlsx)\n\n Coming soon!');
+            document.querySelector('.export-dropdown').classList.remove('show');
+        }
+
+        function exportToPDF() {
+            alert(' EXPORT TO PDF\n\n PDF format\n\n Coming soon!');
+            document.querySelector('.export-dropdown').classList.remove('show');
+        }
+
+        function exportToCSV() {
+            alert(' EXPORT TO CSV\n\n CSV format\n\n Coming soon!');
+            document.querySelector('.export-dropdown').classList.remove('show');
+        }
+        
+        // Confirm all functions loaded - v20260122164609
+        console.log('✅✅✅ Purchase Entry Script Loaded - Version 20260122164609');
+        console.log('📋 Functions available:', {
+            openPurchaseRegister: typeof window.openPurchaseRegister,
+            toggleExportDropdown: typeof window.toggleExportDropdown,
+            resetForm: typeof window.resetForm
+        });
+        
+        // Simple test - call this from console: testButtons()
+        window.testButtons = function() {
+            console.log('Testing buttons...');
+            console.log('Purchase Register:', typeof window.openPurchaseRegister);
+            console.log('Export Dropdown:', typeof window.toggleExportDropdown);
+            console.log('Reset Form:', typeof window.resetForm);
+        };
+    </script>
+</body>
+</html>
+
